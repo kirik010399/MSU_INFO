@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "OneStack.h"
+#include "TwoStacks.h"
 #include <string>
 #include <fstream>
 #include <cstdlib>
