@@ -41,6 +41,7 @@ int TwoStacks::isNull(int number)
         return (this->curIndex2 == this->size);
     }
     }
+    return -1; 
 }
 
 void TwoStacks::addElement (string str, int number)

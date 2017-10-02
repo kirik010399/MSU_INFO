@@ -29,6 +29,8 @@
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TwoStacks.cpp; sourceTree = "<group>"; };
 		ED1C17851F82CC8C00EEC799 /* TwoStacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoStacks.h; sourceTree = "<group>"; };
+		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
+		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		ED635EF01F82CADD0062285E /* OneStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OneStack.cpp; sourceTree = "<group>"; };
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,6 +65,8 @@
 		ED0C3B971F82C3EA00D8B1BE /* MSU_INFO */ = {
 			isa = PBXGroup;
 			children = (
+				ED3B84001F82D29000AB9A64 /* input.txt */,
+				ED3B83FF1F82D29000AB9A64 /* output.txt */,
 				ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */,
 				ED1C17851F82CC8C00EEC799 /* TwoStacks.h */,
 				ED635EF01F82CADD0062285E /* OneStack.cpp */,
