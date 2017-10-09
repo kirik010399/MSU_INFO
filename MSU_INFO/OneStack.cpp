@@ -1,4 +1,6 @@
 #include "OneStack.h"
+#include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -11,6 +13,7 @@ OneStack::OneStack(int maxSize)
 {
     array = new int[maxSize];
     curIndex = -1;
+    arraySize = maxSize;
 }
 
 OneStack::~OneStack()
@@ -32,22 +35,38 @@ int OneStack::isNull()
 void OneStack::addElement (int elem)
 {
     this->curIndex++;
-    this->array[this->curIndex] = elem;
+    if (curIndex < arraySize)
+        this->array[this->curIndex] = elem;
 }
 
 int OneStack::getElement ()
 {
-    int temp = this->array[this->curIndex];
-    this->curIndex--;
-    return temp;
+    if (this->curIndex == -1 || curIndex>=arraySize)
+    {
+        throw (false);
+    }
+    else
+    {
+        int temp = this->array[this->curIndex];
+        curIndex--;
+        return temp;
+    }
 }
 
 int OneStack::getVertice ()
 {
-    return this->array[this->curIndex];
+    if (this->curIndex == -1 || curIndex>=arraySize)
+    {
+        throw (false);
+    }
+    else
+    {
+        return this->array[this->curIndex];
+    }
 }
 
 void OneStack::deleteVertice ()
 {
     this->curIndex--;
 }
+

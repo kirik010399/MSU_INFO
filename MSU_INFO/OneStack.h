@@ -1,5 +1,7 @@
 #ifndef ONESTACK_H
 #define ONESTACK_H
+
+#include <algorithm>
 using namespace std;
 
 class OneStack
@@ -16,10 +18,12 @@ public:
     int getElement ();
     int getVertice ();
     void deleteVertice ();
-
+    int arraySize; 
+    
 protected:
-
+    
 private:
 };
 
 #endif // ONESTACK_H
+
