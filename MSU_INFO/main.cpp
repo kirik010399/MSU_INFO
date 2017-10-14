@@ -3,7 +3,9 @@
 //#include "OneStack.h"
 //#include "TwoStacks.h"
 //#include "ThreeStacks.hpp"
-#include "DEQ.hpp"
+//#include "DEQ.hpp"
+#include "Vector.hpp"
+
 
 #include <string>
 #include <fstream>
@@ -324,7 +326,108 @@ using namespace std;
 //    return 0;
 //}
 
-int ex4 ()
+//int ex4 ()
+//{
+//    FILE* fin;
+//    FILE* fout;
+//    fin = fopen("input.txt", "r");
+//    fout = fopen("output.txt","w");
+//    int comand = 0;
+//    if (fscanf(fin,"%d",&comand) == EOF)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//
+//    int size;
+//    fscanf(fin,"%d",&size);
+//
+//    if (size<0)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//    DEQ stack(size);
+//
+//    int number;
+//
+//    while(fscanf(fin,"%d",&comand)!=EOF)
+//    {
+//        switch (comand)
+//        {
+//            case 2:
+//            {
+//                stack.stackNull();
+//                break;
+//            }
+//            case 3:
+//            {
+//                fprintf (fout, "%d\n", stack.isNull());
+//                break;
+//            }
+//            case 4:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    int elem;
+//                    fscanf(fin,"%d",&elem);
+//
+//                    stack.addElement(elem, number);
+//                }
+//                catch (bool a)
+//                {
+//                    fclose (fin);
+//                    fclose (fout);
+//                    return 0;
+//                }
+//                break;
+//            }
+//            case 5:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    fprintf (fout, "%d\n", stack.getElement(number));
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 6:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    fprintf (fout, "%d\n", stack.getVertice(number));
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 7:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    stack.deleteVertice(number);
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 8:
+//            {
+//                fclose (fin);
+//                fclose (fout);
+//                return 0;
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
+
+int ex5 ()
 {
     FILE* fin;
     FILE* fout;
@@ -347,9 +450,7 @@ int ex4 ()
         fclose (fout);
         return 0;
     }
-    DEQ stack(size);
-
-    int number;
+    Vector <int> vector (size);
 
     while(fscanf(fin,"%d",&comand)!=EOF)
     {
@@ -357,38 +458,26 @@ int ex4 ()
         {
             case 2:
             {
-                stack.stackNull();
+                vector.vectorNull();
                 break;
             }
             case 3:
             {
-                fprintf (fout, "%d\n", stack.isNull());
+                fprintf (fout, "%d\n", vector.isNull());
                 break;
             }
             case 4:
             {
-                try
-                {
-                    fscanf(fin,"%d",&number);
-                    int elem;
-                    fscanf(fin,"%d",&elem);
-
-                    stack.addElement(elem, number);
-                }
-                catch (bool a)
-                {
-                    fclose (fin);
-                    fclose (fout);
-                    return 0;
-                }
+                fprintf (fout, "%d\n", vector.size());
                 break;
             }
             case 5:
             {
                 try
                 {
-                    fscanf(fin,"%d",&number);
-                    fprintf (fout, "%d\n", stack.getElement(number));
+                    int elem;
+                    fscanf(fin,"%d",&elem);
+                    vector.push(elem);
                 }
                 catch (bool a) {}
                 break;
@@ -397,18 +486,19 @@ int ex4 ()
             {
                 try
                 {
-                    fscanf(fin,"%d",&number);
-                    fprintf (fout, "%d\n", stack.getVertice(number));
+                    vector.pop();
                 }
                 catch (bool a) {}
+
                 break;
             }
             case 7:
             {
                 try
                 {
-                    fscanf(fin,"%d",&number);
-                    stack.deleteVertice(number);
+                    int index;
+                    fscanf(fin,"%d",&index);
+                    fprintf (fout, "%d\n", vector.getElement(index));
                 }
                 catch (bool a) {}
                 break;
@@ -417,7 +507,7 @@ int ex4 ()
             {
                 fclose (fin);
                 fclose (fout);
-                return 0;
+                break;
             }
         }
     }
@@ -426,9 +516,10 @@ int ex4 ()
 }
 
 
+
 int main()
 {
-    return ex4();
+    return ex5();
     return 0;
 }
 
