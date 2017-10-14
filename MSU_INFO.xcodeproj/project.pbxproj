@@ -11,6 +11,8 @@
 		ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */; };
 		ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED635EF01F82CADD0062285E /* OneStack.cpp */; };
 		EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */; };
+		EDA0BF121F923E17007DE4F8 /* DEQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF101F923E17007DE4F8 /* DEQ.cpp */; };
+		EDA0BF151F9242A4007DE4F8 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF131F9242A4007DE4F8 /* Vector.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +38,10 @@
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
 		EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeStacks.cpp; sourceTree = "<group>"; };
 		EDA0BF0E1F921451007DE4F8 /* ThreeStacks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreeStacks.hpp; sourceTree = "<group>"; };
+		EDA0BF101F923E17007DE4F8 /* DEQ.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DEQ.cpp; sourceTree = "<group>"; };
+		EDA0BF111F923E17007DE4F8 /* DEQ.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DEQ.hpp; sourceTree = "<group>"; };
+		EDA0BF131F9242A4007DE4F8 /* Vector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
+		EDA0BF141F9242A4007DE4F8 /* Vector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Vector.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +76,8 @@
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
+				EDA0BF131F9242A4007DE4F8 /* Vector.cpp */,
+				EDA0BF141F9242A4007DE4F8 /* Vector.hpp */,
 				ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */,
 				EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */,
 				EDA0BF0E1F921451007DE4F8 /* ThreeStacks.hpp */,
@@ -77,6 +85,8 @@
 				ED635EF01F82CADD0062285E /* OneStack.cpp */,
 				ED635EF11F82CADD0062285E /* OneStack.h */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
+				EDA0BF101F923E17007DE4F8 /* DEQ.cpp */,
+				EDA0BF111F923E17007DE4F8 /* DEQ.hpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -140,8 +150,10 @@
 			files = (
 				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
 				EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */,
+				EDA0BF151F9242A4007DE4F8 /* Vector.cpp in Sources */,
 				ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */,
 				ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */,
+				EDA0BF121F923E17007DE4F8 /* DEQ.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

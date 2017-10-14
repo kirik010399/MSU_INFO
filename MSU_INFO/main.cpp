@@ -2,7 +2,9 @@
 #include <stdio.h>
 //#include "OneStack.h"
 //#include "TwoStacks.h"
-#include "ThreeStacks.hpp"
+//#include "ThreeStacks.hpp"
+#include "DEQ.hpp"
+
 #include <string>
 #include <fstream>
 #include <algorithm>
@@ -219,7 +221,110 @@ using namespace std;
 //    return 0;
 //}
 
-int ex3 ()
+//int ex3 ()
+//{
+//    FILE* fin;
+//    FILE* fout;
+//    fin = fopen("input.txt", "r");
+//    fout = fopen("output.txt","w");
+//    int comand = 0;
+//    if (fscanf(fin,"%d",&comand) == EOF)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//
+//        return 0;
+//    }
+//
+//    int size;
+//    fscanf(fin,"%d",&size);
+//
+//    if (size<0)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//    ThreeStacks stack(size);
+//
+//    int number;
+//
+//    while(fscanf(fin,"%d",&comand)!=EOF)
+//    {
+//        switch (comand)
+//        {
+//            case 2:
+//            {
+//                stack.stackNull();
+//                break;
+//            }
+//            case 3:
+//            {
+//                fscanf(fin,"%d",&number);
+//                fprintf (fout, "%d\n", stack.isNull(number));
+//                break;
+//            }
+//            case 4:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    int elem;
+//                    fscanf(fin,"%d",&elem);
+//
+//                    stack.addElement(elem, number);
+//                }
+//                catch (bool a)
+//                {
+//                    fclose (fin);
+//                    fclose (fout);
+//                    return 0;
+//                }
+//                break;
+//            }
+//            case 5:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    fprintf (fout, "%d\n", stack.getElement(number));
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 6:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    fprintf (fout, "%d\n", stack.getVertice(number));
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 7:
+//            {
+//                try
+//                {
+//                    fscanf(fin,"%d",&number);
+//                    stack.deleteVertice(number);
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 8:
+//            {
+//                fclose (fin);
+//                fclose (fout);
+//                return 0;
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
+
+int ex4 ()
 {
     FILE* fin;
     FILE* fout;
@@ -230,23 +335,22 @@ int ex3 ()
     {
         fclose (fin);
         fclose (fout);
-        
         return 0;
     }
-    
+
     int size;
     fscanf(fin,"%d",&size);
-    
+
     if (size<0)
     {
         fclose (fin);
         fclose (fout);
         return 0;
     }
-    ThreeStacks stack(size);
-    
+    DEQ stack(size);
+
     int number;
-    
+
     while(fscanf(fin,"%d",&comand)!=EOF)
     {
         switch (comand)
@@ -258,8 +362,7 @@ int ex3 ()
             }
             case 3:
             {
-                fscanf(fin,"%d",&number);
-                fprintf (fout, "%d\n", stack.isNull(number));
+                fprintf (fout, "%d\n", stack.isNull());
                 break;
             }
             case 4:
@@ -269,7 +372,7 @@ int ex3 ()
                     fscanf(fin,"%d",&number);
                     int elem;
                     fscanf(fin,"%d",&elem);
-                    
+
                     stack.addElement(elem, number);
                 }
                 catch (bool a)
@@ -318,14 +421,14 @@ int ex3 ()
             }
         }
     }
-    
+
     return 0;
 }
 
 
 int main()
 {
-    return ex3();
+    return ex4();
     return 0;
 }
 
