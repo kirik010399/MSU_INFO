@@ -285,7 +285,7 @@ int ex3 ()
                 try
                 {
                     fscanf(fin,"%d",&number);
-                    fprintf (fout, "%d/n", stack.getElement(number));
+                    fprintf (fout, "%d\n", stack.getElement(number));
                 }
                 catch (bool a) {}
                 break;
@@ -295,16 +295,19 @@ int ex3 ()
                 try
                 {
                     fscanf(fin,"%d",&number);
-                    fprintf (fout, "%d/n", stack.getVertice(number));
+                    fprintf (fout, "%d\n", stack.getVertice(number));
                 }
                 catch (bool a) {}
                 break;
             }
             case 7:
             {
-                fscanf(fin,"%d",&number);
-                stack.deleteVertice(number);
-                
+                try
+                {
+                    fscanf(fin,"%d",&number);
+                    stack.deleteVertice(number);
+                }
+                catch (bool a) {}
                 break;
             }
             case 8:

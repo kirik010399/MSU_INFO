@@ -23,10 +23,12 @@ ThreeStacks::ThreeStacks(int maxSize)
     
     size3 = (int) maxSize/3;
     size = maxSize;
-
+    
+    count3 = 0;
+    
     curIndex1 = -1;
-    curIndex2 = maxSize;
-    curIndex3 = --size3;
+    curIndex2 = size;
+    curIndex3 = size3-1;
 }
 
 ThreeStacks::~ThreeStacks()
@@ -68,17 +70,79 @@ void ThreeStacks::addElement (int elem, int number)
         case 1:
         {
             curIndex1++;
+//            cout<<curIndex1<<endl;
+            if (curIndex1 >= size)
+                throw (false);
+            
+//            for (int i = 0; i<size; ++i)
+//            {
+//                cout<<array[i]<<' ';
+//            }
+//            cout<<endl;
+            
+            if (curIndex1==curIndex3)
+            {
+                int temp = curIndex3;
+//                cout<<count3<<endl;
+                for (int i = count3; i >=1; --i)
+                {
+                    cout<<curIndex3+i<<' '<<curIndex3+i-1<<endl;
+                    array[curIndex3+i] = array[curIndex3+i-1];
+                    temp++;
+                }
+                curIndex3 = temp;
+            }
+            
             array[curIndex1] = elem;
+            
+            break;
         }
         case 2:
         {
-            curIndex2++;
+            curIndex2--;
+//            cout<<curIndex2<<endl;
+            if (curIndex2 < 0)
+                throw (false);
+            
+//            for (int i = 0; i<size; ++i)
+//            {
+//                cout<<array[i]<<' ';
+//            }
+//            cout<<endl;
+            
+            if (curIndex2==curIndex3+count3)
+            {
+                int temp = curIndex3;
+                for (int i = 0; i <= count3; ++i)
+                {
+                    array[curIndex3+i-1] = array[curIndex3+i];
+                    temp--;
+                }
+                curIndex3 = temp;
+            }
+            
             array[curIndex2] = elem;
+            cout<<curIndex3<<endl;
+
+            break;
         }
         case 3:
         {
-            curIndex3--;
+            cout<<curIndex3<<endl;
+
+            curIndex3++;
+            if (curIndex1 >= size)
+                throw (false);
+            
+//            for (int i = 0; i<size; ++i)
+//            {
+//                cout<<array[i]<<' ';
+//            }
+//            cout<<endl;
+            
             array[curIndex3] = elem;
+            count3++;
+            break;
         }
     }
 }
@@ -89,21 +153,52 @@ int ThreeStacks::getElement (int number)
     {
         case 1:
         {
-            int temp = array[curIndex1];
-            curIndex1--;
-            return temp;
+//            cout<<curIndex1<<endl;
+
+            if (curIndex1 == -1 || curIndex1>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                int temp = array[curIndex1];
+                curIndex1--;
+                return temp;
+            }
+
+            break;
         }
         case 2:
         {
-            int temp = array[curIndex2];
-            curIndex2--;
-            return temp;
+//            cout<<curIndex2<<endl;
+
+            if (curIndex2 == size || curIndex2<=-1)
+            {
+                throw (false);
+            }
+            else
+            {
+                int temp = array[curIndex2];
+                curIndex2++;
+                return temp;
+            }
+        
+            break;
         }
         case 3:
         {
-            int temp = array[curIndex3];
-            curIndex3++;
-            return temp;
+            if (curIndex3 == size3-1 || curIndex3>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                cout<<"!!!"<<endl;
+                int temp = array[curIndex3];
+                curIndex3--;
+                return temp;
+            }
+            break;
         }
     }
     return -1;
@@ -116,15 +211,45 @@ int ThreeStacks::getVertice (int number)
     {
         case 1:
         {
-            return array[curIndex1];
+//            cout<<curIndex1<<endl;
+
+            if (curIndex1 == -1 || curIndex1>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                return array[curIndex1];
+            }
+            break;
         }
         case 2:
         {
-            return array[curIndex2];
+//            cout<<curIndex2<<endl;
+
+            if (curIndex2 == size || curIndex2<=-1)
+            {
+                throw (false);
+            }
+            else
+            {
+                return array[curIndex2];
+            }
+            break;
         }
         case 3:
         {
-            return array[curIndex3];
+//            cout<<curIndex3<<endl;
+
+            if (curIndex3 == size3-1 || curIndex3>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                return array[curIndex3];
+            }
+            break;
         }
     }
     return -1;
@@ -136,15 +261,45 @@ void ThreeStacks::deleteVertice (int number)
     {
         case 1:
         {
-            curIndex1--;
+//            cout<<curIndex1<<endl;
+
+            if (curIndex1 == -1 || curIndex1>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                curIndex1--;
+            }
+            break;
         }
         case 2:
         {
-            curIndex2--;
+//            cout<<curIndex2<<endl;
+
+            if (curIndex2 == size || curIndex2<=-1)
+            {
+                throw (false);
+            }
+            else
+            {
+                curIndex2++;
+            }
+            break;
         }
         case 3:
         {
-            curIndex3++;
+//            cout<<curIndex3<<endl;
+
+            if (curIndex3 == size3-1 || curIndex3>=size)
+            {
+                throw (false);
+            }
+            else
+            {
+                curIndex3--;
+            }
+            break; 
         }
     }
 }

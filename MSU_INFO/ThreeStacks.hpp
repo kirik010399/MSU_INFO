@@ -22,6 +22,7 @@ public:
     int curIndex1;
     int curIndex2;
     int curIndex3;
+    int count3; 
     int size3; 
     int size;
     int *array;
