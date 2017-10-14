@@ -5,7 +5,8 @@
 //#include "ThreeStacks.hpp"
 //#include "DEQ.hpp"
 //#include "Vector.hpp"
-#include "Sequence.hpp"
+//#include "Sequence.hpp"
+#include "ListOne.hpp"
 
 #include <string>
 #include <fstream>
@@ -515,113 +516,247 @@ using namespace std;
 //    return 0;
 //}
 
-int ex78 ()
+//int ex78 ()
+//{
+//    FILE* fin;
+//    FILE* fout;
+//    fin = fopen("input.txt", "r");
+//    fout = fopen("output.txt","w");
+//    int comand = 0;
+//    if (fscanf(fin,"%d",&comand) == EOF)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//
+//    int size;
+//    fscanf(fin,"%d",&size);
+//
+//    if (size<0)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//    Sequence<char> seq (size);
+//
+//    while(fscanf(fin,"%d",&comand)!=EOF)
+//    {
+//        switch (comand)
+//        {
+//            case 2:
+//            {
+//                seq.sequenceNull();
+//                break;
+//            }
+//            case 3:
+//            {
+//                fprintf (fout, "%d\n", seq.isNull());
+//                break;
+//            }
+//            case 4:
+//            {
+//                try
+//                {
+//                    char t;
+//                    fscanf(fin,"%c",&t);
+//
+//                    char elem;
+//                    fscanf(fin,"%c",&elem);
+//                    seq.push(elem);
+//                }
+//                catch (bool a) {
+//                    fclose (fin);
+//                    fclose (fout);
+//                    return 0;
+//                }
+//                break;
+//            }
+//            case 5:
+//            {
+//                seq.begin();
+//                break;
+//            }
+//            case 6:
+//            {
+//                fprintf (fout, "%d\n", seq.isUnread());
+//                break;
+//            }
+//            case 7:
+//            {
+//                try
+//                {
+//                    fprintf (fout, "%c\n", seq.read());
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 8:
+//            {
+//                try
+//                {
+//                    fprintf (fout, "%c\n", seq.element());
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 9:
+//            {
+//                seq.skip();
+//                break;
+//            }
+//            case 10:
+//            {
+//                fclose (fin);
+//                fclose (fout);
+//                break;
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
+
+
+int ex910 ()
 {
-    FILE* fin;
-    FILE* fout;
-    fin = fopen("input.txt", "r");
-    fout = fopen("output.txt","w");
+    ifstream fin ("input.txt");
+    ofstream fout ("output.txt");
+
     int comand = 0;
-    if (fscanf(fin,"%d",&comand) == EOF)
+    
+    fin>>comand;
+    if (fin.eof())
     {
-        fclose (fin);
-        fclose (fout);
+        fin.close();
+        fout.close();
         return 0;
     }
     
     int size;
-    fscanf(fin,"%d",&size);
-    
-    if (size<0)
+    fin>>size;
+    cout<<comand<<' '<<size<<endl; 
+    if (fin.eof())
     {
-        fclose (fin);
-        fclose (fout);
+        fin.close();
+        fout.close();
         return 0;
     }
-    Sequence<char> seq (size);
-    
-    while(fscanf(fin,"%d",&comand)!=EOF)
-    {
-        switch (comand)
-        {
-            case 2:
-            {
-                seq.sequenceNull();
-                break;
-            }
-            case 3:
-            {
-                fprintf (fout, "%d\n", seq.isNull());
-                break;
-            }
-            case 4:
-            {
-                try
-                {
-                    char t;
-                    fscanf(fin,"%c",&t);
 
-                    char elem;
-                    fscanf(fin,"%c",&elem);
-                    seq.push(elem);
-                }
-                catch (bool a) {
-                    fclose (fin);
-                    fclose (fout);
-                    return 0; 
-                }
-                break;
-            }
-            case 5:
+    if (size<0)
+    {
+        fin.close();
+        fout.close();
+        return 0;
+    }
+    ListOne <string> list (size);
+
+    while(!fin.eof())
+    {
+        if (fin>>comand)
+        {
+            cout<<comand<<endl;
+            switch (comand)
             {
-                seq.begin();
-                break;
-            }
-            case 6:
-            {
-                fprintf (fout, "%d\n", seq.isUnread());
-                break;
-            }
-            case 7:
-            {
-                try
+                case 2:
                 {
-                    fprintf (fout, "%c\n", seq.read());
+                    list.listNull();
+                    break;
                 }
-                catch (bool a) {}
-                break;
-            }
-            case 8:
-            {
-                try
+                case 3:
                 {
-                    fprintf (fout, "%c\n", seq.element());
+                    fout<<list.isNull()<<endl;
+                    break;
                 }
-                catch (bool a) {}
-                break;
-            }
-            case 9:
-            {
-                seq.skip();
-                break;
-            }
-            case 10:
-            {
-                fclose (fin);
-                fclose (fout);
-                break;
+                case 4:
+                {
+                    list.begin();
+                    break;
+                }
+                case 5:
+                {
+                    fout<<list.isEnd()<<endl;
+                    break;
+                }
+                case 6:
+                {
+                    list.moveIndex();
+                    break;
+                }
+                case 7:
+                {
+                    try
+                    {
+                        string elem;
+                        fin>>elem;
+                        list.push(elem);
+                    }
+                    catch (bool a) {
+                        fin.close();
+                        fout.close();
+                        return 0;
+                    }
+                    break;
+                }
+                case 8:
+                {
+                    try
+                    {
+                        fout<<list.getElement()<<endl;
+                    }
+                    catch (bool a) {
+                        fin.close();
+                        fout.close();
+                        return 0;
+                    }
+                    break;
+                }
+                case 9:
+                {
+                    try
+                    {
+                        fout<<list.readElement()<<endl;
+                    }
+                    catch (bool a) {
+                        fin.close();
+                        fout.close();
+                        return 0;
+                    }
+                    break;
+                }
+                case 10:
+                {
+                    try
+                    {
+                        list.deleteElement();
+                    }
+                    catch (bool a) {
+                        cout<<"!!!!"<<endl; 
+                        fin.close();
+                        fout.close();
+                        return 0;
+                    }
+                    break;
+                }
+                case 11:
+                {
+                    fin.close();
+                    fout.close();
+                    return 0;
+                    break;
+                }
             }
         }
     }
-    
+
     return 0;
 }
 
 
-
 int main()
 {
-    return ex78();
+    return ex910();
     return 0;
 }
 
