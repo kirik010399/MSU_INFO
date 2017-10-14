@@ -13,9 +13,6 @@ TwoStacks::TwoStacks(int maxSize)
 {
     array = new char[maxSize];
     
-    for (int i=0; i<maxSize; ++i)
-        array[i] = '0'+i%10;
-    
     curIndex1 = -1;
     curIndex2 = maxSize;
     size = maxSize;
@@ -38,11 +35,11 @@ int TwoStacks::isNull(int number)
     {
     case 1:
     {
-        return (this->curIndex1 == -1);
+        return (curIndex1 == -1);
     }
     case 2:
     {
-        return (this->curIndex2 == this->size);
+        return (curIndex2 == size);
     }
     }
     return -1; 
@@ -50,7 +47,6 @@ int TwoStacks::isNull(int number)
 
 void TwoStacks::addElement (string str, int number)
 {
-    cout<<str<<endl;
     int index;
     
     if (number == 1)
@@ -58,34 +54,33 @@ void TwoStacks::addElement (string str, int number)
     else
         index = --curIndex2;
     
-    cout<<index<<endl;
+    if (index==-1 || index == size)
+        throw (false);
     
     for (int i = 0; i < str.size(); ++i)
     {
         array[index] = str[i];
+        
         if (number==1)
         {
-            ++this->curIndex1;
+            ++curIndex1;
             ++index;
         }
         else
         {
-            --this->curIndex2;
+            --curIndex2;
             --index;
         }
+        
+        if (index==-1 || index == size)
+            throw (false);
     }
+    
+    if (index==-1 || index == size)
+        throw (false);
+    
     array[index] = '\0';
-    
-    for (int i = 0; i < size; ++i)
-    {
-        if (array[i]=='\0')
-            cout<<' ';
-        else
-            cout<<array[i];
-    }
-    cout<<endl;
-    
-    cout<<curIndex1<<' '<<curIndex2<<endl;
+
 }
 
 string TwoStacks::getElement (int number)
@@ -110,7 +105,7 @@ string TwoStacks::getElement (int number)
     }
     else
     {
-        if (curIndex2==-size)
+        if (curIndex2==size)
             throw (false);
      
         curIndex2++;
@@ -125,16 +120,10 @@ string TwoStacks::getElement (int number)
         }
     }
     
-    cout<<curIndex1<<' '<<curIndex2<<endl;
-    
-    cout<<res<<endl;
-    
     string result;
 
-    for (int i = res.size()-1; i >= 0; --i)
+    for (int i = res.length()-1; i >= 0; --i)
         result += res[i];
-    
-    cout<<result<<endl; 
     
     return result;
 }
@@ -165,7 +154,7 @@ string TwoStacks::getVertice (int number)
     }
     else
     {
-        if (curIndex2==-size)
+        if (curIndex2==size)
             throw (false);
         
         index = curIndex2;
@@ -182,17 +171,11 @@ string TwoStacks::getVertice (int number)
         }
     }
     
-    cout<<curIndex1<<' '<<curIndex2<<endl;
-    
-    cout<<res<<endl;
-    
     string result;
     
-    for (int i = res.size()-1; i >= 0; --i)
+    for (int i = res.length()-1; i >= 0; --i)
         result += res[i];
-    
-    cout<<result<<endl;
-    
+
     return result;
 }
 
