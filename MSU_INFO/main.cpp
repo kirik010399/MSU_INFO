@@ -4,8 +4,8 @@
 //#include "TwoStacks.h"
 //#include "ThreeStacks.hpp"
 //#include "DEQ.hpp"
-#include "Vector.hpp"
-
+//#include "Vector.hpp"
+#include "Sequence.hpp"
 
 #include <string>
 #include <fstream>
@@ -427,7 +427,95 @@ using namespace std;
 //    return 0;
 //}
 
-int ex5 ()
+//int ex56 ()
+//{
+//    FILE* fin;
+//    FILE* fout;
+//    fin = fopen("input.txt", "r");
+//    fout = fopen("output.txt","w");
+//    int comand = 0;
+//    if (fscanf(fin,"%d",&comand) == EOF)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//
+//    int size;
+//    fscanf(fin,"%d",&size);
+//
+//    if (size<0)
+//    {
+//        fclose (fin);
+//        fclose (fout);
+//        return 0;
+//    }
+//    Vector <int> vector (size);
+//
+//    while(fscanf(fin,"%d",&comand)!=EOF)
+//    {
+//        switch (comand)
+//        {
+//            case 2:
+//            {
+//                vector.vectorNull();
+//                break;
+//            }
+//            case 3:
+//            {
+//                fprintf (fout, "%d\n", vector.isNull());
+//                break;
+//            }
+//            case 4:
+//            {
+//                fprintf (fout, "%d\n", vector.size());
+//                break;
+//            }
+//            case 5:
+//            {
+//                try
+//                {
+//                    int elem;
+//                    fscanf(fin,"%d",&elem);
+//                    vector.push(elem);
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 6:
+//            {
+//                try
+//                {
+//                    vector.pop();
+//                }
+//                catch (bool a) {}
+//
+//                break;
+//            }
+//            case 7:
+//            {
+//                try
+//                {
+//                    int index;
+//                    fscanf(fin,"%d",&index);
+//                    fprintf (fout, "%d\n", vector.getElement(index));
+//                }
+//                catch (bool a) {}
+//                break;
+//            }
+//            case 8:
+//            {
+//                fclose (fin);
+//                fclose (fout);
+//                break;
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
+
+int ex78 ()
 {
     FILE* fin;
     FILE* fout;
@@ -440,70 +528,84 @@ int ex5 ()
         fclose (fout);
         return 0;
     }
-
+    
     int size;
     fscanf(fin,"%d",&size);
-
+    
     if (size<0)
     {
         fclose (fin);
         fclose (fout);
         return 0;
     }
-    Vector <int> vector (size);
-
+    Sequence<char> seq (size);
+    
     while(fscanf(fin,"%d",&comand)!=EOF)
     {
         switch (comand)
         {
             case 2:
             {
-                vector.vectorNull();
+                seq.sequenceNull();
                 break;
             }
             case 3:
             {
-                fprintf (fout, "%d\n", vector.isNull());
+                fprintf (fout, "%d\n", seq.isNull());
                 break;
             }
             case 4:
             {
-                fprintf (fout, "%d\n", vector.size());
+                try
+                {
+                    char t;
+                    fscanf(fin,"%c",&t);
+
+                    char elem;
+                    fscanf(fin,"%c",&elem);
+                    seq.push(elem);
+                }
+                catch (bool a) {
+                    fclose (fin);
+                    fclose (fout);
+                    return 0; 
+                }
                 break;
             }
             case 5:
             {
-                try
-                {
-                    int elem;
-                    fscanf(fin,"%d",&elem);
-                    vector.push(elem);
-                }
-                catch (bool a) {}
+                seq.begin();
                 break;
             }
             case 6:
             {
-                try
-                {
-                    vector.pop();
-                }
-                catch (bool a) {}
-
+                fprintf (fout, "%d\n", seq.isUnread());
                 break;
             }
             case 7:
             {
                 try
                 {
-                    int index;
-                    fscanf(fin,"%d",&index);
-                    fprintf (fout, "%d\n", vector.getElement(index));
+                    fprintf (fout, "%c\n", seq.read());
                 }
                 catch (bool a) {}
                 break;
             }
             case 8:
+            {
+                try
+                {
+                    fprintf (fout, "%c\n", seq.element());
+                }
+                catch (bool a) {}
+                break;
+            }
+            case 9:
+            {
+                seq.skip();
+                break;
+            }
+            case 10:
             {
                 fclose (fin);
                 fclose (fout);
@@ -511,7 +613,7 @@ int ex5 ()
             }
         }
     }
-
+    
     return 0;
 }
 
@@ -519,7 +621,7 @@ int ex5 ()
 
 int main()
 {
-    return ex5();
+    return ex78();
     return 0;
 }
 
