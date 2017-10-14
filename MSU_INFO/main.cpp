@@ -2,7 +2,7 @@
 #include <stdio.h>
 //#include "OneStack.h"
 //#include "TwoStacks.h"
-#include "ThreeStacks.h"
+#include "ThreeStacks.hpp"
 #include <string>
 #include <fstream>
 #include <algorithm>
@@ -243,7 +243,7 @@ int ex3 ()
         fclose (fout);
         return 0;
     }
-    TwoStacks stack(size);
+    ThreeStacks stack(size);
     
     int number;
     
@@ -266,20 +266,9 @@ int ex3 ()
             {
                 try
                 {
-                    string elem;
-                    char curSymbol = 'a';
                     fscanf(fin,"%d",&number);
-                    
-                    char t;
-                    fscanf (fin,"%c",&t);
-                    
-                    fscanf(fin,"%c",&curSymbol);
-                    
-                    while(curSymbol != '\n')
-                    {
-                        elem+=curSymbol;
-                        fscanf(fin,"%c",&curSymbol);
-                    }
+                    int elem;
+                    fscanf(fin,"%d",&elem);
                     
                     stack.addElement(elem, number);
                 }
@@ -296,15 +285,7 @@ int ex3 ()
                 try
                 {
                     fscanf(fin,"%d",&number);
-                    string res = stack.getElement(number);
-                    
-                    cout<<3<<endl;
-                    
-                    for (int i=0; i<res.length(); ++i)
-                    {
-                        fprintf (fout, "%c", res[i]);
-                    }
-                    fprintf (fout, "\n");
+                    fprintf (fout, "%d/n", stack.getElement(number));
                 }
                 catch (bool a) {}
                 break;
@@ -314,16 +295,9 @@ int ex3 ()
                 try
                 {
                     fscanf(fin,"%d",&number);
-                    
-                    string res = stack.getVertice(number);
-                    for (int i=0; i<res.length(); ++i)
-                    {
-                        fprintf (fout, "%c", res[i]);
-                    }
-                    fprintf (fout, "\n");
+                    fprintf (fout, "%d/n", stack.getVertice(number));
                 }
                 catch (bool a) {}
-                
                 break;
             }
             case 7:
