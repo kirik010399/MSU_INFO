@@ -10,6 +10,7 @@
 		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
 		ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */; };
 		ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED635EF01F82CADD0062285E /* OneStack.cpp */; };
+		EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +34,8 @@
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		ED635EF01F82CADD0062285E /* OneStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OneStack.cpp; sourceTree = "<group>"; };
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
+		EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeStacks.cpp; sourceTree = "<group>"; };
+		EDA0BF0E1F921451007DE4F8 /* ThreeStacks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreeStacks.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
 				ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */,
+				EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */,
+				EDA0BF0E1F921451007DE4F8 /* ThreeStacks.hpp */,
 				ED1C17851F82CC8C00EEC799 /* TwoStacks.h */,
 				ED635EF01F82CADD0062285E /* OneStack.cpp */,
 				ED635EF11F82CADD0062285E /* OneStack.h */,
@@ -134,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
+				EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */,
 				ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */,
 				ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */,
 			);
