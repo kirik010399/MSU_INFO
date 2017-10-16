@@ -6,7 +6,7 @@
 //#include "DEQ.hpp"
 //#include "Vector.hpp"
 //#include "Sequence.hpp"
-#include "ListOne.hpp"
+#include "ListOneString.hpp"
 
 #include <string>
 #include <fstream>
@@ -636,7 +636,7 @@ int ex910 ()
     
     int size;
     fin>>size;
-    cout<<comand<<' '<<size<<endl; 
+
     if (fin.eof())
     {
         fin.close();
@@ -650,13 +650,12 @@ int ex910 ()
         fout.close();
         return 0;
     }
-    ListOne <string> list (size);
+    ListOneString <string> list (size);
 
     while(!fin.eof())
     {
         if (fin>>comand)
         {
-            cout<<comand<<endl;
             switch (comand)
             {
                 case 2:
@@ -732,7 +731,6 @@ int ex910 ()
                         list.deleteElement();
                     }
                     catch (bool a) {
-                        cout<<"!!!!"<<endl; 
                         fin.close();
                         fout.close();
                         return 0;
