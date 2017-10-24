@@ -52,6 +52,10 @@ template <typename T>
 ListOneString<T>::ListOneString(int maxSize)
 {
     array = new char [maxSize];
+    for (int i = 0; i<maxSize; ++i)
+    {
+        array[i] = 0;
+    }
     length = 0;
     curIndex = -1;
     readIndex = -1;
@@ -81,7 +85,7 @@ int ListOneString<T>::isNull()
 template <typename T>
 void ListOneString<T>::begin()
 {
-    readIndex=-1;
+    readIndex = -1;
 }
 
 template <typename T>
@@ -93,20 +97,39 @@ int ListOneString<T>::isEnd()
 template <typename T>
 void ListOneString<T>::moveIndex()
 {
-    readIndex++;
+    cout<<"move"<<endl;
+    cout<<readIndex<<' ';
+    ++readIndex;
+    while (array[readIndex]!='\0'&&readIndex!=curIndex)
+    {
+        ++readIndex;
+    }
+    cout<<readIndex<<endl;
 }
 
 template <typename T>
 void ListOneString<T>::push(T elem)
 {
-    if (curIndex>=arraySize)
+    if (curIndex+elem.size()>=arraySize)
         throw (false);
     
-    for (int j = 0; j < elem.size(); ++j)
-        for (int i = curIndex; i>=readIndex+2; i--)
+    int tempCurIndex = curIndex;
+    int tempReadIndex = readIndex;
+    
+    cout<<"push"<<endl;
+    cout<<curIndex<<' '<<readIndex<<endl;
+
+    cout<<elem<<endl;
+    
+    for (int j = 0; j < elem.size()+1; ++j)
+    {
+        for (int i = tempCurIndex+1; i>=tempReadIndex+2; --i)
         {
             array[i] = array[i-1];
         }
+        tempCurIndex++;
+        tempReadIndex++;
+    }
     
     curIndex+=elem.size();
     
@@ -115,7 +138,7 @@ void ListOneString<T>::push(T elem)
     
     array[readIndex+1+elem.size()] = '\0';
     
-    cout<<"push"<<endl; 
+    ++curIndex;
     
     for (int i = 0; i < arraySize; ++i)
     {
@@ -132,42 +155,115 @@ T ListOneString<T>::getElement()
     if (readIndex+1>curIndex)
         throw(false);
     
-    string temp = " " + array[readIndex+1];
+    cout<<"get"<<endl;
+    int tempReadIndex = readIndex;
+    int tempCurIndex = curIndex;
     
-    for (int i = readIndex+1; i<curIndex; ++i)
-        array[i] = array[i+1];
+    string res = "";
+    
+    tempReadIndex++;
+    while(array[tempReadIndex]!='\0')
+    {
+        res += array[tempReadIndex];
+        tempReadIndex++;
+    }
+    
+    tempReadIndex = readIndex;
+    
+    for (int j = 0; j < res.size()+1; ++j)
+    {
+        for (int i = tempReadIndex+res.size()+1; i<tempCurIndex; ++i)
+         {
+             array[i] = array[i+1];
+         }
+        tempReadIndex--;
+        tempCurIndex--;
+    }
     
     for (int i = 0; i < arraySize; ++i)
     {
-        cout<<array[i]<<' ';
+        if (array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
     }
     cout<<endl;
     
     curIndex--;
+    curIndex-=res.size();
     
-    return temp ;
+    return res;
 }
 
 template <typename T>
 T ListOneString<T>::readElement()
 {
-    if (readIndex+1>=curIndex)
+    if (readIndex+1>curIndex)
         throw(false);
     
-    return " "+array[readIndex+1];
+    cout<<"read"<<endl;
+    int tempReadIndex = readIndex;
+    
+    string res = "";
+    
+    tempReadIndex++;
+    while(array[tempReadIndex]!='\0')
+    {
+        res += array[tempReadIndex];
+        tempReadIndex++;
+    }
+    
+    for (int i = 0; i < arraySize; ++i)
+    {
+        if (array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
+    
+    return res;
 }
 
 template <typename T>
 void ListOneString<T>::deleteElement()
 {
-    cout<<readIndex<<' '<<curIndex<<endl;
+    cout<<"delete"<<endl;
     if (readIndex+1>curIndex)
         throw(false);
     
-    for (int i = readIndex+1; i<curIndex; ++i)
-        array[i] = array[i+1];
+    int tempReadIndex = readIndex;
+    int tempCurIndex = curIndex;
+    
+    string res = "";
+    
+    tempReadIndex++;
+    while(array[tempReadIndex]!='\0')
+    {
+        res += array[tempReadIndex];
+        tempReadIndex++;
+    }
+    
+    tempReadIndex = readIndex;
+    
+    for (int j = 0; j < res.size()+1; ++j)
+    {
+        for (int i = tempReadIndex+res.size()+1; i<tempCurIndex; ++i)
+        {
+            array[i] = array[i+1];
+        }
+        tempReadIndex--;
+        tempCurIndex--;
+    }
+    
+    for (int i = 0; i < arraySize; ++i)
+    {
+        if (array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
     
     curIndex--;
+    curIndex-=res.size();
 }
 
 

@@ -715,7 +715,8 @@ int ex910 ()
                 {
                     try
                     {
-                        fout<<list.readElement()<<endl;
+                        string res = list.readElement();
+                        fout<<res<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -751,10 +752,9 @@ int ex910 ()
     return 0;
 }
 
-
 int main()
 {
-    return ex910();
+    ex910();
     return 0;
 }
 
