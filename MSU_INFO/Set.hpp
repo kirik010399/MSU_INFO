@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
-
+#include <algorithm>
 using namespace std;
 
 template <typename T>
@@ -21,10 +21,10 @@ public:
     Set();
     Set(int size);
     virtual ~Set();
-    int curIndex;
-    int length;
     int arraySize;
-    T *array;
+    int length;
+    int curIndex;
+    pair<T, bool> *array;
     void setNull();
     int isNull();
     int size();
@@ -47,10 +47,11 @@ Set<T>::Set()
 template <typename T>
 Set<T>::Set(int maxSize)
 {
-    array = new T[maxSize];
+    array = new pair <T, bool> [maxSize];
     for (int i = 0; i < maxSize; ++i)
     {
-        array[i] = -1;
+        array[i].first = 0;
+        array[i].second = false;
     }
     length = 0;
     curIndex = -1;
@@ -60,90 +61,112 @@ Set<T>::Set(int maxSize)
 template <typename T>
 Set<T>::~Set()
 {
-    delete [] array;
 }
 
 
 template <typename T>
 void Set<T>::setNull()
 {
-    curIndex = -1;
+    for (int i = 0; i < arraySize; i++)
+    {
+        array[i].first = 0;
+        array[i].second = false;
+    }
 }
 
 template <typename T>
 int Set<T>::isNull()
 {
-    return (curIndex == -1);
+    int flag = 1;
+    for (int i = 0; i < arraySize; i++)
+    {
+        if (array[i].second != false)
+        {
+            flag = 0;
+        }
+    }
+    return flag;
 }
 
 template <typename T>
 void Set<T>::push(T elem)
 {
-    curIndex++;
+    int hashIndex = ((int) (elem)) % arraySize;
     
-    if (curIndex>=arraySize)
-        throw (false);
+    if (array[hashIndex].second == false)
+    {
+        array[hashIndex].first = elem;
+        array[hashIndex].second = true;
     
-    bool flag = true;
-    for (int i = 0; i < curIndex; ++i)
-    {
-        if (array[i] == elem)
-            flag = false;
-    }
-    if (flag)
-    {
-        array[curIndex] = elem;
+        return;
     }
     
-    for (int i = 0; i<arraySize; ++i)
-        cout<<array[i]<<' ';
-    cout<<endl;
+    if (array[hashIndex].first == elem && array[hashIndex].second == true)
+        return;
+    
+    for (int i = 0; i < arraySize; ++i)
+    {
+        if (array[i].second == false)
+        {
+            array[i].first = elem;
+            array[i].second = true;
+        }
+    }
 }
 
 template <typename T>
 void Set<T>::deleteElem(T elem)
 {
-    if (curIndex==-1)
+    bool flag = true;
+    for (int i = 0; i < arraySize; i++)
+    {
+        if (array[i].second != false)
+        {
+            flag = false;
+        }
+    }
+    
+    if(flag)
         throw (false);
     
-    int readIndex = -1;
-    for (int i = 0; i<=curIndex; ++i)
+    int hashIndex = ((int) elem) % arraySize;
+
+    if (array[hashIndex].first == elem && array[hashIndex].second == true)
     {
-        if (array[i]==elem)
-            readIndex = i;
+        array[hashIndex].second = false;
+        return;
     }
-    cout<<readIndex<<endl; 
     
-    for (int i = readIndex; i<curIndex; ++i)
-        array[i] = array[i+1];
-    
-    curIndex--;
-    
-    for (int i = 0; i<arraySize; ++i)
-        cout<<array[i]<<' ';
-    cout<<endl;
+    for (int i = 0; i < arraySize; ++i)
+    {
+        if (array[i].first==elem && array[i].second == true)
+            array[i].second = false;
+    }
 }
 
 template <typename T>
 int Set<T>::inSet(T elem)
 {
-    int flag = 0;
-    for (int i = 0; i<=curIndex; ++i)
+    int hashIndex = ((int) elem) % arraySize;
+    
+    if (array[hashIndex].first == elem && array[hashIndex].second != false)
     {
-        if (array[i]==elem)
-            flag = 1;
+        return 1;
     }
-    return flag;
     
     for (int i = 0; i<arraySize; ++i)
-        cout<<array[i]<<' ';
-    cout<<endl;
+    {
+        if (array[i].first==elem && array[i].second != false)
+            return 1;
+    }
+
+    return 0;
 }
 
 template <typename T>
 T Set<T>::getElement()
 {
-    return array[curIndex];
+    return array[arraySize-1].first;
 }
 
 
