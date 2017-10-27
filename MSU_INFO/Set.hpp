@@ -25,6 +25,7 @@ public:
     int length;
     int curIndex;
     pair<T, bool> *array;
+    T *array1;
     void setNull();
     int isNull();
     int size();
@@ -48,11 +49,17 @@ template <typename T>
 Set<T>::Set(int maxSize)
 {
     array = new pair <T, bool> [maxSize];
+    array1 = new T [maxSize-1];
     for (int i = 0; i < maxSize; ++i)
     {
         array[i].first = 0;
         array[i].second = false;
     }
+    for (int i = 0; i < maxSize-1; ++i)
+    {
+        array1[i] = 0; 
+    }
+    
     length = 0;
     curIndex = -1;
     arraySize = maxSize;
@@ -72,6 +79,7 @@ void Set<T>::setNull()
         array[i].first = 0;
         array[i].second = false;
     }
+    curIndex = -1;
 }
 
 template <typename T>
@@ -85,7 +93,7 @@ int Set<T>::isNull()
             flag = 0;
         }
     }
-    return flag;
+    return (flag && curIndex == -1);
 }
 
 template <typename T>
@@ -104,13 +112,16 @@ void Set<T>::push(T elem)
     if (array[hashIndex].first == elem && array[hashIndex].second == true)
         return;
     
-    for (int i = 0; i < arraySize; ++i)
+    ++curIndex;
+    bool flag = true;
+    for (int i = 0; i <= curIndex; ++i)
     {
-        if (array[i].second == false)
-        {
-            array[i].first = elem;
-            array[i].second = true;
-        }
+        if (array1[i] == elem)
+            flag = false;
+    }
+    if (flag)
+    {
+        array1[curIndex] = elem;
     }
 }
 
@@ -126,7 +137,7 @@ void Set<T>::deleteElem(T elem)
         }
     }
     
-    if(flag)
+    if(flag&&curIndex==-1)
         throw (false);
     
     int hashIndex = ((int) elem) % arraySize;
@@ -137,11 +148,19 @@ void Set<T>::deleteElem(T elem)
         return;
     }
     
-    for (int i = 0; i < arraySize; ++i)
+    int readIndex = -1;
+    for (int i = 0; i<=curIndex; ++i)
     {
-        if (array[i].first==elem && array[i].second == true)
-            array[i].second = false;
+        if (array1[i]==elem)
+            readIndex = i;
     }
+    
+    for (int i = readIndex; i<curIndex; ++i)
+        array1[i] = array1[i+1];
+    
+    curIndex--;
+    
+    
 }
 
 template <typename T>
@@ -154,13 +173,13 @@ int Set<T>::inSet(T elem)
         return 1;
     }
     
-    for (int i = 0; i<arraySize; ++i)
+    int flag = 0;
+    for (int i = 0; i<=curIndex; ++i)
     {
-        if (array[i].first==elem && array[i].second != false)
-            return 1;
+        if (array1[i]==elem)
+            flag = 1;
     }
-
-    return 0;
+    return flag;
 }
 
 template <typename T>

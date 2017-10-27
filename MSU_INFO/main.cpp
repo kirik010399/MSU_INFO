@@ -776,7 +776,7 @@ int ex14 ()
         fclose (fout);
         return 0;
     }
-    Set <double> set (size);
+    Set <int> set (size);
 
     while(fscanf(fin,"%d",&comand)!=EOF)
     {
