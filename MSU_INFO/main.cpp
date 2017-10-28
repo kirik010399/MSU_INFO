@@ -6,7 +6,8 @@
 //#include "DEQ.hpp"
 //#include "Vector.hpp"
 //#include "Sequence.hpp"
-#include "ListOne.hpp"
+//#include "ListOne.hpp"
+#include "ListTwoString.hpp"
 
 #include <string>
 #include <fstream>
@@ -650,7 +651,8 @@ int ex910 ()
         fout.close();
         return 0;
     }
-    ListOne <int> list (size);
+    ListTwoString <string> list (size);
+    int number;
 
     while(!fin.eof())
     {
@@ -671,28 +673,33 @@ int ex910 ()
                 }
                 case 4:
                 {
-                    list.begin();
+                    fin>>number;
+                    list.begin(number);
                     break;
                 }
                 case 5:
                 {
-                    fout<<list.isEnd()<<endl;
+                    fin>>number;
+                    fout<<list.isEnd(number)<<endl;
                     break;
                 }
                 case 6:
                 {
-                    list.moveIndex();
+                    fin>>number;
+                    list.moveIndex(number);
                     break;
                 }
                 case 7:
                 {
                     try
                     {
-                        int elem;
+                        string elem;
+                        fin>>number;
                         fin>>elem;
-                        list.push(elem);
+                        list.push(elem, number);
                     }
-                    catch (bool a) {
+                    catch (bool a)
+                    {
                         fin.close();
                         fout.close();
                         return 0;
@@ -703,7 +710,8 @@ int ex910 ()
                 {
                     try
                     {
-                        fout<<list.getElement()<<endl;
+                        fin>>number;
+                        fout<<list.getElement(number)<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -716,7 +724,8 @@ int ex910 ()
                 {
                     try
                     {
-                        fout<<list.readElement()<<endl;
+                        fin>>number;
+                        fout<<list.readElement(number)<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -729,7 +738,8 @@ int ex910 ()
                 {
                     try
                     {
-                        list.deleteElement();
+                        fin>>number;
+                        list.deleteElement(number);
                     }
                     catch (bool a) {
                         fin.close();

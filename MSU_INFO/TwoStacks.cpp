@@ -20,13 +20,13 @@ TwoStacks::TwoStacks(int maxSize)
 
 TwoStacks::~TwoStacks()
 {
-    delete [] array;
+//    delete [] array;
 }
 
 void TwoStacks::stackNull()
 {
-    this->curIndex1 = -1;
-    this->curIndex2 = this->size;
+    curIndex1 = -1;
+    curIndex2 = size;
 }
 
 int TwoStacks::isNull(int number)
@@ -48,12 +48,12 @@ int TwoStacks::isNull(int number)
 void TwoStacks::addElement (string str, int number)
 {
     int index;
-    
+
     if (number == 1)
         index = ++curIndex1;
     else
         index = --curIndex2;
-    
+
     if (index==-1 || index == size)
         throw (false);
     
@@ -80,6 +80,14 @@ void TwoStacks::addElement (string str, int number)
         throw (false);
     
     array[index] = '\0';
+    
+    for (int i = 0; i < size; ++i)
+    {
+        if(array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
 
 }
 
@@ -89,9 +97,6 @@ string TwoStacks::getElement (int number)
     
     if (number==1)
     {
-        if (curIndex1==-1)
-            throw (false);
-        
         curIndex1--;
         
         while (array[curIndex1]!='\0')
@@ -105,9 +110,6 @@ string TwoStacks::getElement (int number)
     }
     else
     {
-        if (curIndex2==size)
-            throw (false);
-     
         curIndex2++;
         
         while (array[curIndex2]!='\0')
@@ -125,6 +127,14 @@ string TwoStacks::getElement (int number)
     for (int i = res.length()-1; i >= 0; --i)
         result += res[i];
     
+    for (int i = 0; i < size; ++i)
+    {
+        if(array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
+    
     return result;
 }
 
@@ -136,9 +146,6 @@ string TwoStacks::getVertice (int number)
     
     if (number==1)
     {
-        if (curIndex1==-1)
-            throw (false);
-        
         index = curIndex1;
         
         index--;
@@ -154,9 +161,6 @@ string TwoStacks::getVertice (int number)
     }
     else
     {
-        if (curIndex2==size)
-            throw (false);
-        
         index = curIndex2;
         
         index++;
@@ -176,6 +180,14 @@ string TwoStacks::getVertice (int number)
     for (int i = res.length()-1; i >= 0; --i)
         result += res[i];
 
+    for (int i = 0; i < size; ++i)
+    {
+        if(array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
+    
     return result;
 }
 
@@ -205,4 +217,12 @@ void TwoStacks::deleteVertice (int number)
                 break;
         }
     }
+    
+    for (int i = 0; i < size; ++i)
+    {
+        if(array[i]!='\0')
+            cout<<array[i];
+        else cout<<' ';
+    }
+    cout<<endl;
 }

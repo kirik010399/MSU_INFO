@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ED0B3E6C1FA4A701004CAB87 /* ListTwoString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0B3E6A1FA4A701004CAB87 /* ListTwoString.cpp */; };
 		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
 		ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */; };
 		ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED635EF01F82CADD0062285E /* OneStack.cpp */; };
@@ -30,6 +31,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		ED0B3E6A1FA4A701004CAB87 /* ListTwoString.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ListTwoString.cpp; sourceTree = "<group>"; };
+		ED0B3E6B1FA4A701004CAB87 /* ListTwoString.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ListTwoString.hpp; sourceTree = "<group>"; };
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TwoStacks.cpp; sourceTree = "<group>"; };
@@ -94,6 +97,8 @@
 				ED635EF11F82CADD0062285E /* OneStack.h */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 				EDA0BF191F926887007DE4F8 /* ListOne.cpp */,
+				ED0B3E6A1FA4A701004CAB87 /* ListTwoString.cpp */,
+				ED0B3E6B1FA4A701004CAB87 /* ListTwoString.hpp */,
 				EDA0BF1A1F926887007DE4F8 /* ListOne.hpp */,
 				EDA0BF101F923E17007DE4F8 /* DEQ.cpp */,
 				EDA0BF111F923E17007DE4F8 /* DEQ.hpp */,
@@ -162,6 +167,7 @@
 				EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */,
 				EDA0BF1B1F926887007DE4F8 /* ListOne.cpp in Sources */,
 				EDA0BF151F9242A4007DE4F8 /* Vector.cpp in Sources */,
+				ED0B3E6C1FA4A701004CAB87 /* ListTwoString.cpp in Sources */,
 				ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */,
 				ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */,
 				EDA0BF121F923E17007DE4F8 /* DEQ.cpp in Sources */,
