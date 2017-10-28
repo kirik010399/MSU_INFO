@@ -636,7 +636,7 @@ int ex910 ()
     
     int size;
     fin>>size;
-    cout<<comand<<' '<<size<<endl; 
+
     if (fin.eof())
     {
         fin.close();
@@ -650,13 +650,13 @@ int ex910 ()
         fout.close();
         return 0;
     }
-    ListOne <string> list (size);
+    ListOne <int> list (size);
 
     while(!fin.eof())
     {
         if (fin>>comand)
         {
-            cout<<comand<<endl;
+            cout<<comand<<endl; 
             switch (comand)
             {
                 case 2:
@@ -688,7 +688,7 @@ int ex910 ()
                 {
                     try
                     {
-                        string elem;
+                        int elem;
                         fin>>elem;
                         list.push(elem);
                     }
@@ -732,7 +732,6 @@ int ex910 ()
                         list.deleteElement();
                     }
                     catch (bool a) {
-                        cout<<"!!!!"<<endl; 
                         fin.close();
                         fout.close();
                         return 0;

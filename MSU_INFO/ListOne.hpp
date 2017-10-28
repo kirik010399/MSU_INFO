@@ -30,11 +30,13 @@ public:
     int length;
     int arraySize;
     T *array;
+    int *array1;
     void listNull();
     int isNull();
     void begin();
     int isEnd();
     void moveIndex();
+    int firstElem();
     void push(T elem);
     T getElement();
     T readElement();
@@ -55,6 +57,14 @@ template <typename T>
 ListOne<T>::ListOne(int maxSize)
 {
     array = new T [maxSize];
+    array1 = new int [maxSize];
+    
+    for (int i = 0; i<maxSize; ++i)
+        array[i]=-2;
+    
+    for (int i = 0; i<maxSize; ++i)
+        array1[i]=-2;
+    cout<<endl;
     length = 0;
     curIndex = -1;
     readIndex = -1;
@@ -65,6 +75,7 @@ template <typename T>
 ListOne<T>::~ListOne()
 {
     delete [] array;
+    delete [] array1;
 }
 
 
@@ -84,61 +95,190 @@ int ListOne<T>::isNull()
 template <typename T>
 void ListOne<T>::begin()
 {
-    readIndex=-1;
+    readIndex = -1;
+}
+
+template <typename T>
+int ListOne<T>::firstElem()
+{
+    int sum=0, sum1=0;
+
+    for (int i = 0; i <= curIndex; ++i)
+        if (array1[i]!=-1)
+        {
+            sum += array1[i];
+            sum1 += i;
+        }
+    
+    return (sum1 - sum);
 }
 
 template <typename T>
 int ListOne<T>::isEnd()
 {
-    return (readIndex==curIndex);
+    if (readIndex==-1)
+    {
+        return 0;
+    }
+    return (array1[readIndex] == -1);
 }
 
 template <typename T>
 void ListOne<T>::moveIndex()
 {
-    readIndex++;
+    if (readIndex == -1)
+        readIndex = firstElem();
+    else
+        readIndex = array1[array1[readIndex]];
+    
+    cout<<readIndex<<endl; 
 }
 
+// 9 7 4 2 7 8
+//-1 3 0 5 1 2
+
+//after 3
+
+//0  1 2 3 4 5 6
+//-1 3 0 6 1 2 5
 template <typename T>
 void ListOne<T>::push(T elem)
 {
-    curIndex++;
-    cout<<curIndex<<' '<<readIndex<<endl;
-    
-    if (curIndex>=arraySize)
+    if (curIndex+1>=arraySize)
         throw (false);
-    
-    for (int i = curIndex; i>=readIndex+2; i--)
+    // 1 2 3
+    //-1 0 1
+    array[curIndex+1] = elem;
+    if (curIndex+1 == 0)
     {
-        array[i] = array[i-1];
+        array1[curIndex+1] = -1;
+        curIndex++;
+        
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array[i]<<' ';
+        cout<<endl;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array1[i]<<' ';
+        cout<<endl;
+        return;
     }
-    array[readIndex+1] = elem;
-    
-    for (int i = 0; i < arraySize; ++i)
+    if (readIndex == -1)
     {
+        array1[curIndex+1] = firstElem();
+        array[curIndex+1] = elem;
+        curIndex++;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array[i]<<' ';
+        cout<<endl;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array1[i]<<' ';
+        cout<<endl;
+        return;
+    }
+    
+    if (array1[readIndex] == -1)
+    {
+        curIndex++;
+        array1[readIndex] = curIndex;
+        array1[curIndex] = -1;
+        
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array[i]<<' ';
+        cout<<endl;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array1[i]<<' ';
+        cout<<endl;
+        return;
+    }
+    
+    curIndex++;
+    
+    int tempIndex = array1[readIndex];
+    array1[readIndex] = curIndex;
+    array1[curIndex] = tempIndex;
+    for (int i = 0; i<arraySize; ++i)
         cout<<array[i]<<' ';
-    }
+    cout<<endl;
+    for (int i = 0; i<arraySize; ++i)
+        cout<<array1[i]<<' ';
     cout<<endl;
 }
+
+//0  1 2 3 4 5
+//-1 3 0 5 1 2
+
+//delete after 4
+
+//0  1 2 3 4 5
+//-1 3 0 5 3 2
+
+//0  2 3 4 5
+//-1 0 5 3 2
+
+//0  2 3 4 5
+//-1 0 4 2 1
+
+// 1 2 3 4
+//-1 0 1 2
 
 template <typename T>
 T ListOne<T>::getElement()
 {
-    if (readIndex+1>curIndex)
-        throw(false);
-    
-    T temp = array[readIndex+1];
-    
-    for (int i = readIndex+1; i<curIndex; ++i)
-        array[i] = array[i+1];
-    
-    for (int i = 0; i < arraySize; ++i)
+    T temp;
+    if (readIndex == -1)
     {
-        cout<<array[i]<<' ';
+        int beginIndex = firstElem();
+        temp = array[beginIndex];
+        
+        for (int i = beginIndex; i<curIndex; ++i)
+        {
+            array[i] = array[i+1];
+            array1[i] = array1[i+1];
+        }
+        curIndex--;
+        
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array[i]<<' ';
+        cout<<endl;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array1[i]<<' ';
+        cout<<endl;
+        
+        return temp ;
     }
-    cout<<endl;
     
-    curIndex--; 
+    temp = array[array1[readIndex]];
+    cout<<"temp "<<temp<<endl;
+    
+    int tempReadIndex = array1[readIndex];
+    
+    cout<<"tempReadIndex "<<tempReadIndex<<endl;
+    
+    int tempIndex = array1[array1[readIndex]];
+    cout<<"tempIndex "<<tempIndex<<endl;
+
+    array1[readIndex] = tempIndex;
+    
+    for (int i = tempReadIndex; i<curIndex; ++i)
+    {
+        array[i] = array[i+1];
+        array1[i] = array1[i+1];
+    }
+    
+    for (int i = 0; i < curIndex; ++i)
+    {
+        if (array1[i] > tempReadIndex)
+            array1[i]--;
+    }
+    
+    curIndex--;
+    
+    for (int i = 0; i<arraySize; ++i)
+        cout<<array[i]<<' ';
+    cout<<endl;
+    for (int i = 0; i<arraySize; ++i)
+        cout<<array1[i]<<' ';
+    cout<<endl;
     
     return temp ;
 }
@@ -146,23 +286,63 @@ T ListOne<T>::getElement()
 template <typename T>
 T ListOne<T>::readElement()
 {
-    if (readIndex+1>=curIndex)
-        throw(false);
-    
-    return array[readIndex+1];
+    if (readIndex == -1)
+    {
+        int beginIndex = firstElem();
+        return array[beginIndex];
+    }
+    return array[array1[readIndex]];
 }
 
 template <typename T>
 void ListOne<T>::deleteElement()
 {
-    cout<<readIndex<<' '<<curIndex<<endl; 
-    if (readIndex+1>curIndex)
-        throw(false);
+    if (readIndex == -1)
+    {
+        int beginIndex = firstElem();
+        
+        for (int i = beginIndex; i<curIndex; ++i)
+        {
+            array[i] = array[i+1];
+            array1[i] = array1[i+1];
+        }
+        curIndex--;
+        
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array[i]<<' ';
+        cout<<endl;
+        for (int i = 0; i<arraySize; ++i)
+            cout<<array1[i]<<' ';
+        cout<<endl;
+        
+        return;
+    }
     
-    for (int i = readIndex+1; i<curIndex; ++i)
+    int tempReadIndex = array1[readIndex];
+    
+    int tempIndex = array1[array1[readIndex]];
+    array1[readIndex] = tempIndex;
+    
+    for (int i = tempReadIndex; i<curIndex; ++i)
+    {
         array[i] = array[i+1];
+        array1[i] = array1[i+1];
+    }
+    
+    for (int i = 0; i < curIndex; ++i)
+    {
+        if (array1[i] > tempReadIndex)
+            array1[i]--;
+    }
     
     curIndex--;
+    
+    for (int i = 0; i<arraySize; ++i)
+        cout<<array[i]<<' ';
+    cout<<endl;
+    for (int i = 0; i<arraySize; ++i)
+        cout<<array1[i]<<' ';
+    cout<<endl;
 }
 
 
