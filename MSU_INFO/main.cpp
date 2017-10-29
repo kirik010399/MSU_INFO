@@ -623,7 +623,7 @@ int ex910 ()
 {
     ifstream fin ("input.txt");
     ofstream fout ("output.txt");
-
+    
     int comand = 0;
     
     fin>>comand;
@@ -636,14 +636,14 @@ int ex910 ()
     
     int size;
     fin>>size;
-
+    
     if (fin.eof())
     {
         fin.close();
         fout.close();
         return 0;
     }
-
+    
     if (size<0)
     {
         fin.close();
@@ -651,12 +651,13 @@ int ex910 ()
         return 0;
     }
     ListOne <int> list (size);
-
+    int number;
+    
     while(!fin.eof())
     {
         if (fin>>comand)
         {
-            cout<<comand<<endl; 
+            cout<<comand<<endl;
             switch (comand)
             {
                 case 2:
@@ -671,17 +672,20 @@ int ex910 ()
                 }
                 case 4:
                 {
-                    list.begin();
+                    fin>>number;
+                    list.begin(number);
                     break;
                 }
                 case 5:
                 {
-                    fout<<list.isEnd()<<endl;
+                    fin>>number;
+                    fout<<list.isEnd(number)<<endl;
                     break;
                 }
                 case 6:
                 {
-                    list.moveIndex();
+                    fin>>number;
+                    list.moveIndex(number);
                     break;
                 }
                 case 7:
@@ -689,10 +693,12 @@ int ex910 ()
                     try
                     {
                         int elem;
+                        fin>>number;
                         fin>>elem;
-                        list.push(elem);
+                        list.push(elem, number);
                     }
-                    catch (bool a) {
+                    catch (bool a)
+                    {
                         fin.close();
                         fout.close();
                         return 0;
@@ -703,7 +709,8 @@ int ex910 ()
                 {
                     try
                     {
-                        fout<<list.getElement()<<endl;
+                        fin>>number;
+                        fout<<list.getElement(number)<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -716,7 +723,8 @@ int ex910 ()
                 {
                     try
                     {
-                        fout<<list.readElement()<<endl;
+                        fin>>number;
+                        fout<<list.readElement(number)<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -729,7 +737,8 @@ int ex910 ()
                 {
                     try
                     {
-                        list.deleteElement();
+                        fin>>number;
+                        list.deleteElement(number);
                     }
                     catch (bool a) {
                         fin.close();
@@ -748,7 +757,7 @@ int ex910 ()
             }
         }
     }
-
+    
     return 0;
 }
 
