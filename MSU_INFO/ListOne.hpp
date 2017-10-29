@@ -112,10 +112,13 @@ int ListOne<T>::lastElem(){
 template <typename T>
 int ListOne<T>::firstElem(){
     int sum=0, sum1=0;
-    for (int i = 0; i <= curIndex; ++i){
-        if (array1[i]!=-1)
-            sum += array1[i];
-        sum1 += i;
+    for (int i = 0; i < arraySize; ++i){
+        if (array1[i]!=-2)
+        {
+            if (array1[i]!=-1)
+                sum += array1[i];
+            sum1 += i;
+        }
     }
     return (sum1 - sum);
 }
@@ -175,26 +178,107 @@ void ListOne<T>::push(T elem, int number)
     if (curIndex+1>=arraySize)
         throw (false);
     
+    if (curIndex+1==0)
+    {
+        curIndex++;
+        array[curIndex] = elem;
+        array1[curIndex] = -1;
+        array2[curIndex] = -1;
+        
+        print(); 
+        return;
+    }
+    
     if (number == 0)
     {
         
     }
     else
     {
+        if (readIndex == -1)
+        {
+            array1[curIndex+1] = firstElem();
+            array[curIndex+1] = elem; 
+            
+            for (int i = 0; i <= curIndex; ++i)
+            {
+                if (array2[i]==-1)
+                {
+                    array2[i] = curIndex+1;
+                    break;
+                }
+            }
+            array2[curIndex+1] = -1;
+            curIndex++;
+            print();
+            return;
+        }
         
+        for (int i = 0; i < arraySize; ++i)
+        {
+            if (array1[i] == -2 && array2[i] == -2)
+            {
+                array[i] = elem;
+                
+                array2[array1[readIndex]] = i;
+                array2[i] = readIndex;
+                
+                array1[i] = array1[readIndex];
+                array1[readIndex] = i;
+                break;
+            }
+        }
+        curIndex++;
+        print();
     }
 }
 
 template <typename T>
 T ListOne<T>::getElement(int number)
 {
+    T temp;
+    curIndex--;
     if (number == 0)
     {
-        
+        return 0;
     }
     else
     {
+        if (readIndex == -1)
+        {
+            int beginIndex = firstElem();
+            temp = array[beginIndex];
+            
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array2[array1[beginIndex]] = -1;
+            if (curIndex == 0)
+            {
+                array1[firstElem()] = -1;
+                array2[firstElem()] = -1;
+            }
+            print();
+            return temp ;
+        }
         
+        int beginIndex = array1[readIndex];
+        temp = array[beginIndex];
+        
+        int tempIndex = array1[beginIndex];
+        array1[readIndex] = tempIndex;
+        
+        array1[beginIndex] = -2;
+        array2[beginIndex] = -2;
+        
+        array2[array1[beginIndex]] = array2[beginIndex];
+        if (curIndex == 0)
+        {
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+        }
+        print();
+        return temp;
     }
 }
 
@@ -207,7 +291,14 @@ T ListOne<T>::readElement(int number)
     }
     else
     {
-       
+        if (readIndex == -1)
+        {
+            int beginIndex = firstElem();
+            return array[beginIndex];
+        }
+        
+        int beginIndex = array1[readIndex];
+        return array[beginIndex];
     }
     return 0; 
 }
@@ -215,13 +306,46 @@ T ListOne<T>::readElement(int number)
 template <typename T>
 void ListOne<T>::deleteElement(int number)
 {
+    curIndex--; 
     if (number == 0)
     {
         
     }
     else
     {
+        if (readIndex == -1)
+        {
+            int beginIndex = firstElem();
+            
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array2[array1[beginIndex]] = -1;
+            if (curIndex == 0)
+            {
+                array1[firstElem()] = -1;
+                array2[firstElem()] = -1;
+            }
+            print();
+            return;
+        }
         
+        int beginIndex = array1[readIndex];
+        
+        int tempIndex = array1[beginIndex];
+        array1[readIndex] = tempIndex;
+        
+        array1[beginIndex] = -2;
+        array2[beginIndex] = -2;
+        
+        array2[array1[beginIndex]] = array2[beginIndex];
+
+        if (curIndex == 0)
+        {
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+        }
+        print();
     }
 }
 
