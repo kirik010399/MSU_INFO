@@ -70,23 +70,15 @@ void ThreeStacks::addElement (int elem, int number)
         case 1:
         {
             curIndex1++;
-//            cout<<curIndex1<<endl;
+            
             if (curIndex1 >= size)
                 throw (false);
-            
-//            for (int i = 0; i<size; ++i)
-//            {
-//                cout<<array[i]<<' ';
-//            }
-//            cout<<endl;
             
             if (curIndex1==curIndex3)
             {
                 int temp = curIndex3;
-//                cout<<count3<<endl;
                 for (int i = count3; i >=1; --i)
                 {
-                    cout<<curIndex3+i<<' '<<curIndex3+i-1<<endl;
                     array[curIndex3+i] = array[curIndex3+i-1];
                     temp++;
                 }
@@ -100,15 +92,9 @@ void ThreeStacks::addElement (int elem, int number)
         case 2:
         {
             curIndex2--;
-//            cout<<curIndex2<<endl;
+            
             if (curIndex2 < 0)
                 throw (false);
-            
-//            for (int i = 0; i<size; ++i)
-//            {
-//                cout<<array[i]<<' ';
-//            }
-//            cout<<endl;
             
             if (curIndex2==curIndex3+count3)
             {
@@ -122,23 +108,13 @@ void ThreeStacks::addElement (int elem, int number)
             }
             
             array[curIndex2] = elem;
-            cout<<curIndex3<<endl;
-
             break;
         }
         case 3:
         {
-            cout<<curIndex3<<endl;
-
             curIndex3++;
             if (curIndex1 >= size)
                 throw (false);
-            
-//            for (int i = 0; i<size; ++i)
-//            {
-//                cout<<array[i]<<' ';
-//            }
-//            cout<<endl;
             
             array[curIndex3] = elem;
             count3++;
@@ -153,8 +129,6 @@ int ThreeStacks::getElement (int number)
     {
         case 1:
         {
-//            cout<<curIndex1<<endl;
-
             if (curIndex1 == -1 || curIndex1>=size)
             {
                 throw (false);
@@ -165,13 +139,11 @@ int ThreeStacks::getElement (int number)
                 curIndex1--;
                 return temp;
             }
-
+            
             break;
         }
         case 2:
         {
-//            cout<<curIndex2<<endl;
-
             if (curIndex2 == size || curIndex2<=-1)
             {
                 throw (false);
@@ -182,7 +154,7 @@ int ThreeStacks::getElement (int number)
                 curIndex2++;
                 return temp;
             }
-        
+            
             break;
         }
         case 3:
@@ -193,7 +165,6 @@ int ThreeStacks::getElement (int number)
             }
             else
             {
-                cout<<"!!!"<<endl;
                 int temp = array[curIndex3];
                 curIndex3--;
                 return temp;
@@ -211,8 +182,6 @@ int ThreeStacks::getVertice (int number)
     {
         case 1:
         {
-//            cout<<curIndex1<<endl;
-
             if (curIndex1 == -1 || curIndex1>=size)
             {
                 throw (false);
@@ -225,8 +194,6 @@ int ThreeStacks::getVertice (int number)
         }
         case 2:
         {
-//            cout<<curIndex2<<endl;
-
             if (curIndex2 == size || curIndex2<=-1)
             {
                 throw (false);
@@ -239,8 +206,6 @@ int ThreeStacks::getVertice (int number)
         }
         case 3:
         {
-//            cout<<curIndex3<<endl;
-
             if (curIndex3 == size3-1 || curIndex3>=size)
             {
                 throw (false);
@@ -261,8 +226,6 @@ void ThreeStacks::deleteVertice (int number)
     {
         case 1:
         {
-//            cout<<curIndex1<<endl;
-
             if (curIndex1 == -1 || curIndex1>=size)
             {
                 throw (false);
@@ -275,8 +238,6 @@ void ThreeStacks::deleteVertice (int number)
         }
         case 2:
         {
-//            cout<<curIndex2<<endl;
-
             if (curIndex2 == size || curIndex2<=-1)
             {
                 throw (false);
@@ -289,8 +250,6 @@ void ThreeStacks::deleteVertice (int number)
         }
         case 3:
         {
-//            cout<<curIndex3<<endl;
-
             if (curIndex3 == size3-1 || curIndex3>=size)
             {
                 throw (false);
@@ -299,7 +258,8 @@ void ThreeStacks::deleteVertice (int number)
             {
                 curIndex3--;
             }
-            break; 
+            break;
         }
     }
 }
+
