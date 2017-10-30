@@ -79,9 +79,6 @@ ListOne<T>::ListOne(int maxSize)
 template <typename T>
 ListOne<T>::~ListOne()
 {
-    delete [] array;
-    delete [] array1;
-    delete [] array2;
 }
 
 
@@ -272,15 +269,23 @@ T ListOne<T>::getElement(int number)
         int tempIndex = array2[beginIndex];
         array2[readIndex] = tempIndex;
         
+        if (curIndex == 0)
+        {
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+            
+            print();
+            return temp;
+        }
+        
+        array1[array2[beginIndex]] = array1[beginIndex];
+
         array1[beginIndex] = -2;
         array2[beginIndex] = -2;
         
-        array1[array2[beginIndex]] = array1[beginIndex];
-        if (curIndex == 0)
-        {
-            array1[array1[readIndex]] = -1;
-            array2[array1[readIndex]] = -1;
-        }
         print();
         return temp;
     }
@@ -291,15 +296,21 @@ T ListOne<T>::getElement(int number)
             int beginIndex = firstElem();
             temp = array[beginIndex];
             
+            if (curIndex == 0)
+            {
+                array1[beginIndex] = -2;
+                array2[beginIndex] = -2;
+                array1[firstElem()] = -1;
+                array2[firstElem()] = -1;
+                print();
+                return temp ;
+            }
+            
+            array2[array1[beginIndex]] = -1;
+
             array1[beginIndex] = -2;
             array2[beginIndex] = -2;
             
-            array2[array1[beginIndex]] = -1;
-            if (curIndex == 0)
-            {
-                array1[firstElem()] = -1;
-                array2[firstElem()] = -1;
-            }
             print();
             return temp ;
         }
@@ -310,15 +321,23 @@ T ListOne<T>::getElement(int number)
         int tempIndex = array1[beginIndex];
         array1[readIndex] = tempIndex;
         
+        if (curIndex == 0)
+        {
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+            
+            print();
+            return temp;
+        }
+        
+        array2[array1[beginIndex]] = array2[beginIndex];
+
         array1[beginIndex] = -2;
         array2[beginIndex] = -2;
         
-        array2[array1[beginIndex]] = array2[beginIndex];
-        if (curIndex == 0)
-        {
-            array1[array1[readIndex]] = -1;
-            array2[array1[readIndex]] = -1;
-        }
         print();
         return temp;
     }
@@ -331,7 +350,7 @@ T ListOne<T>::readElement(int number)
     {
         if (readIndex == -1)
         {
-            return -1;
+            return array[0];
         }
         
         int beginIndex = array2[readIndex];
@@ -346,6 +365,7 @@ T ListOne<T>::readElement(int number)
         }
         
         int beginIndex = array1[readIndex];
+        cout<<readIndex<<' '<<beginIndex<<endl;
         return array[beginIndex];
     }
     return 0; 
@@ -367,15 +387,23 @@ void ListOne<T>::deleteElement(int number)
         int tempIndex = array2[beginIndex];
         array2[readIndex] = tempIndex;
         
+        if (curIndex == 0)
+        {
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+            
+            print();
+            return;
+        }
+        
+        array1[array2[beginIndex]] = array1[beginIndex];
+
         array1[beginIndex] = -2;
         array2[beginIndex] = -2;
         
-        array1[array2[beginIndex]] = array1[beginIndex];
-        if (curIndex == 0)
-        {
-            array1[array1[readIndex]] = -1;
-            array2[array1[readIndex]] = -1;
-        }
         print();
     }
     else
@@ -384,15 +412,21 @@ void ListOne<T>::deleteElement(int number)
         {
             int beginIndex = firstElem();
             
-            array1[beginIndex] = -2;
-            array2[beginIndex] = -2;
-            
-            array2[array1[beginIndex]] = -1;
             if (curIndex == 0)
             {
+                array1[beginIndex] = -2;
+                array2[beginIndex] = -2;
                 array1[firstElem()] = -1;
                 array2[firstElem()] = -1;
+                print();
+                return;
             }
+            
+            array2[array1[beginIndex]] = -1;
+            
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+    
             print();
             return;
         }
@@ -402,16 +436,23 @@ void ListOne<T>::deleteElement(int number)
         int tempIndex = array1[beginIndex];
         array1[readIndex] = tempIndex;
         
-        array1[beginIndex] = -2;
-        array2[beginIndex] = -2;
+        if (curIndex == 0)
+        {
+            array1[beginIndex] = -2;
+            array2[beginIndex] = -2;
+            
+            array1[array1[readIndex]] = -1;
+            array2[array1[readIndex]] = -1;
+            
+            print();
+            return;
+        }
         
         array2[array1[beginIndex]] = array2[beginIndex];
 
-        if (curIndex == 0)
-        {
-            array1[array1[readIndex]] = -1;
-            array2[array1[readIndex]] = -1;
-        }
+        array1[beginIndex] = -2;
+        array2[beginIndex] = -2;
+        
         print();
     }
 }
