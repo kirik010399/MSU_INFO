@@ -651,7 +651,6 @@ int ex910 ()
         return 0;
     }
     ListOne <int> list (size);
-    int number;
     
     while(!fin.eof())
     {
@@ -672,20 +671,17 @@ int ex910 ()
                 }
                 case 4:
                 {
-                    fin>>number;
-                    list.begin(number);
+                    list.begin();
                     break;
                 }
                 case 5:
                 {
-                    fin>>number;
-                    fout<<list.isEnd(number)<<endl;
+                    fout<<list.isEnd()<<endl;
                     break;
                 }
                 case 6:
                 {
-                    fin>>number;
-                    list.moveIndex(number);
+                    list.moveIndex();
                     break;
                 }
                 case 7:
@@ -693,9 +689,8 @@ int ex910 ()
                     try
                     {
                         int elem;
-                        fin>>number;
                         fin>>elem;
-                        list.push(elem, number);
+                        list.push(elem);
                     }
                     catch (bool a)
                     {
@@ -709,8 +704,7 @@ int ex910 ()
                 {
                     try
                     {
-                        fin>>number;
-                        fout<<list.getElement(number)<<endl;
+                        fout<<list.getElement()<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -723,8 +717,7 @@ int ex910 ()
                 {
                     try
                     {
-                        fin>>number;
-                        fout<<list.readElement(number)<<endl;
+                        fout<<list.readElement()<<endl;
                     }
                     catch (bool a) {
                         fin.close();
@@ -737,8 +730,7 @@ int ex910 ()
                 {
                     try
                     {
-                        fin>>number;
-                        list.deleteElement(number);
+                        list.deleteElement();
                     }
                     catch (bool a) {
                         fin.close();
