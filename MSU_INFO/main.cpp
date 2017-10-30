@@ -12,6 +12,12 @@
 #include <fstream>
 #include <algorithm>
 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <sstream>
+
 using namespace std;
 
 //int ex1 ()
@@ -619,152 +625,239 @@ using namespace std;
 //}
 
 
-int ex910 ()
-{
-    ifstream fin ("input.txt");
-    ofstream fout ("output.txt");
-    
-    int comand = 0;
-    
-    fin>>comand;
-    if (fin.eof())
-    {
-        fin.close();
-        fout.close();
-        return 0;
-    }
-    
-    int size;
-    fin>>size;
-    
-    if (fin.eof())
-    {
-        fin.close();
-        fout.close();
-        return 0;
-    }
-    
-    if (size<0)
-    {
-        fin.close();
-        fout.close();
-        return 0;
-    }
-    ListOne <int> list (size);
-    int number;
-    
-    while(!fin.eof())
-    {
-        if (fin>>comand)
-        {
-            cout<<comand<<endl;
-            switch (comand)
-            {
-                case 2:
-                {
-                    list.listNull();
-                    break;
-                }
-                case 3:
-                {
-                    fout<<list.isNull()<<endl;
-                    break;
-                }
-                case 4:
-                {
-                    fin>>number;
-                    list.begin(number);
-                    break;
-                }
-                case 5:
-                {
-                    fin>>number;
-                    fout<<list.isEnd(number)<<endl;
-                    break;
-                }
-                case 6:
-                {
-                    fin>>number;
-                    list.moveIndex(number);
-                    break;
-                }
-                case 7:
-                {
-                    try
-                    {
-                        int elem;
-                        fin>>number;
-                        fin>>elem;
-                        list.push(elem, number);
-                    }
-                    catch (bool a)
-                    {
-                        fin.close();
-                        fout.close();
-                        return 0;
-                    }
-                    break;
-                }
-                case 8:
-                {
-                    try
-                    {
-                        fin>>number;
-                        fout<<list.getElement(number)<<endl;
-                    }
-                    catch (bool a) {
-                        fin.close();
-                        fout.close();
-                        return 0;
-                    }
-                    break;
-                }
-                case 9:
-                {
-                    try
-                    {
-                        fin>>number;
-                        fout<<list.readElement(number)<<endl;
-                    }
-                    catch (bool a) {
-                        fin.close();
-                        fout.close();
-                        return 0;
-                    }
-                    break;
-                }
-                case 10:
-                {
-                    try
-                    {
-                        fin>>number;
-                        list.deleteElement(number);
-                    }
-                    catch (bool a) {
-                        fin.close();
-                        fout.close();
-                        return 0;
-                    }
-                    break;
-                }
-                case 11:
-                {
-                    fin.close();
-                    fout.close();
-                    return 0;
-                    break;
-                }
-            }
-        }
-    }
-    
-    return 0;
-}
+//int ex910 ()
+//{
+//    ifstream fin ("input.txt");
+//    ofstream fout ("output.txt");
+//
+//    int comand = 0;
+//
+//    fin>>comand;
+//    if (fin.eof())
+//    {
+//        fin.close();
+//        fout.close();
+//        return 0;
+//    }
+//
+//    int size;
+//    fin>>size;
+//
+//    if (fin.eof())
+//    {
+//        fin.close();
+//        fout.close();
+//        return 0;
+//    }
+//
+//    if (size<0)
+//    {
+//        fin.close();
+//        fout.close();
+//        return 0;
+//    }
+//    ListOne <int> list (size);
+//    int number;
+//
+//    while(!fin.eof())
+//    {
+//        if (fin>>comand)
+//        {
+//            cout<<comand<<endl;
+//            switch (comand)
+//            {
+//                case 2:
+//                {
+//                    list.listNull();
+//                    break;
+//                }
+//                case 3:
+//                {
+//                    fout<<list.isNull()<<endl;
+//                    break;
+//                }
+//                case 4:
+//                {
+//                    fin>>number;
+//                    list.begin(number);
+//                    break;
+//                }
+//                case 5:
+//                {
+//                    fin>>number;
+//                    fout<<list.isEnd(number)<<endl;
+//                    break;
+//                }
+//                case 6:
+//                {
+//                    fin>>number;
+//                    list.moveIndex(number);
+//                    break;
+//                }
+//                case 7:
+//                {
+//                    try
+//                    {
+//                        int elem;
+//                        fin>>number;
+//                        fin>>elem;
+//                        list.push(elem, number);
+//                    }
+//                    catch (bool a)
+//                    {
+//                        fin.close();
+//                        fout.close();
+//                        return 0;
+//                    }
+//                    break;
+//                }
+//                case 8:
+//                {
+//                    try
+//                    {
+//                        fin>>number;
+//                        fout<<list.getElement(number)<<endl;
+//                    }
+//                    catch (bool a) {
+//                        fin.close();
+//                        fout.close();
+//                        return 0;
+//                    }
+//                    break;
+//                }
+//                case 9:
+//                {
+//                    try
+//                    {
+//                        fin>>number;
+//                        fout<<list.readElement(number)<<endl;
+//                    }
+//                    catch (bool a) {
+//                        fin.close();
+//                        fout.close();
+//                        return 0;
+//                    }
+//                    break;
+//                }
+//                case 10:
+//                {
+//                    try
+//                    {
+//                        fin>>number;
+//                        list.deleteElement(number);
+//                    }
+//                    catch (bool a) {
+//                        fin.close();
+//                        fout.close();
+//                        return 0;
+//                    }
+//                    break;
+//                }
+//                case 11:
+//                {
+//                    fin.close();
+//                    fout.close();
+//                    return 0;
+//                    break;
+//                }
+//            }
+//        }
+//    }
+//
+//    return 0;
+//}
 
 
 int main()
 {
-    return ex910();
-    return 0;
+    
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+    string str;
+    getline(cin,str);
+    if (str=="") return 0;
+    stringstream stream;
+    stream << str;
+    int firstIn=0;
+    int secondIn=0;
+    stream >> firstIn >> secondIn;
+    if (secondIn<0) return 0;
+    
+    MySpisok mySpisok(secondIn);
+    
+    while(true){
+        int a,b,r;
+        cin >> a;
+        /*cout << "Massiv:";
+         for (int i=0;i<mySpisok.get_max_size()+1;i++){
+         cout << "el:" << mySpisok.el[i];
+         cout << "ss:" << mySpisok.ss[i];
+         } */
+        switch(a){
+            case 2:
+                mySpisok.sdpust();
+                break;
+            case 3:
+                if (mySpisok.get_cur_size()==0) cout << 1 << endl;
+                else cout << 0 << endl;
+                break;
+            case 4:
+                cin >> r;
+                if (r==0){
+                    mySpisok.cursor_clear();
+                }
+                if (r==1){
+                    mySpisok.cursor_end();
+                }
+                break;
+            case 5:
+                cin >> r;
+                if (r==0){
+                    if (mySpisok.get_cursor()==mySpisok.get_start()) cout << 1 << endl; else cout << 0 << endl;
+                }
+                if (r==1){
+                    if (mySpisok.get_cursor()==mySpisok.get_endd()) cout << 1 << endl; else cout << 0 << endl;
+                }
+                break;
+            case 6:
+                cin >> r;
+                if (r==0) mySpisok.pered_cursor();
+                if (r==1) mySpisok.pered_cursor_naz();
+                break;
+            case 7:
+                cin >> r >> b;
+                if (mySpisok.get_cur_size()==mySpisok.get_max_size()) return 0;
+                if (r==0){
+                    mySpisok.push_z(b);
+                }
+                if (r==1){
+                    mySpisok.push(b);
+                }
+                break;
+            case 8:
+                cin >> r;
+                if (mySpisok.get_cur_size()==0) return 0;
+                if (r==0) cout << mySpisok.pop_z() << endl;
+                if (r==1) cout << mySpisok.pop() <<endl;
+                break;
+            case 9:
+                cin >> r;
+                if (r==1) cout << mySpisok.get_element() <<endl;
+                if (r==0) cout << mySpisok.get_element_z() <<endl;
+                break;
+            case 10:
+                cin >> r;
+                if (mySpisok.get_cur_size()==0) return 0;
+                if (r==1) mySpisok.del();
+                if (r==0) mySpisok.del_z();
+                break;
+            case 11:
+                return 0;
+                
+        }
+        
+        
+    }
+    
 }
 
