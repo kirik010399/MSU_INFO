@@ -10,11 +10,8 @@
 #define ListOne_hpp
 
 #include <stdio.h>
-
 #include <algorithm>
 #include <iostream>
-
-#include <stdio.h>
 
 using namespace std;
 
@@ -27,8 +24,6 @@ public:
     virtual ~ListOne();
     int curIndex;
     int readIndex;
-    int readIndex2;
-    int length;
     int arraySize;
     T *array;
     int *array1;
@@ -67,7 +62,7 @@ ListOne<T>::ListOne(int maxSize)
         array[i] = -2;
         array1[i] = -2;
     }
-    length = 0;
+    
     curIndex = -1;
     readIndex = -1;
     arraySize = maxSize;
@@ -76,6 +71,8 @@ ListOne<T>::ListOne(int maxSize)
 template <typename T>
 ListOne<T>::~ListOne()
 {
+    delete [] array;
+    delete [] array1;
 }
 
 
@@ -110,7 +107,7 @@ int ListOne<T>::firstElem()
 template <typename T>
 void ListOne<T>::begin()
 {
-        readIndex = -1;
+    readIndex = -1;
 }
 
 template <typename T>
@@ -206,7 +203,6 @@ T ListOne<T>::getElement()
     if (curIndex == 0)
     {
         array1[beginIndex] = -2;
-        
         array1[array1[readIndex]] = -1;
         
         print();
@@ -222,7 +218,6 @@ T ListOne<T>::getElement()
 template <typename T>
 T ListOne<T>::readElement()
 {
-    
     if (readIndex == -1)
     {
         int beginIndex = firstElem();
@@ -253,20 +248,17 @@ void ListOne<T>::deleteElement()
         }
             
         array1[beginIndex] = -2;
-    
         print();
         return;
     }
         
     int beginIndex = array1[readIndex];
-        
     int tempIndex = array1[beginIndex];
     array1[readIndex] = tempIndex;
         
     if (curIndex == 0)
     {
         array1[beginIndex] = -2;
-            
         array1[array1[readIndex]] = -1;
             
         print();
@@ -274,9 +266,7 @@ void ListOne<T>::deleteElement()
     }
     
     array1[beginIndex] = -2;
-    
     print();
-    
 }
 
 template <typename T>
@@ -288,10 +278,6 @@ void ListOne<T>::print ()
     for (int i = 0; i<arraySize; ++i)
         cout<<array1[i]<<' ';
     cout<<endl;
-
 }
-
-
-
 
 #endif /* ListOne_hpp */
