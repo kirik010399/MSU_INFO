@@ -21,9 +21,7 @@ bool isIntersect (coordinates p1, coordinates p2, coordinates p3, coordinates p4
     
     double k2 = (y4-y3)/(x4-x3);
     double d2 = -(x3*y4-y3*x4)/(x4-x3);
-    
-    cout<<k1<<' '<<d1<<' '<<k2<<' '<<d2<<endl;
-    
+        
     if (k1 == k2)
     {
         if (d1 == d2)
@@ -35,8 +33,6 @@ bool isIntersect (coordinates p1, coordinates p2, coordinates p3, coordinates p4
     {
         double x = (d2-d1)/(k1-k2);
         double y = k1*x+d1;
-        
-        cout<<x<<' '<<y<<endl;
         
         coordinates v1, v2;
         v1.x = x-x1;
@@ -82,10 +78,6 @@ int main()
     {
         for (int j = i+2; j < a.size()-1; ++j)
         {
-            cout<<a[i].x<<' '<<a[i].y<<' '<<a[i+1].x<<' '<<a[i+1].y<<endl;
-            cout<<a[j].x<<' '<<a[j].y<<' '<<a[j+1].x<<' '<<a[j+1].y<<endl;
-            cout<<endl;
-
             if (isIntersect(a[i], a[i+1], a[j], a[j+1]))
             {
                 fprintf (fout, "%d", 0);
