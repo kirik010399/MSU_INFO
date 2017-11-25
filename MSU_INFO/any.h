@@ -14,15 +14,15 @@
 class abstractVar
 {
 public:
-    virtual abstractVar* copy() = 0;
-    virtual ~abstractVar();
+    virtual abstractVar* copy(){ return nullptr;};
+    virtual ~abstractVar(){}
 };
 
 template <class T>
-class Var: abstractVar
+class Var: public abstractVar
 {
 public:
-    Var ();
+    Var (){}
     Var (T a);
     T variable;
     virtual abstractVar* copy();

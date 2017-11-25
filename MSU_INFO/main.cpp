@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdio.h>
-#include "Any.hpp"
+#include "any.h"
 
 #include <string>
 #include <fstream>
@@ -10,7 +10,8 @@ using namespace std;
 
 int main()
 {
-    
+    Any a;
+    a = 5; 
     return 0;
 }
 
