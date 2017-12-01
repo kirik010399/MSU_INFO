@@ -1,93 +1,132 @@
-#include <iostream>
 #include <stdio.h>
-#include <vector>
-#include <fstream>
+#include <math.h>
+#define N 10000
 
-using namespace std;
+int line(int *a,int *b,int v);// function of checking of intersection
+int getarray(int *a,int *b, FILE *fin);// reading of array
 
-struct coordinates
+int main(void)
 {
-    double x = 0;
-    double y = 0;
-};
-
-bool isIntersect (coordinates p1, coordinates p2, coordinates p3, coordinates p4)
-{
-    double x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
-    double x3 = p3.x, y3 = p3.y, x4 = p4.x, y4 = p4.y;
+    FILE *fin;// file with data
+    int a[N];// array with x coordinates
+    int b[N];// array with y coordinates
+    char imya[120];// the name of file with data
     
-    double k1 = (y2-y1)/(x2-x1);
-    double d1 = -(x1*y2-y1*x2)/(x2-x1);
+    int v = 0,k = 0;
+    printf("Enter the name of file with data\n");
+    scanf("%s", imya);
+    fin = fopen(imya, "r");
     
-    double k2 = (y4-y3)/(x4-x3);
-    double d2 = -(x3*y4-y3*x4)/(x4-x3);
-        
-    if (k1 == k2)
-    {
-        if (d1 == d2)
-            return true;
-        else
-            return false;
-    }
+    v = getarray(a,b,fin);// checking if data were readed
+    
+    if (v != -1)
+        k = line(a,b,v);//answer if there is points of intersection
     else
-    {
-        double x = (d2-d1)/(k1-k2);
-        double y = k1*x+d1;
-        
-        coordinates v1, v2;
-        v1.x = x-x1;
-        v1.y = y-y1;
-        
-        v2.x = x-x2;
-        v2.y = y-y2;
-        
-        coordinates v3, v4;
-        v3.x = x-x3;
-        v3.y = y-y3;
-        
-        v4.x = x-x4;
-        v4.y = y-y4;
-        
-        if (v1.x*v2.x+v1.y*v2.y > 0 || v3.x*v4.x+v3.y*v4.y > 0)
-            return false;
-        else
-            return true;
-    }
-}
-
-int main()
-{
-    coordinates p;
-    vector <coordinates> a;
+        return -1;
     
-    FILE* fin;
-    FILE* fout;
-    fin = fopen("input.txt", "r");
-    fout = fopen("output.txt","w");
+    if (k == 1)
+        printf("there is points of intersection\n");
+    else
+        printf("there isn't points of intersection\n");
     
-    double x, y;
-    
-    while(fscanf(fin,"%lf%lf",&x, &y)!=EOF)
-    {
-        p.x = x;
-        p.y = y;
-        a.push_back(p);
-    }
-    
-    for (int i = 0; i < a.size()-1; ++i)
-    {
-        for (int j = i+2; j < a.size()-1; ++j)
-        {
-            if (isIntersect(a[i], a[i+1], a[j], a[j+1]))
-            {
-                fprintf (fout, "%d", 0);
-                return 0;
-            }
-        }
-    }
-    
-    fprintf (fout, "%d", 1);
-
+    fclose(fin);
     return 0;
 }
 
+int line(int *a, int *b, int v)
+{
+    int i = 0, j = 0;
+    int x1,y1,x2,y2,x3,x4,y3,y4;
+    int flag;
+    double v1x, v2x, v1y, v2y;
+    double v3x, v4x, v3y, v4y;
+    double x, y, k1, d1, k2, d2;
+
+    for (i = 0; i < v-1; ++i)
+    {
+        for (j = i+2; j < v-1; ++j)
+        {
+            x1 = a[i];
+            x2 = a[i+1];
+            y1 = b[i];
+            y2 = b[i+1];
+            x3 = a[j];
+            x4 = a[j+1];
+            y3 = b[j];
+            y4 = b[j+1];
+            
+            k1 = (y2-y1)/(x2-x1);
+            d1 = -(x1*y2-y1*x2)/(x2-x1);
+            
+            k2 = (y4-y3)/(x4-x3);
+            d2 = -(x3*y4-y3*x4)/(x4-x3);
+            
+            if (k1 == k2)
+            {
+                if (d1 == d2)
+                    flag = 1;
+                else
+                    flag = -1;
+            }
+            else
+            {
+                x = (d2-d1)/(k1-k2);
+                y = k1*x+d1;
+                
+                v1x = x-x1;
+                v1y = y-y1;
+                
+                v2x = x-x2;
+                v2y = y-y2;
+                
+                v3x = x-x3;
+                v3y = y-y3;
+                
+                v4x = x-x4;
+                v4y = y-y4;
+                
+                if (v1x*v2x+v1y*v2y > 0 || v3x*v4x+v3y*v4y > 0)
+                    flag = -1;
+                else
+                    flag = 1;
+            }
+            if (flag == 1)
+                return 1;
+        }
+    }
+    return -1;
+}
+
+int getarray(int *a, int *b, FILE *fin)
+{
+    int i = 0;
+    int var;
+    int x, y;
+    i=0;
+    
+    while (true)
+    {
+        var = fscanf(fin,"%d%d",&x,&y);
+
+        if (var == EOF)
+        {
+            if (i==0)
+            {
+                printf("Your file is empty\n");
+                return -1;
+            }
+            else
+                break;
+        }
+        if (var == -1)
+        {
+            printf("Your data is wrong\n");
+            break;
+        }
+        
+        a[i] = x;
+        b[i] = y;
+        ++i;
+    }
+    return i;
+}
