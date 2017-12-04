@@ -1,10 +1,9 @@
-//
-// Stack Calculator (non-graphic version)
-//
+#include <cstdio>
 #include <cstring>
-#include <cctype>
 #include <cstdlib>
-#include "RealStack.hpp"
+#include <locale>
+#include "RealStack.h"
+#include <iostream>
 
 FILE *in, *out;
 
@@ -18,7 +17,14 @@ static void onPop();
 static void onInit();
 static void display();
 static void onShow();
-int nod(int,int); //
+int nod(int,int);
+static void onPower();
+static void onPow();
+static void onExp();
+static void onSin();
+static void onCos();
+static void onTg();
+
 
 static RealStack *stack = 0;
 
@@ -39,6 +45,8 @@ int main() {
                 onSub();
             else if (strcmp(line, "%") == 0)
                 onNOD();
+            
+            
             else if (strcmp(line, "*") == 0)
                 onMul();
             else if (strcmp(line, "/") == 0)
@@ -57,6 +65,18 @@ int main() {
                 onInit();
             else if (strcmp(line, "show") == 0)
                 onShow();
+            else if (strcmp(line, "power") == 0)
+                onPower();
+            else if (strcmp(line, "pow") == 0)
+                onPow();
+            else if (strcmp(line, "exp") == 0)
+                onExp();
+            else if (strcmp(line, "sin") == 0)
+                onExp();
+            else if (strcmp(line, "cos") == 0)
+                onExp();
+            else if (strcmp(line, "tg") == 0)
+                onExp();
             else if (
                      strcmp(line, "") == 0 ||
                      (linelen > 0 && (line[0] == 'q' || line[0] == 'Q'))
@@ -142,11 +162,208 @@ static void onShow() {
     fprintf(out, "]\n");
 }
 
-
 int nod(int x, int y)
 {
     if (y == 0)
         return abs(x);
     else
         return nod(y, x % y);
+}
+
+static void onPow()
+{
+    if (stack->depth()<2)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    
+    int d = (int)stack->pop();
+    double x = stack->pop();
+    
+    if (x<0 || d<0)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    
+    double res = 1;
+    
+    while (d > 0)
+    {
+        if (d%2 == 1)
+            res*=x;
+        
+        x*=x;
+        d/=2;
+    }
+    
+    stack->push(res);
+    display();
+}
+
+static void onPower()
+{
+    if (stack->depth()<3)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    
+    int m = (int)stack->pop();
+    int d = (int)stack->pop();
+    double x = stack->pop();
+
+    if (x<0 || d<0 || m<0)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+        
+    double res = 1;
+    
+    while (d > 0)
+    {
+        if (d%2 == 1)
+            res*=x;
+        
+        x*=x;
+        d/=2;
+    }
+    
+    while (res>=m)
+        res-=m;
+    
+    stack->push(res);
+    display();
+}
+
+static void onExp()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res = 0, d = 1, fact = 1;
+        int i = 1;
+        
+        while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+        {
+            res+=d/fact;
+            d*=x;
+            fact*=i;
+            i++;
+        }
+        
+        stack->push(res);
+        display();
+    }
+}
+
+static void onSin()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res = 0, d = 1, fact = 1;
+        int i = 1;
+        
+        while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+        {
+            if (i%2!=1)
+            {
+                if (i%4==2)
+                    res+=d/fact;
+                else if (i%4==0)
+                    res-=d/fact;
+            }
+            d*=x;
+            fact*=i;
+            i++;
+        }
+        
+        stack->push(res);
+        display();
+    }
+}
+
+static void onCos()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res = 0, d = 1, fact = 1;
+        int i = 1;
+        
+        while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+        {
+            if (i%2==1)
+            {
+                if (i%4==1)
+                    res+=d/fact;
+                else if (i%4==3)
+                    res-=d/fact;
+            }
+            d*=x;
+            fact*=i;
+            i++;
+        }
+        
+        stack->push(res);
+        display();
+    }
+}
+
+static void onTg()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res = 0, d = 1, fact = 1;
+        int i = 1;
+        
+        while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+        {
+            if (i%2!=1)
+            {
+                if (i%4==2)
+                    res+=d/fact;
+                else if (i%4==0)
+                    res-=d/fact;
+            }
+            d*=x;
+            fact*=i;
+            i++;
+        }
+        
+        stack->push(res);
+        display();
+    }
 }
