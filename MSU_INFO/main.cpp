@@ -4,7 +4,8 @@
 #include <locale>
 #include "RealStack.h"
 #include <iostream>
-
+#include <math.h>
+using namespace std;
 FILE *in, *out;
 
 static void onNOD();
@@ -26,6 +27,12 @@ static void onCos();
 static void onTg();
 double sin (double a);
 double cos (double a);
+static void onArcsin();
+static void onArccos();
+static void onArctg();
+double arcsin (double a);
+double arccos (double a);
+double arctg (double a);
 
 
 static RealStack *stack = 0;
@@ -74,11 +81,17 @@ int main() {
             else if (strcmp(line, "exp") == 0)
                 onExp();
             else if (strcmp(line, "sin") == 0)
-                onExp();
+                onSin();
             else if (strcmp(line, "cos") == 0)
-                onExp();
+                onCos();
             else if (strcmp(line, "tg") == 0)
-                onExp();
+                onTg();
+            else if (strcmp(line, "arcsin") == 0)
+                onArcsin();
+            else if (strcmp(line, "arccos") == 0)
+                onArccos();
+            else if (strcmp(line, "arctg") == 0)
+                onArctg();
             else if (
                      strcmp(line, "") == 0 ||
                      (linelen > 0 && (line[0] == 'q' || line[0] == 'Q'))
@@ -148,7 +161,11 @@ static void onInit() {
 
 static void display() {
     if (!stack->empty()) {
-        fprintf(out, "%lf\n", stack->top());
+        double a = stack->top();
+        if (isnan(a))
+            fprintf(out, "nan\n");
+        else
+           fprintf(out, "%lf\n", a);
     } else {
         fprintf(out, "stack empty\n");
     }
@@ -311,10 +328,21 @@ static void onCos()
 
 double cos (double x)
 {
+    if (x>0)
+        while (x>=2*M_PI)
+        {
+            x-=2*M_PI;
+        }
+    else
+        while (x<=-2*M_PI)
+        {
+            x+=2*M_PI;
+        }
+    
     double res = 0, d = 1, fact = 1;
     int i = 1;
     
-    while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+    while (d/fact>=0.0000000000001 || d/fact<=-0.0000000000001)
     {
         if (i%2==1)
         {
@@ -333,10 +361,21 @@ double cos (double x)
 
 double sin (double x)
 {
+    if (x>0)
+        while (x>=2*M_PI)
+        {
+            x-=2*M_PI;
+        }
+    else
+        while (x<=-2*M_PI)
+        {
+            x+=2*M_PI;
+        }
+    
     double res = 0, d = 1, fact = 1;
     int i = 1;
     
-    while (d/fact>=0.0000000001 || d/fact<=-0.0000000001)
+    while (d/fact>=0.0000000000001 || d/fact<=-0.0000000000001)
     {
         if (i%2!=1)
         {
@@ -371,3 +410,116 @@ static void onTg()
         display();
     }
 }
+
+
+static void onArcsin()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res;
+        
+        if (isnan(x))
+            res = NAN;
+        else
+        {
+            res = arcsin(x);
+        }
+        
+        stack->push(res);
+        display();
+    }
+}
+
+double arcsin(double x)
+{
+    if (x == 1)
+        return M_PI_2;
+    if (x == -1)
+        return -M_PI_2;
+    if (fabs(x) > 1)
+    {
+        return NAN; 
+    }
+    else
+    {
+        double res = x;
+        double d = x;
+        int i=1;
+        while (true)
+        {
+            d*=x*x*i/(i+1);
+            i+=2;
+            d/=i;
+            if (d>=0.000000000001||d<=-0.000000000001)
+                res+=d;
+            else
+                return res;
+            d*=i;
+        }
+    }
+}
+
+static void onArccos()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        
+        double res;
+        
+        if (isnan(x))
+            res = NAN;
+        else
+            res = arccos(x);
+        
+        stack->push(res);
+        display();
+    }
+}
+
+double arccos(double x)
+{
+    return M_PI_2-arcsin(x);
+}
+
+static void onArctg()
+{
+    if (stack->depth() < 1)
+    {
+        StackException exception;
+        exception.reason = "error";
+        throw (exception);
+    }
+    else
+    {
+        double x = stack->pop();
+        double res;
+        if (isnan(x))
+            res = NAN;
+        else
+            res = arctg(x);
+        
+        stack->push(res);
+        display();
+    }
+}
+
+double arctg(double x)
+{
+    double res = arcsin(x/(sqrt(1+x*x)));
+    return res;
+}
+
