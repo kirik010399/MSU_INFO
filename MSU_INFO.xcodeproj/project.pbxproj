@@ -11,6 +11,7 @@
 		ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */; };
 		ED4889661FC44DAE007709DF /* Any.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED4889641FC44DAE007709DF /* Any.cpp */; };
 		ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED635EF01F82CADD0062285E /* OneStack.cpp */; };
+		ED90A60D1FDFFDE800C1D55F /* singleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED90A60B1FDFFDE800C1D55F /* singleton.cpp */; };
 		ED9860881F9FCF55004B5ECC /* Set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED9860861F9FCF55004B5ECC /* Set.cpp */; };
 		EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */; };
 		EDA0BF121F923E17007DE4F8 /* DEQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF101F923E17007DE4F8 /* DEQ.cpp */; };
@@ -43,6 +44,8 @@
 		ED4889651FC44DAE007709DF /* any.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = any.h; sourceTree = "<group>"; };
 		ED635EF01F82CADD0062285E /* OneStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OneStack.cpp; sourceTree = "<group>"; };
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
+		ED90A60B1FDFFDE800C1D55F /* singleton.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = singleton.cpp; sourceTree = "<group>"; };
+		ED90A60C1FDFFDE800C1D55F /* singleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = singleton.h; sourceTree = "<group>"; };
 		ED9860861F9FCF55004B5ECC /* Set.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Set.cpp; sourceTree = "<group>"; };
 		ED9860871F9FCF55004B5ECC /* Set.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Set.hpp; sourceTree = "<group>"; };
 		EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreeStacks.cpp; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 				ED635EF01F82CADD0062285E /* OneStack.cpp */,
 				ED635EF11F82CADD0062285E /* OneStack.h */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
+				ED90A60B1FDFFDE800C1D55F /* singleton.cpp */,
+				ED90A60C1FDFFDE800C1D55F /* singleton.h */,
 				EDA0BF191F926887007DE4F8 /* ListOne.cpp */,
 				EDA0BF1A1F926887007DE4F8 /* ListOne.hpp */,
 				EDC014151F950C480033139D /* ListOneString.cpp */,
@@ -178,6 +183,7 @@
 				EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */,
 				EDA0BF1B1F926887007DE4F8 /* ListOne.cpp in Sources */,
 				EDC014171F950C480033139D /* ListOneString.cpp in Sources */,
+				ED90A60D1FDFFDE800C1D55F /* singleton.cpp in Sources */,
 				EDA0BF151F9242A4007DE4F8 /* Vector.cpp in Sources */,
 				ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */,
 				ED4889661FC44DAE007709DF /* Any.cpp in Sources */,
