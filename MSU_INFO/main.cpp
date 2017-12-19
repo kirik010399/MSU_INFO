@@ -1,92 +1,64 @@
-#include "ReadWrite.h"
+#include <iostream>
+#include <vector>
 
-ReThread::ReThread(int i): id(i){}
-bool flag = true;
+using namespace std;
 
-void ReThread::run(void)
+struct coordinates
 {
-    qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
-    msleep(qrand()%MaxWait);
-    
-    while(flag)
-    {}
-    
-    cell.acquire(0);
-    read.acquire(1);
-    
-    // Printf.lock();
-    qDebug() << buffer.toLocal8Bit().constData() << " Reader " << id ;
-    qDebug() << "Some Readers Debug information";
-    //  Printf.unlock();
-    
-    read.release(1);
-    cell.release(0);
-    
-    msleep(qrand()%MaxWait);
-}
+    double x;
+    double y;
+    double z;
+};
 
-
-
-WrThread::WrThread(int i): id(i){}
-
-void WrThread::run(void)
+struct triangle
 {
-    flag = true;
-    qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
-    msleep(qrand()%MaxWait);
-    
-    while(read.available() != nRethreads)
-    {}
-    
-    cell.acquire(1);
-    
-    buffer.clear();
-    buffer.append("I Wrote my ID ");
-    buffer.append(QString::number(id));
-    qDebug() << buffer.toLocal8Bit().constData() << " Writer" << id;
-    qDebug() << "Some Writers Debug information";
-    
-    cell.release(1);
-    flag = false;
-    
-    msleep(qrand()%MaxWait);
-}
+    coordinates first;
+    coordinates second;
+    coordinates third;
+};
 
-
-int main(int argc, char *argv[])
+int main ()
 {
-    QCoreApplication a(argc, argv);
+    int n;
+    cin>>n;
+    coordinates a[n];
+    vector <triangle> b;
+    for (int i = 0; i < n; ++i)
+        cin>>a[i].x>>a[i].y>>a[i].z;
     
-    ReThread *Rethreads[nRethreads];
-    WrThread *Wrthreads[nWrthreads];
-    
-    qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
-    
-    for (int k = 0; k < nRethreads; k++)
+    for (int i = 0; i < n-2; ++i)
     {
-        Rethreads[k] = new ReThread(k);
-    }
-    for (int k = 0; k < nWrthreads; k++)
-    {
-        Wrthreads[k] = new WrThread(k);
-    }
-    
-    Wrthreads[0]->start();
-    Wrthreads[0]->wait();
-    
-    for (int k = 0; k < 1000; k++)
-    {
-        if (qrand()%2 > 0)
+        for (int j = i+1; j < n-1; ++j)
         {
-            int i = qrand()%nRethreads;
-            Rethreads[i]->wait();
-            Rethreads[i]->start();
+            for (int k = j+1; k < n; ++k)
+            {
+                //if (a[i]==a[j]||a[i]==a[k]||a[j]==a[k])
+                //  continue;
+                //уравнение плоскости
+                //int sign;
+                //sign = плоскость от первого не равного i, j, k
+                //int temp = номер этого элемента
+                for (int p = 0; p < n; ++p)
+                {
+                    //if (p==i||p==j||p==k||p==temp)
+                    //  continue;
+                    //if (плоскость(a[p])!=sign)
+                    //  continue;
+                }
+                triangle tr;
+                tr.first = a[i];
+                tr.second = a[j];
+                tr.third = a[k];
+                b.push_back(tr);
+            }
         }
-        else
+    }
+    
+    for (int i = 0; i < b.size()-1; ++i)
+    {
+        for (int j = i + 1; j < b.size(); ++j)
         {
-            int i = qrand()%nWrthreads;
-            Wrthreads[i]->wait();
-            Wrthreads[i]->start();
+            //если плоскости совпадают, то все эти точки объединить в одну грань
         }
     }
     
