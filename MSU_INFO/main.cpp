@@ -126,13 +126,14 @@ int main ()
                 bool flag = false;
                 if (A*x+B*y+C*z+D == 0)
                 {
+                    if (borders.size()!=0)
                     for (int u = 0; u < borders.size(); ++u)
                     {
-                        cout<<9;
-                        cout<<"!!!!!"<<borders[u].size()<<endl;
-                        for (int ety = 0; ety < borders[u].size(); ++ety)
+                    
+                        int length = borders[u].size();
+                        if (borders[u].size() != 0)
+                        for (int ety = 0; ety < length; ++ety)
                         {
-                            cout<<10<<' '<<ety<<endl;
                             if (i == borders[u][ety])
                             {
                                 borders[u].push_back(j);
