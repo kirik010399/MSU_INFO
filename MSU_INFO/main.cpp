@@ -1,94 +1,90 @@
-#include "ReadWrite.h"
+#include "critical.h"
 
-ReThread::ReThread(int i): id(i){}
-bool flag = true;
+int next(int i)
+{
+    int result = i + 1;
+    
+    if (result >= nPhilosophers)
+        result = 0;
+    
+    return result;
+}
 
-void ReThread::run(void)
+int prev(int i)
+{
+    int result = i - 1;
+    
+    if (result < 0)
+        result = nPhilosophers - 1;
+    
+    return result;
+}
+
+void PhThread::run(void)
 {
     qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
     msleep(qrand()%MaxWait);
     
-    while(flag)
-    {}
+    forkSem.acquire(1);//чтобы никто не смог изменять значения вилок когда хоть кто-то изменяет его
     
-    cell.acquire(0);
-    read.acquire(1);
+    while (!(forks[id] && forks[next(id)]))//пока хотя бы одна занята
+    {
+        forkSem.release(1);
+        
+        mutex.lock();
+        sleepWaiters[id].wait(&mutex);
+        mutex.unlock();
+        
+        forkSem.acquire(1);
+    }
     
-    // Printf.lock();
-    qDebug() << buffer.toLocal8Bit().constData() << " Reader " << id ;
-    qDebug() << "Some Readers Debug information";
-    //  Printf.unlock();
+    forks[id] = false;
+    forks[next(id)] = false;
     
-    read.release(1);
-    cell.release(0);
+    forkSem.release(1);
     
-    msleep(qrand()%MaxWait);
-}
-
-
-
-WrThread::WrThread(int i): id(i){}
-
-void WrThread::run(void)
-{
-    flag = true;
-    qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
-    msleep(qrand()%MaxWait);
+    qDebug() << "\"I'm eating\" - said Philosopher " << id;
     
-    while(read.available() != nRethreads)
-    {}
+    forkSem.acquire(1);
     
-    cell.acquire(1);
+    forks[id] = true;
+    forks[next(id)] = true;
     
-    buffer.clear();
-    buffer.append("I Wrote my ID ");
-    buffer.append(QString::number(id));
-    qDebug() << buffer.toLocal8Bit().constData() << " Writer" << id;
-    qDebug() << "Some Writers Debug information";
+    sleepWaiters[next(id)].wakeAll();
+    sleepWaiters[prev(id)].wakeAll();
     
-    cell.release(1);
-    flag = false;
+    forkSem.release(1);
+    
+    qDebug() << "\"I'm thinking\" - said Philosopher " << id;
     
     msleep(qrand()%MaxWait);
 }
-
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     
-    ReThread *Rethreads[nRethreads];
-    WrThread *Wrthreads[nWrthreads];
+    PhThread *Philosophers[nPhilosophers];
+    
+    for (int k = 0; k < nPhilosophers; k++)
+    {
+        forks[k] = true;
+    }
     
     qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()));
     
-    for (int k = 0; k < nRethreads; k++)
+    for (int k = 0; k < nPhilosophers; k++)
     {
-        Rethreads[k] = new ReThread(k);
+        Philosophers[k] = new PhThread(k);
     }
-    for (int k = 0; k < nWrthreads; k++)
-    {
-        Wrthreads[k] = new WrThread(k);
-    }
-    
-    Wrthreads[0]->start();
-    Wrthreads[0]->wait();
     
     for (int k = 0; k < 1000; k++)
     {
-        if (qrand()%2 > 0)
-        {
-            int i = qrand()%nRethreads;
-            Rethreads[i]->wait();
-            Rethreads[i]->start();
-        }
-        else
-        {
-            int i = qrand()%nWrthreads;
-            Wrthreads[i]->wait();
-            Wrthreads[i]->start();
-        }
+        int i = qrand()%nPhilosophers;
+        Philosophers[i]->wait();
+        Philosophers[i]->start();
     }
     
-    return 0;
+    return a.exec();
 }
+
