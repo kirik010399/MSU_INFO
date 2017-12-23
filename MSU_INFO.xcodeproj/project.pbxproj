@@ -45,6 +45,7 @@
 		ED4889651FC44DAE007709DF /* any.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = any.h; sourceTree = "<group>"; };
 		ED635EF01F82CADD0062285E /* OneStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OneStack.cpp; sourceTree = "<group>"; };
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
+		ED8D87E21FEE736C008EDC0E /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
 		ED90A60B1FDFFDE800C1D55F /* singleton.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = singleton.cpp; sourceTree = "<group>"; };
 		ED90A60C1FDFFDE800C1D55F /* singleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = singleton.h; sourceTree = "<group>"; };
 		ED9860861F9FCF55004B5ECC /* Set.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Set.cpp; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 				ED4889651FC44DAE007709DF /* any.h */,
 				EDA0BF161F925191007DE4F8 /* Sequence.cpp */,
 				EDA0BF171F925191007DE4F8 /* Sequence.hpp */,
+				ED8D87E21FEE736C008EDC0E /* table.h */,
 				ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */,
 				ED9860861F9FCF55004B5ECC /* Set.cpp */,
 				ED9860871F9FCF55004B5ECC /* Set.hpp */,
