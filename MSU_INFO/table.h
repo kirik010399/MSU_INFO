@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -52,7 +53,7 @@ public:
     
     Cell &operator = (const Cell & other)
     {
-        switch (type)
+        switch (other.type)
         {
             case 0:
             {
@@ -61,6 +62,7 @@ public:
             }
             case 1:
             {
+                cout<<"!!!!!!!!!";
                 *this = other.toFloat();
                 break;
             }
@@ -141,6 +143,7 @@ public:
     
     float toFloat() const
     {
+        cout<<type;
         if (type != 1)
         {
             return 0.0;
@@ -173,7 +176,7 @@ public:
 
 class Table
 {
-    public:
+public:
     Cell a[26][99];
     
     Cell &operator[](const string &cell)
@@ -190,10 +193,11 @@ class Table
         }
         return a[i][j];
     };
-
-    protected:
     
-    private:
+protected:
+    
+private:
 };
 
 #endif /* Cell_hpp */
+

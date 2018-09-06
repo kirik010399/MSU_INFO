@@ -1,14 +1,4 @@
-//
-//  functions.hpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 24.03.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
-#ifndef functions_hpp
-#define functions_hpp
-
-#include <stdio.h>
-
-#endif /* functions_hpp */
+int stringCompare(char* s1, char* s2);
+struct tree* add_to_tree(struct tree *root, char* new_value);
+void printTree(struct tree *p, FILE* fin2);
+int mySymb(char c, char* s); 

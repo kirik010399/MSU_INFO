@@ -122,9 +122,7 @@ string TwoStacks::getElement (int number)
     
     string result;
 
-    for (int i = res.length()-1; i >= 0; --i)
-        result += res[i];
-    
+
     return result;
 }
 
@@ -173,8 +171,6 @@ string TwoStacks::getVertice (int number)
     
     string result;
     
-    for (int i = res.length()-1; i >= 0; --i)
-        result += res[i];
 
     return result;
 }

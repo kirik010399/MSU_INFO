@@ -1,0 +1,7 @@
+count: 1, word: are
+count: 1, word: areare
+count: 2, word: hello
+count: 1, word: how
+count: 1, word: kirill
+count: 1, word: you
+count: 1, word: youuuu
