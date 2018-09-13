@@ -1,14 +1,1 @@
-1
-arcsin
-arcsin
-1
-arccos
-arccos
-arccos
-1
-arctg
-arctg
-arctg
-arctg
-arctg
-quit
+1 4 21 3 5 1 2
