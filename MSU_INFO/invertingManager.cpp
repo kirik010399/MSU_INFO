@@ -9,6 +9,8 @@
 #include "invertingManager.hpp"
 #include <math.h>
 
+using namespace std; 
+
 int invertMatrix(double* matrix, double* inverseMatrix, int n)
 {
     int i;
@@ -96,9 +98,10 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     {
         for (j = i + 1; j < n; ++j)
         {
-            var1 = inverseMatrix[i*n+j];
-            inverseMatrix[i*n+j] = inverseMatrix[j*n+i];
-            inverseMatrix[j*n+i] = var1;
+            swap(inverseMatrix[i*n+j], inverseMatrix[j*n+i]);
+//            var1 = inverseMatrix[i*n+j];
+//            inverseMatrix[i*n+j] = inverseMatrix[j*n+i];
+//            inverseMatrix[j*n+i] = var1;
         }
     }
     

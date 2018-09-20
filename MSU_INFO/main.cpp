@@ -66,7 +66,7 @@ int main()
     }
     else
     {
-        cout<<"Error while inverting matrix";
+        cout<<"Error while inverting matrix"<<endl;
     }
     
     delete []matrix;
