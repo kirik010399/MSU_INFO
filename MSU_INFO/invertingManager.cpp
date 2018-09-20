@@ -9,84 +9,112 @@
 #include "invertingManager.hpp"
 #include <math.h>
 
-int invertMatrix(double* a, double* x, int n)
+int invertMatrix(double* matrix, double* inverseMatrix, int n)
 {
     int i;
     int j;
     int k;
-    double tmp1;
-    double tmp2;
-    
-    for (i = 0; i < n; ++i)
-        for (j = 0; j < n; ++j)
-            x[i * n + j] = (double)(i == j);
+    double var1;
+    double var2;
     
     for (i = 0; i < n; ++i)
     {
-        tmp1 = 0.0;
+        for (j = 0; j < n; ++j)
+        {
+            if (i == j)
+                inverseMatrix[i*n+j] = 1;
+            else
+                inverseMatrix[i*n+j] = 0;
+        }
+    }
+    
+    for (i = 0; i < n; ++i)
+    {
+        var1 = 0.0;
+        
         for (j = i + 1; j < n; j++)
-            tmp1 += a[j * n + i] * a[j * n + i];
+        {
+            var1 += matrix[j*n+i] * matrix[j*n+i];
+        }
         
-        tmp2 = sqrt(tmp1 + a[i * n + i] * a[i * n + i]);
+        var2 = sqrt(var1 + matrix[i*n+i] * matrix[i*n+i]);
         
-        if (tmp2 < 1e-100)
+        if (var2 < 1e-100)
             return 0;
         
-        a[i * n + i] -= tmp2;
+        matrix[i*n+i] -= var2;
         
-        tmp1 = sqrt(tmp1 + a[i * n + i] * a[i * n + i]);
+        var1 = sqrt(var1 + matrix[i*n+i] * matrix[i*n+i]);
         
-        if (tmp1 < 1e-100)
+        if (var1 < 1e-100)
         {
-            a[i * n + i] += tmp2;
+            matrix[i*n+i] += var2;
             continue;
         }
         
-        tmp1 = 1.0 / tmp1;
+        var1 = 1.0 / var1;
+        
         for (j = i; j < n; ++j)
-            a[j * n + i] *= tmp1;
+        {
+            matrix[j*n+i] *= var1;
+        }
         
         for (k = i + 1; k < n; ++k)
         {
-            tmp1 = 0.0;
+            var1 = 0.0;
             for (j = i; j < n; ++j)
-                tmp1 += a[j * n + i] * a[j * n + k];
+            {
+                var1 += matrix[j*n+i] * matrix[j*n+k];
+            }
             
-            tmp1 *= 2.0;
+            var1 *= 2.0;
             for (j = i; j < n; ++j)
-                a[j * n + k] -= tmp1 * a[j * n + i];
+            {
+                matrix[j*n+k] -= var1 * matrix[j*n+i];
+            }
         }
         
         for (k = 0; k < n; ++k)
         {
-            tmp1 = 0.0;
+            var1 = 0.0;
             for (j = i; j < n; ++j)
-                tmp1 += a[j * n + i] * x[k * n + j];
+            {
+                var1 += matrix[j*n+i] * inverseMatrix[k*n+j];
+            }
             
-            tmp1 *= 2.0;
+            var1 *= 2.0;
             for (j = i; j < n; ++j)
-                x[k * n + j] -= tmp1 * a[j * n + i];
+            {
+                inverseMatrix[k*n+j] -= var1 * matrix[j*n+i];
+            }
         }
         
-        a[i * n + i] = tmp2;
+        matrix[i*n+i] = var2;
     }
     
     for (i = 0; i < n; ++i)
+    {
         for (j = i + 1; j < n; ++j)
         {
-            tmp1 = x[i * n + j];
-            x[i * n + j] = x[j * n + i];
-            x[j * n + i] = tmp1;
+            var1 = inverseMatrix[i*n+j];
+            inverseMatrix[i*n+j] = inverseMatrix[j*n+i];
+            inverseMatrix[j*n+i] = var1;
         }
+    }
     
     for (k = 0; k < n; ++k)
+    {
         for (i = n - 1; i >= 0; --i)
         {
-            tmp1 = x[i * n + k];
+            var1 = inverseMatrix[i*n+k];
             for (j = i + 1; j < n; ++j)
-                tmp1 -= a[i * n + j] * x[j * n + k];
-            x[i * n + k] = tmp1 / a[i * n + i];
+            {
+                var1 -= matrix[i*n+j] * inverseMatrix[j*n+k];
+            }
+            
+            inverseMatrix[i*n+k] = var1/matrix[i*n+i];
         }
+    }
     
     return 1;
 }
