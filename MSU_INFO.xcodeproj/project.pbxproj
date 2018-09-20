@@ -10,6 +10,8 @@
 		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
 		ED1C17861F82CC8C00EEC799 /* TwoStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED1C17841F82CC8C00EEC799 /* TwoStacks.cpp */; };
 		ED41B0081FC0681600540097 /* RealStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED41B0061FC0681600540097 /* RealStack.cpp */; };
+		ED568B362153DD980012834A /* matrixUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED568B342153DD980012834A /* matrixUtils.cpp */; };
+		ED568B392153DDBC0012834A /* invertingManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED568B372153DDBC0012834A /* invertingManager.cpp */; };
 		ED635EF21F82CADD0062285E /* OneStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED635EF01F82CADD0062285E /* OneStack.cpp */; };
 		ED9860881F9FCF55004B5ECC /* Set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED9860861F9FCF55004B5ECC /* Set.cpp */; };
 		EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA0BF0D1F921451007DE4F8 /* ThreeStacks.cpp */; };
@@ -41,6 +43,10 @@
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		ED41B0061FC0681600540097 /* RealStack.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RealStack.cpp; sourceTree = "<group>"; };
 		ED41B0071FC0681600540097 /* RealStack.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealStack.hpp; sourceTree = "<group>"; };
+		ED568B342153DD980012834A /* matrixUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrixUtils.cpp; sourceTree = "<group>"; };
+		ED568B352153DD980012834A /* matrixUtils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = matrixUtils.hpp; sourceTree = "<group>"; };
+		ED568B372153DDBC0012834A /* invertingManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = invertingManager.cpp; sourceTree = "<group>"; };
+		ED568B382153DDBC0012834A /* invertingManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = invertingManager.hpp; sourceTree = "<group>"; };
 		ED635EF01F82CADD0062285E /* OneStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OneStack.cpp; sourceTree = "<group>"; };
 		ED635EF11F82CADD0062285E /* OneStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneStack.h; sourceTree = "<group>"; };
 		ED9860861F9FCF55004B5ECC /* Set.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Set.cpp; sourceTree = "<group>"; };
@@ -103,6 +109,10 @@
 				ED1C17851F82CC8C00EEC799 /* TwoStacks.h */,
 				ED635EF01F82CADD0062285E /* OneStack.cpp */,
 				ED635EF11F82CADD0062285E /* OneStack.h */,
+				ED568B342153DD980012834A /* matrixUtils.cpp */,
+				ED568B352153DD980012834A /* matrixUtils.hpp */,
+				ED568B372153DDBC0012834A /* invertingManager.cpp */,
+				ED568B382153DDBC0012834A /* invertingManager.hpp */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 				ED41B0061FC0681600540097 /* RealStack.cpp */,
 				ED41B0071FC0681600540097 /* RealStack.hpp */,
@@ -175,6 +185,7 @@
 			files = (
 				ED9860881F9FCF55004B5ECC /* Set.cpp in Sources */,
 				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
+				ED568B362153DD980012834A /* matrixUtils.cpp in Sources */,
 				EDA0BF0F1F921451007DE4F8 /* ThreeStacks.cpp in Sources */,
 				EDA0BF1B1F926887007DE4F8 /* ListOne.cpp in Sources */,
 				EDC014171F950C480033139D /* ListOneString.cpp in Sources */,
@@ -184,6 +195,7 @@
 				EDA0BF121F923E17007DE4F8 /* DEQ.cpp in Sources */,
 				ED41B0081FC0681600540097 /* RealStack.cpp in Sources */,
 				EDA0BF181F925191007DE4F8 /* Sequence.cpp in Sources */,
+				ED568B392153DDBC0012834A /* invertingManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,66 +1,75 @@
 #include <iostream>
-#include <vector>
-using namespace std;
+#include <time.h>
+#include <math.h>
+#include "matrixUtils.hpp"
+#include "invertingManager.hpp"
 
-unsigned long deleteElements (vector <double> a, double x, double n);
+using namespace std;
 
 int main()
 {
-    vector <double> a;
-    
     int n;
-    cin>>n;
-    double x;
-    cin>>x;
+    double *matrix;
+    double *inverseMatrix;
+    FILE* fin = NULL;
+    clock_t t;
+    int inputType;
+    int returnFlag;
     
-    cout<<"choose type of enter data: 1 - file, 2 - random"<<endl;
-
-    int type;
-    cin>>type;
+    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    cin>>inputType;
     
-    if (type == 1)
+    if (inputType == 1)
     {
-        FILE *fin;
-        fin = fopen("input.txt", "r");
-
-        for (int i = 0; i < n; ++i)
+        fin = fopen("input.txt", "r");//TODO
+        
+        if (!fin)
         {
-            double b;
-            fscanf (fin, "%lf", &b);
-            a.push_back(b);
+            printf("File don't exist");
+            fclose(fin);
+            return -1;
+        }
+        
+        if (fscanf(fin, "%d", &n) != 1)
+        {
+            printf("Data isn't correct");
+            fclose(fin);
+            return -2;
         }
     }
     else
     {
-        for (int i = 0; i < n; ++i)
-        {
-            double b;
-            b = rand();
-            a.push_back(b);
-        }
+        cout<<"Enter size: ";
+        cin>>n; //TODO
     }
     
-    for (int i = 0; i < n; ++i)
-        cout<<a[i]<<' ';
-    cout<<endl;
+    matrix = new double [n*n];
+    inverseMatrix = new double [n*n];
     
-    cout<<deleteElements(a, x, n);
+    //TODO CHECKING OF MEMORY
+
+    returnFlag = enterMatrix(matrix, n, fin);
+    
+    cout<<"Entering matrix:"<<endl;
+    printMatrix(matrix, n);
+    cout<<endl; 
+    
+    t = clock();
+    returnFlag = invertMatrix(matrix, inverseMatrix, n);
+    t = clock() - t;
+    
+    if (returnFlag)
+    {
+        printMatrix(inverseMatrix, n);
+        cout<<"Inversion time= %.2f sec"<< (double)t/CLOCKS_PER_SEC;
+    }
+    else
+    {
+        cout<<"error while inverting matrix";
+    }
+    
+    delete []matrix;
+    delete []inverseMatrix;
     
     return 0;
-}
-
-unsigned long deleteElements (vector <double> a, double x, double n)
-{
-    for (int i = n-1; i >= 0; --i)
-    {
-        if (a[i]<x)
-        {
-            a.erase(a.begin()+i);
-//            for (int i = 0; i < a.size(); ++i)
-//                cout<<a[i]<<' ';
-//            cout<<endl;
-        }
-    }
-    
-    return a.size();
 }
