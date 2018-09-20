@@ -60,12 +60,13 @@ int main()
     
     if (returnFlag)
     {
+        cout<<"Inverse Matrix:"<<endl; 
         printMatrix(inverseMatrix, n);
-        cout<<"Inversion time= %.2f sec"<< (double)t/CLOCKS_PER_SEC;
+        cout<<"Inversion time =  "<< (double)t/CLOCKS_PER_SEC << " sec"<<endl;
     }
     else
     {
-        cout<<"error while inverting matrix";
+        cout<<"Error while inverting matrix";
     }
     
     delete []matrix;
