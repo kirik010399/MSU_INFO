@@ -8,7 +8,7 @@ using namespace std;
 
 int main()
 {
-    int n;
+    int n, m;
     double *matrix;
     double *inverseMatrix;
     FILE* fin = NULL;
@@ -16,12 +16,15 @@ int main()
     int inputType;
     int returnFlag;
     
+//    cout<<"Enter size: ";
+//    cin>>n;
+    
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
     cin>>inputType;
     
     if (inputType == 1)
     {
-        fin = fopen("input.txt", "r");//TODO
+        fin = fopen("input.txt", "r");
         
         if (!fin)
         {
@@ -39,19 +42,44 @@ int main()
     }
     else
     {
-        cout<<"Enter size: ";
-        cin>>n; //TODO
+            cout<<"Enter size: ";
+            cin>>n;
     }
     
     matrix = new double [n*n];
     inverseMatrix = new double [n*n];
     
-    //TODO CHECKING OF MEMORY
+    if (!(matrix && inverseMatrix))
+    {
+        cout<<"No memory, enter matrix with less dimensions"<<endl;
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []inverseMatrix;
+        
+        return -2;
+    }
 
     returnFlag = enterMatrix(matrix, n, fin);
     
-    cout<<"Entering matrix:"<<endl;
-    printMatrix(matrix, n);
+    if (returnFlag == -1)
+    {
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []inverseMatrix;
+        
+        return -2;
+    }
+    
+    cout<<"Enter size of priting matrix: ";
+    cin>>m;
+    
+    cout<<endl<<"Entering matrix:"<<endl;
+    printMatrix(matrix, n, m);
     cout<<endl; 
     
     t = clock();
@@ -61,13 +89,31 @@ int main()
     if (returnFlag)
     {
         cout<<"Inverse Matrix:"<<endl; 
-        printMatrix(inverseMatrix, n);
-        cout<<"Inversion time =  "<< (double)t/CLOCKS_PER_SEC << " sec"<<endl;
+        printMatrix(inverseMatrix, n, m);
+        
+        if (inputType == 1)
+            fseek(fin, 1, SEEK_SET);
+        
+        returnFlag = enterMatrix(matrix, n, fin);
+        
+        cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
+        
+        cout<<"Inversion time =  "<< t << " milliseconds"<<endl;
     }
     else
     {
         cout<<"Error while inverting matrix"<<endl;
+        
+        if (inputType == 1)
+            fclose(fin);
+        delete []matrix;
+        delete []inverseMatrix;
+        
+        return -1;
     }
+    
+    if (inputType == 1)
+        fclose(fin);
     
     delete []matrix;
     delete []inverseMatrix;

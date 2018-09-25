@@ -18,7 +18,7 @@ double func(int i, int j)
     return 1.0/(i+j+1.0);
 }
 
-int enterMatrix(double* a, int n, FILE* fin)
+int enterMatrix(double* matrix, int n, FILE* fin)
 {
     int i;
     int j;
@@ -29,7 +29,7 @@ int enterMatrix(double* a, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                if (fscanf(fin, "%lf", &a[i*n+j]) != 1)
+                if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
                     return -1;
             }
         }
@@ -40,7 +40,7 @@ int enterMatrix(double* a, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                a[i*n+j] = func(i, j);
+                matrix[i*n+j] = func(i, j);
             }
         }
     }
@@ -48,17 +48,44 @@ int enterMatrix(double* a, int n, FILE* fin)
     return 0;
 }
 
-void printMatrix(double* a, int n)
+void printMatrix(double* matrix, int n, int m)
 {
     int i;
     int j;
+    int min_ = min(n,m);
     
+    for (i = 0; i < min_; ++i)
+    {
+        for (j = 0; j < min_; ++j)
+        {
+            cout<<matrix[i*n+j]<<' ';
+        }
+        cout<<endl;
+    }
+}
+
+double residualNorm(double* matrix, double* inverseMatrix, int n)
+{
+    int i;
+    int j;
+    int k;
+    double a;
+    double res = 0.0;
+        
     for (i = 0; i < n; ++i)
     {
         for (j = 0; j < n; ++j)
         {
-            cout<<a[i*n+j]<<' ';
+            a = 0.0;
+            
+            for (k = 0; k < n; ++k)
+                a += matrix[i*n+k] * inverseMatrix[k*n+j];
+            
+            if (i == j)
+                a -= 1.0;
+            
+            res += a*a;
         }
-        cout<<endl;
     }
+    return sqrt(res);//Euclid norm
 }

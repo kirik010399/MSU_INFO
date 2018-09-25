@@ -11,6 +11,6 @@
 
 #include <stdio.h>
 
-int invertMatrix(double* a, double* x, int n);
+int invertMatrix(double* matrix, double* inverseMatrix, int n);
 
 #endif /* invertingManager_hpp */
