@@ -35,16 +35,16 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
         a = 0.0;
         
         for (j = i + 1; j < n; j++)
-            a += matrix[j*n+i] * matrix[j*n+i];
+            a += matrix[j*n+i] * matrix[j*n+i];//(12)
         
-        b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);
+        b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
         
         if (b < 1e-100)
             return 0;
         
-        matrix[i*n+i] -= b;
+        matrix[i*n+i] -= b;//(14)
         
-        a = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);
+        a = sqrt(matrix[i*n+i] * matrix[i*n+i] + a);//(15)
         
         if (a < 1e-100)
         {
@@ -52,10 +52,10 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
             continue;
         }
         
-        a = 1.0/a;
+        a = 1.0/a;//(16)
         
         for (j = i; j < n; ++j)
-            matrix[j*n+i] *= a;
+            matrix[j*n+i] *= a; //(16), R is keeped in up triangle, Q isn't keeped
         
         for (k = i + 1; k < n; ++k)
         {
