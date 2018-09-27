@@ -18,9 +18,13 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     int k;
     double a;
     double b;
+    double *d;
+    
+    d = new double [n];
     
     for (i = 0; i < n; ++i)
     {
+        d[i] = 0;
         for (j = 0; j < n; ++j)
         {
             if (i == j)
@@ -33,55 +37,55 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     for (i = 0; i < n; ++i)
     {
         a = 0.0;
-        
         for (j = i + 1; j < n; j++)
             a += matrix[j*n+i] * matrix[j*n+i];//(12)
-        
+
         b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
-        
-        if (b < 1e-100)
-            return 0;
-        
-        matrix[i*n+i] -= b;//(14)
-        
-        a = sqrt(matrix[i*n+i] * matrix[i*n+i] + a);//(15)
-        
-        if (a < 1e-100)
+
+        if (b < 0.0000001)
         {
-            matrix[i*n+i] += b;
+            delete[]d;
+            return 0;
+        }//det = 0;
+
+        d[i] = matrix[i*n+i] - b;
+        
+        for (j = i+1; j < n; ++j)
+            d[j] = matrix[j*n+i]; //(14)
+        
+        a = sqrt(d[i] * d[i] + a);//(15)
+
+        if (a < 0.0000001)
             continue;
-        }
-        
-        a = 1.0/a;//(16)
-        
+
         for (j = i; j < n; ++j)
-            matrix[j*n+i] *= a; //(16), R is keeped in up triangle, Q isn't keeped
-        
+            d[j] /= a; //(16)
+
         for (k = i + 1; k < n; ++k)
         {
             a = 0.0;
             for (j = i; j < n; ++j)
-                a += matrix[j*n+i] * matrix[j*n+k];
-            
-            a *= 2.0;
+                a += d[j] * matrix[j*n+k];
+
+            a*=2.0;//from formula
             for (j = i; j < n; ++j)
-                matrix[j*n+k] -= a * matrix[j*n+i];
+                matrix[j*n+k] -= a * d[j];
         }
-        
+
         for (k = 0; k < n; ++k)
         {
             a = 0.0;
             for (j = i; j < n; ++j)
-                a += matrix[j*n+i] * inverseMatrix[k*n+j];
-            
-            a *= 2.0;
+                a += d[j] * inverseMatrix[k*n+j];
+
+            a*=2.0;//from formula
             for (j = i; j < n; ++j)
-                inverseMatrix[k*n+j] -= a * matrix[j*n+i];
+                inverseMatrix[k*n+j] -= a * d[j];
         }
-        
+
         matrix[i*n+i] = b;
     }
-    
+
     for (i = 0; i < n; ++i)
     {
         for (j = i + 1; j < n; ++j)
@@ -89,19 +93,20 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
             swap(inverseMatrix[i*n+j], inverseMatrix[j*n+i]);
         }
     }
-    
+
     for (k = 0; k < n; ++k)
     {
         for (i = n - 1; i >= 0; --i)
         {
             a = inverseMatrix[i*n+k];
-            
+
             for (j = i + 1; j < n; ++j)
                 a -= matrix[i*n+j] * inverseMatrix[j*n+k];
-            
+
             inverseMatrix[i*n+k] = a/matrix[i*n+i];
         }
-    }
+    }//Gauss
     
+    delete []d;
     return 1;
 }
