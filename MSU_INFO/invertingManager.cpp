@@ -25,6 +25,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     for (i = 0; i < n; ++i)
     {
         d[i] = 0;
+        
         for (j = 0; j < n; ++j)
         {
             if (i == j)
@@ -76,22 +77,14 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
         {
             a = 0.0;
             for (j = i; j < n; ++j)
-                a += d[j] * inverseMatrix[k*n+j];
+                a += d[j] * inverseMatrix[j*n+k];
 
             a*=2.0;//from formula
             for (j = i; j < n; ++j)
-                inverseMatrix[k*n+j] -= a * d[j];
+                inverseMatrix[j*n+k] -= a * d[j];
         }
 
-        matrix[i*n+i] = b;
-    }
-
-    for (i = 0; i < n; ++i)
-    {
-        for (j = i + 1; j < n; ++j)
-        {
-            swap(inverseMatrix[i*n+j], inverseMatrix[j*n+i]);
-        }
+        matrix[i*n+i] = b;//on diag R
     }
 
     for (k = 0; k < n; ++k)
@@ -105,7 +98,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
 
             inverseMatrix[i*n+k] = a/matrix[i*n+i];
         }
-    }//Gauss
+    }//Reverse Gauss
     
     delete []d;
     return 1;
