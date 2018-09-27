@@ -8,6 +8,7 @@
 
 #include "invertingManager.hpp"
 #include <math.h>
+#define eps 1e-100
 
 using namespace std; 
 
@@ -43,7 +44,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
 
         b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
 
-        if (b < 0.0000001)
+        if (b < eps)
         {
             delete[]d;
             return 0;
@@ -56,7 +57,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
         
         a = sqrt(d[i] * d[i] + a);//(15)
 
-        if (a < 0.0000001)
+        if (a < eps)
             continue;
 
         for (j = i; j < n; ++j)
@@ -86,6 +87,8 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
 
         matrix[i*n+i] = b;//on diag R
     }
+    
+    //R in up triangle, Q in down triangle and in d
 
     for (k = 0; k < n; ++k)
     {
