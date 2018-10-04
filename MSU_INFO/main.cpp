@@ -28,22 +28,32 @@ int main()
         
         if (!fin)
         {
-            printf("File don't exist");
+            cout<<"File don't exist"<<endl;
             fclose(fin);
             return -1;
         }
         
-        if (fscanf(fin, "%d", &n) != 1)
+        if (fscanf(fin, "%d", &n) != 1 || n <= 0)
         {
-            printf("Data isn't correct");
+            cout<<"Data isn't correct"<<endl;
             fclose(fin);
             return -2;
         }
     }
-    else
+    else if (inputType == 2)
     {
             cout<<"Enter size: ";
-            cin>>n;
+        
+            if (scanf("%d", &n) != 1 || n <= 0)
+            {
+                cout<<"Data isn't correct"<<endl;
+                return -2;
+            }
+    }
+    else
+    {
+        cout<<"Input type isn't correct"<<endl;
+        return -2;
     }
     
     matrix = new double [n*n];
@@ -66,6 +76,8 @@ int main()
     
     if (returnFlag == -1)
     {
+        cout<<"Data isn't correct"<<endl;
+        
         if (inputType == 1)
             fclose(fin);
         
@@ -75,7 +87,7 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of priting matrix: ";
+    cout<<"Enter size of printing matrix: ";
     cin>>m;
     
     cout<<endl<<"Entering matrix:"<<endl;
@@ -106,6 +118,7 @@ int main()
         
         if (inputType == 1)
             fclose(fin);
+        
         delete []matrix;
         delete []inverseMatrix;
         

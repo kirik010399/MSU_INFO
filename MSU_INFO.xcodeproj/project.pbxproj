@@ -67,11 +67,11 @@
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
+				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 				ED568B342153DD980012834A /* matrixUtils.cpp */,
 				ED568B352153DD980012834A /* matrixUtils.hpp */,
 				ED568B372153DDBC0012834A /* invertingManager.cpp */,
 				ED568B382153DDBC0012834A /* invertingManager.hpp */,
-				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";

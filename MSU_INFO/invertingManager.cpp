@@ -8,7 +8,8 @@
 
 #include "invertingManager.hpp"
 #include <math.h>
-#define eps 1e-100
+#include <iostream>
+//#define eps 1e-100
 
 using namespace std; 
 
@@ -20,6 +21,8 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     double a;
     double b;
     double *d;
+
+    double eps = max(pow(10, -n*3), 1e-100);
     
     d = new double [n];
     
