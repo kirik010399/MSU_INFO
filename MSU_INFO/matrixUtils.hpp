@@ -11,8 +11,9 @@
 
 #include <stdio.h>
 
-int enterMatrix(double* matrix, int n, FILE* fin);
-void printMatrix(double* matrix, int n, int m);
-double residualNorm(double* matrix, double* inverseMatrix, int n);
+int enterData(double* matrix, double* vector, int n, FILE* fin);
+void printResult(double* matrix, int n, int m);
+double residualNorm(double* matrix, double* vector, double* result, int n); 
+double errorFunction(double *result, int n);
 
 #endif /* matrixUtils_hpp */

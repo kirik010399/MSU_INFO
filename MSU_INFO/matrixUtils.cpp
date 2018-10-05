@@ -15,10 +15,10 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return 1.0/(i+j+1.0);
+    return 1.0/(1.0+i+j);
 }
 
-int enterMatrix(double* matrix, int n, FILE* fin)
+int enterData(double* matrix, double *vector, int n, FILE* fin)
 {
     int i;
     int j;
@@ -32,15 +32,23 @@ int enterMatrix(double* matrix, int n, FILE* fin)
                 if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
                     return -1;
             }
+            
+            if (fscanf(fin, "%lf", &vector[i]) != 1)
+                return -1;
         }
     }
     else
     {
         for (i = 0; i < n; ++i)
         {
+            vector[i] = 0;
+            
             for (j = 0; j < n; ++j)
             {
                 matrix[i*n+j] = func(i, j);
+                
+                if (j % 2 == 0)
+                    vector[i] += matrix[i*n+j];
             }
         }
     }
@@ -48,44 +56,50 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printMatrix(double* matrix, int n, int m)
+void printResult(double* result, int n, int m)
 {
     int i;
-    int j;
     int min_ = min(n,m);
     
     for (i = 0; i < min_; ++i)
-    {
-        for (j = 0; j < min_; ++j)
-        {
-            cout<<matrix[i*n+j]<<' ';
-        }
-        cout<<endl;
-    }
+        cout<<result[i]<<' ';
+    
+    cout<<endl;
 }
 
-double residualNorm(double* matrix, double* inverseMatrix, int n)
+double residualNorm(double* matrix, double* vector, double* result, int n)
 {
-    int i;
-    int j;
-    int k;
+    int i, j;
+    double res = 0;
     double a;
-    double res = 0.0;
-        
+    
     for (i = 0; i < n; ++i)
     {
+        a = 0.0;
+        
         for (j = 0; j < n; ++j)
-        {
-            a = 0.0;
-            
-            for (k = 0; k < n; ++k)
-                a += matrix[i*n+k] * inverseMatrix[k*n+j];
-            
-            if (i == j)
-                a -= 1.0;
-            
-            res += a*a;
-        }
+            a += matrix[i*n+j] * result[j];
+        
+        a -= vector[i];
+        
+        res += a*a;
     }
-    return sqrt(res);//Euclid norm
+    
+    return sqrt(res);
+}
+
+double errorFunction(double *result, int n)
+{
+    double error = 0;
+    int i;
+    
+    for (i = 0; i < n; ++i)
+    {
+        if (i % 2)
+            error += result[i]*result[i];
+        else
+            error += (result[i]-1)*(result[i]-1);
+    }
+    
+    return sqrt(error);
 }
