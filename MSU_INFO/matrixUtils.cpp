@@ -15,7 +15,7 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return 1.0/(i+j+1.0);
+    return i+j==999?1:0;
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)
@@ -70,10 +70,13 @@ double residualNorm(double* matrix, double* inverseMatrix, int n)
     int j;
     int k;
     double a;
-    double res = 0.0;
+    double sum = 0.0;
+    double max = 0.0;
         
     for (i = 0; i < n; ++i)
     {
+        sum = 0.0;
+        
         for (j = 0; j < n; ++j)
         {
             a = 0.0;
@@ -84,8 +87,12 @@ double residualNorm(double* matrix, double* inverseMatrix, int n)
             if (i == j)
                 a -= 1.0;
             
-            res += a*a;
+            sum += fabs(a);
         }
+        
+        if (sum > max)
+            max = sum;
     }
-    return sqrt(res);//Euclid norm
+    
+    return max;
 }
