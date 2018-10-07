@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp matrixUtils.cpp solvingManager.cpp -o program
+	g++ main.cpp matrixFunctions.cpp solvingFunctions.cpp -o program
