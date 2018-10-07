@@ -96,7 +96,7 @@ int main()
     returnFlag = solveSystem(matrix, vector, result, n);
     t = clock() - t;
     
-    if (returnFlag)
+    if (returnFlag != -1)
     {
         cout<<"Result vector:"<<endl;
         printResult(result, n, m);
