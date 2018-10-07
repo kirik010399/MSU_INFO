@@ -1,11 +1,3 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "matrixUtils.hpp"
 #include <stdio.h>
 #include <math.h>
@@ -15,7 +7,8 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return i+j==999?1:0;
+//    return i+j==999?1:0;
+    return 1.0/(1.0+i+j); 
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)

@@ -1,11 +1,3 @@
-//
-//  matrixUtils.hpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #ifndef matrixUtils_hpp
 #define matrixUtils_hpp
 

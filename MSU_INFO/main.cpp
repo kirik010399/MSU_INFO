@@ -16,9 +16,6 @@ int main()
     int inputType;
     int returnFlag;
     
-//    cout<<"Enter size: ";
-//    cin>>n;
-    
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
     cin>>inputType;
     
