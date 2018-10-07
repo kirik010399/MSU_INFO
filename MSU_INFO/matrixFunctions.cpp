@@ -1,12 +1,4 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
-#include "matrixUtils.hpp"
+#include "matrixFunctions.hpp"
 #include <stdio.h>
 #include <math.h>
 #include <iostream>
@@ -62,9 +54,9 @@ void printResult(double* result, int n, int m)
     int min_ = min(n,m);
     
     for (i = 0; i < min_; ++i)
-        cout<<result[i]<<' ';
+        printf("%f ", result[i]);
     
-    cout<<endl;
+    printf("\n");
 }
 
 double residualNorm(double* matrix, double* vector, double* result, int n)
@@ -88,7 +80,7 @@ double residualNorm(double* matrix, double* vector, double* result, int n)
     return sqrt(res);
 }
 
-double errorFunction(double *result, int n)
+double errorNorm(double *result, int n)
 {
     double error = 0;
     int i;

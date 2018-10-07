@@ -1,8 +1,8 @@
 #include <iostream>
 #include <time.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "solvingManager.hpp"
+#include "matrixFunctions.hpp"
+#include "solvingFunctions.hpp"
 
 using namespace std;
 
@@ -17,40 +17,45 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
-    cin>>inputType;
+    printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
     
+    if (scanf("%d", &inputType) != 1)
+    {
+        printf("Data isn't correct\n");
+        return -2;
+    }
+
     if (inputType == 1)
     {
         fin = fopen("input.txt", "r");
         
         if (!fin)
         {
-            cout<<"File don't exist"<<endl;
+            printf("File don't exist\n");
             fclose(fin);
             return -1;
         }
         
         if (fscanf(fin, "%d", &n) != 1 || n <= 0)
         {
-            cout<<"Data isn't correct"<<endl;
+            printf("Data isn't correct\n");
             fclose(fin);
             return -2;
         }
     }
     else if (inputType == 2)
     {
-            cout<<"Enter size: ";
-        
-            if (scanf("%d", &n) != 1 || n <= 0)
-            {
-                cout<<"Data isn't correct"<<endl;
-                return -2;
-            }
+        printf("Enter size of matrix: ");
+    
+        if (scanf("%d", &n) != 1 || n <= 0)
+        {
+            printf("Data isn't correct\n");
+            return -2;
+        }
     }
     else
     {
-        cout<<"Input type isn't correct"<<endl;
+        printf("Data isn't correct\n");
         return -2;
     }
     
@@ -60,7 +65,7 @@ int main()
     
     if (!(matrix && vector && result))
     {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
+        printf("No memory, enter matrix with less dimensions\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -76,8 +81,8 @@ int main()
     
     if (returnFlag == -1)
     {
-        cout<<"Data isn't correct"<<endl;
-        
+        printf("Data isn't correct\n");
+
         if (inputType == 1)
             fclose(fin);
         
@@ -88,9 +93,23 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of printing result: ";
-    cin>>m;
-    cout<<endl; 
+    printf("Enter size of printing: ");
+
+    if (scanf("%d", &m) != 1)
+    {
+        printf("Data isn't correct\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []vector;
+        delete []result;
+        
+        return -2;
+    }
+        
+    printf("\n");
     
     t = clock();
     returnFlag = solveSystem(matrix, vector, result, n);
@@ -98,7 +117,7 @@ int main()
     
     if (returnFlag != -1)
     {
-        cout<<"Result vector:"<<endl;
+        printf("Result:\n");
         printResult(result, n, m);
         
         if (inputType == 1)
@@ -106,16 +125,16 @@ int main()
         
         returnFlag = enterData(matrix, vector, n, fin);
         
-        cout<<endl<<"The norm of residual: "<<residualNorm(matrix, vector, result, n)<<endl;
+        printf("\nResidual norm: %f\n", residualNorm(matrix, vector, result, n));
         
         if (inputType == 2)
-            cout<<"The norm of error: "<<errorFunction(result, n)<<endl;
+            printf("Error norm: %f\n", errorNorm(result, n));
         
-        cout<<"Solving time =  "<< t << " milliseconds"<<endl;
+        printf("Solving time =  %lu milliseconds", t);
     }
     else
     {
-        cout<<"Error while solving system"<<endl;
+        printf("Error while solving system\n");
         
         if (inputType == 1)
             fclose(fin);
