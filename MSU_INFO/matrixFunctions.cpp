@@ -1,7 +1,6 @@
 #include "matrixFunctions.hpp"
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
 using namespace std;
 
@@ -51,7 +50,7 @@ int enterData(double* matrix, double *vector, int n, FILE* fin)
 void printResult(double* result, int n, int m)
 {
     int i;
-    int min_ = min(n,m);
+    int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
         printf("%f ", result[i]);
