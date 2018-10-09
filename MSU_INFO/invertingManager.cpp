@@ -22,7 +22,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     double b;
     double *d;
 
-    double eps = max(pow(10, -n*3), 1e-100);
+    double eps = fmax(pow(10, -n*3), 1e-100);
     
     d = new double [n];
     

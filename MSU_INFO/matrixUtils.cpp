@@ -52,7 +52,7 @@ void printMatrix(double* matrix, int n, int m)
 {
     int i;
     int j;
-    int min_ = min(n,m);
+    int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
     {
