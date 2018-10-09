@@ -16,12 +16,14 @@ int main()
     int inputType;
     int returnFlag;
     
-//    cout<<"Enter size: ";
-//    cin>>n;
-    
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
-    cin>>inputType;
     
+    if (scanf("%d", &inputType) != 1)
+    {
+        cout<<"Data isn't correct"<<endl;
+        return -2;
+    }
+         
     if (inputType == 1)
     {
         fin = fopen("input.txt", "r");
@@ -42,13 +44,13 @@ int main()
     }
     else if (inputType == 2)
     {
-            cout<<"Enter size: ";
-        
-            if (scanf("%d", &n) != 1 || n <= 0)
-            {
-                cout<<"Data isn't correct"<<endl;
-                return -2;
-            }
+        cout<<"Enter size: ";
+    
+        if (scanf("%d", &n) != 1 || n <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
     }
     else
     {
@@ -88,7 +90,19 @@ int main()
     }
     
     cout<<"Enter size of printing matrix: ";
-    cin>>m;
+    
+    if (scanf("%d", &m) != 1 || m <= 0)
+    {
+        cout<<"Data isn't correct"<<endl;
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []inverseMatrix;
+        
+        return -2;
+    }
     
     cout<<endl<<"Entering matrix:"<<endl;
     printMatrix(matrix, n, m);
