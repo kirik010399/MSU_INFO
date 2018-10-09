@@ -39,13 +39,13 @@ int main()
     }
     else if (inputType == 2)
     {
-            cout<<"Enter size: ";
-        
-            if (scanf("%d", &n) != 1 || n <= 0)
-            {
-                cout<<"Data isn't correct"<<endl;
-                return -2;
-            }
+        cout<<"Enter size: ";
+    
+        if (scanf("%d", &n) != 1 || n <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
     }
     else
     {
