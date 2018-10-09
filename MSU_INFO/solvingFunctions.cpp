@@ -6,81 +6,63 @@ using namespace std;
 
 int solveSystem(double* matrix, double* vector, double* result, int n)
 {
-    int i, j, k, b;
-    double a;
-
-    double eps = fmax(pow(10, -n*3), 1e-100);
+    int i, j, k, maxElemIndex;
+    double a, maxElem;
     
-    for (j = 0; j < n; ++j)
-    {
-        a = matrix[j*n+j];
-        b = j;
-        
-        for (i = j+1; i < n; ++i)
-        {
-            if (fabs(matrix[i*n+j]) > fabs(a))// Search for max in column
-            {
-                a = matrix[i*n+j];
-                b = i;
-            }
-        }
-        
-        if (fabs(a) < eps) 
-            return -1;
-        
-        if (b != j) // Swap strings (j <-> max)
-        {
-            for (i = j; i < n; ++i)
-                swap(matrix[b*n+i], matrix[j*n+i]);
-            
-            swap(vector[b], vector[j]);
-        }
-    }//main through column
+    double eps = fmax(pow(10, -n*3), 1e-100);
     
     for (i = 0; i < n; ++i)
     {
-        a = matrix[i*n+i];
-        b = i;
+        maxElem = fabs(matrix[i*n+i]);
+        maxElemIndex = i;
         
-        for (j = i+1; j < n; ++j) // Search for max in line
+        for (j = i + 1; j < n; ++j)
         {
-            if (fabs(matrix[i*n+j]) > fabs(a))
+            if (maxElem < fabs(matrix[j*n+i]))
             {
-                a = matrix[i*n+j];
-                b = j;
+                maxElem = fabs(matrix[j*n+i]);
+                maxElemIndex = j;
             }
         }
         
-        if (fabs(a) < eps) // det = 0
+        if (maxElemIndex != i)
+        {
+            for (j = i; j < n; ++j)
+                swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
+        
+            swap (vector[i], vector[maxElemIndex]);
+        }
+        
+        if (maxElem < eps)
             return -1;
         
-        if (b != i) // Swap columns (i <-> max)
+        a = 1.0/matrix[i*n+i];
+        
+        for (j = i; j < n; ++j)
+            matrix[i*n+j] *= a;
+        
+        vector[i] *= a;
+        
+        for (j = i+1; j < n; ++j)
         {
-            for (j = 0; j < n; ++j)
-                swap(matrix[j*n+b], matrix[j*n+i]);
+            a = matrix[j*n+i];
             
-            swap(vector[b], vector[i]);
-        }
-    }//main through string
-    
-    for (j = 0; j < n; ++j)
-    {
-        for(i = 0; i < n; ++i)
-        {
-            if (i != j && fabs(matrix[i*n+j]) > eps)
-            {
-                a = matrix[i*n+j]/matrix[j*n+j];
-                
-                for(k = j; k < n; ++k)
-                    matrix[i*n+k] -= a*matrix[j*n+k];
-                
-                vector[i] -= a*vector[j];
-            }
+            for (k = i; k < n; ++k)
+                matrix[j*n+k] -= matrix[i*n+k] * a;
+            
+            vector[j] -= vector[i] * a;
         }
     }
     
-    for (i = 0; i < n; ++i)
-        result[i] = vector[i]/matrix[i*n+i];
+    for (i = n-1; i >= 0; --i)
+    {
+        a = vector[i];
+        
+        for (j = i+1; j < n; ++j)
+            a -= matrix[i * n + j] * result[j];
+        
+        result[i] = a;
+    }
     
     return 0;
 }
