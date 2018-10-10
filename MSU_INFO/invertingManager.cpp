@@ -15,11 +15,8 @@ using namespace std;
 
 int invertMatrix(double* matrix, double* inverseMatrix, int n)
 {
-    int i;
-    int j;
-    int k;
-    double a;
-    double b;
+    int i, j, k;
+    double a, b;
     double *d;
 
     double eps = fmax(pow(10, -n*3), 1e-100);
