@@ -1,67 +1,64 @@
 #include "solvingFunctions.hpp"
 #include <math.h>
 #include <iostream>
+#include "matrixFunctions.hpp"
 
 using namespace std; 
 
 int solveSystem(double* matrix, double* vector, double* result, int n)
 {
-    int i, j, k, b;
+    int i, j, k;
     double a;
+    
+    int maxStrInd, maxColInd;
 
     double eps = fmax(pow(10, -n*3), 1e-100);
     
     for (j = 0; j < n; ++j)
     {
-        a = matrix[j*n+j];
-        b = j;
+        a = fabs(matrix[j*n+j]);
+        maxStrInd = j;
+        maxColInd = j;
         
-        for (i = j+1; i < n; ++i)
+        for (i = j; i < n; ++i)
         {
-            if (fabs(matrix[i*n+j]) > fabs(a))// Search for max in column
+            for (k = j; k < n; ++k)
             {
-                a = matrix[i*n+j];
-                b = i;
+                if (fabs(matrix[i*n+k]) > a)// Search for max in column
+                {
+                    a = matrix[i*n+j];
+                    maxStrInd = i;
+                    maxColInd = j;
+                }
             }
+        }
+        
+        cout<<maxStrInd<<" "<<maxColInd<<endl;
+        
+        for (int p = 0; p < n; ++p)
+        {
+            for (int q = 0; q < n ++q)
+                cout<<matrix[p*n+q]<<' ';
+            cout<<endl;
         }
         
         if (fabs(a) < eps) 
             return -1;
         
-        if (b != j) // Swap strings (j <-> max)
+        if (maxStrInd != j) // Swap strings (j <-> max)
         {
             for (i = j; i < n; ++i)
-                swap(matrix[b*n+i], matrix[j*n+i]);
+                swap(matrix[maxStrInd*n+i], matrix[maxStrInd*n+i]);
             
-            swap(vector[b], vector[j]);
+            swap(vector[maxStrInd], vector[j]);
         }
-    }//main through column
-    
-    for (i = 0; i < n; ++i)
-    {
-        a = matrix[i*n+i];
-        b = i;
         
-        for (j = i+1; j < n; ++j) // Search for max in line
+        if (maxColInd != j) // Swap columns (j <-> max)
         {
-            if (fabs(matrix[i*n+j]) > fabs(a))
-            {
-                a = matrix[i*n+j];
-                b = j;
-            }
+            for (i = j; i < n; ++i)
+                swap(matrix[i*n+maxColInd], matrix[i*n+j]);
         }
-        
-        if (fabs(a) < eps) // det = 0
-            return -1;
-        
-        if (b != i) // Swap columns (i <-> max)
-        {
-            for (j = 0; j < n; ++j)
-                swap(matrix[j*n+b], matrix[j*n+i]);
-            
-            swap(vector[b], vector[i]);
-        }
-    }//main through string
+    }
     
     for (j = 0; j < n; ++j)
     {
