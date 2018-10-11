@@ -20,8 +20,7 @@ double func(int i, int j)
 
 int enterMatrix(double* matrix, int n, FILE* fin)
 {
-    int i;
-    int j;
+    int i, j;
     
     if (fin)
     {
@@ -50,8 +49,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
 
 void printMatrix(double* matrix, int n, int m)
 {
-    int i;
-    int j;
+    int i, j;
     int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
@@ -66,12 +64,8 @@ void printMatrix(double* matrix, int n, int m)
 
 double residualNorm(double* matrix, double* inverseMatrix, int n)
 {
-    int i;
-    int j;
-    int k;
-    double a;
-    double sum = 0.0;
-    double max = 0.0;
+    int i, j, k;
+    double a, sum = 0.0, max = 0.0;
         
     for (i = 0; i < n; ++i)
     {
