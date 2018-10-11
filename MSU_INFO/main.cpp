@@ -6,12 +6,10 @@
 int main()
 {
     int n, m;
-    double *matrix;
-    double *inverseMatrix;
+    double *matrix, *inverseMatrix, *vector;
     FILE* fin = NULL;
     clock_t t;
-    int inputType;
-    int returnFlag;
+    int inputType, returnFlag;
     
     printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
     
@@ -55,10 +53,11 @@ int main()
         return -2;
     }
     
-    matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
+    matrix = new double [n*(n+1)/2];
+    inverseMatrix = new double[n*(n+1)/2];
+    vector = new double [n];
     
-    if (!(matrix && inverseMatrix))
+    if (!(matrix && inverseMatrix && vector))
     {
         printf("No memory, enter matrix with less dimensions\n");
 
@@ -67,6 +66,7 @@ int main()
         
         delete []matrix;
         delete []inverseMatrix;
+        delete []vector;
         
         return -2;
     }
@@ -82,6 +82,7 @@ int main()
         
         delete []matrix;
         delete []inverseMatrix;
+        delete []vector;
         
         return -2;
     }
@@ -97,12 +98,13 @@ int main()
         
         delete []matrix;
         delete []inverseMatrix;
+        delete []vector;
         
         return -2;
     }
     
     t = clock();
-    returnFlag = invertMatrix(matrix, inverseMatrix, n);
+    returnFlag = invertMatrix(matrix, inverseMatrix, vector, n);
     t = clock() - t;
     
     if (returnFlag != -1)
@@ -117,7 +119,8 @@ int main()
         
         printf("\nResidual norm: %f\n", residualNorm(matrix, inverseMatrix, n));
         
-        printf("Solving time:  %lu milliseconds", t);    }
+        printf("Solving time:  %lu milliseconds", t);
+    }
     else
     {
         printf("Error while inverting matrix\n");
@@ -127,6 +130,7 @@ int main()
         
         delete []matrix;
         delete []inverseMatrix;
+        delete []vector;
         
         return -1;
     }
@@ -136,6 +140,7 @@ int main()
     
     delete []matrix;
     delete []inverseMatrix;
+    delete []vector;
     
     return 0;
 }

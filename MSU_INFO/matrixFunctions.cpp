@@ -18,6 +18,14 @@ double func(int i, int j)
     return i+j==999?1:0;
 }
 
+int getElem(int i, int j)
+{
+    if (i < j)
+        return j*(j+1)/2+i;
+    else
+        return i*(i+1)/2+j;
+}
+
 int enterMatrix(double* matrix, int n, FILE* fin)
 {
     int i;
@@ -29,7 +37,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
+                if (fscanf(fin, "%lf", &matrix[getElem(i, j)]) != 1)
                     return -1;
             }
         }
@@ -40,7 +48,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j);
+                matrix[getElem(i, j)] = func(i, j);
             }
         }
     }
@@ -57,7 +65,7 @@ void printMatrix(double* matrix, int n, int m)
     {
         for (j = 0; j < min_; ++j)
         {
-            printf("%f ", matrix[i*n+j]);
+            printf("%f ", matrix[getElem(i, j)]);
         }
         printf("\n");
     }
@@ -81,7 +89,7 @@ double residualNorm(double* matrix, double* inverseMatrix, int n)
             a = 0.0;
             
             for (k = 0; k < n; ++k)
-                a += matrix[i*n+k] * inverseMatrix[k*n+j];
+                a += matrix[getElem(i, k)] * inverseMatrix[getElem(k, j)];
             
             if (i == j)
                 a -= 1.0;
