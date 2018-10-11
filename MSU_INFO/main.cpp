@@ -104,17 +104,13 @@ int main()
         return -2;
     }
     
-    cout<<endl<<"Entering matrix:"<<endl;
-    printMatrix(matrix, n, m);
-    cout<<endl; 
-    
     t = clock();
     returnFlag = invertMatrix(matrix, inverseMatrix, n);
     t = clock() - t;
     
     if (returnFlag)
     {
-        cout<<"Inverse Matrix:"<<endl; 
+        cout<<endl<<"Inverse Matrix:"<<endl;
         printMatrix(inverseMatrix, n, m);
         
         if (inputType == 1)
