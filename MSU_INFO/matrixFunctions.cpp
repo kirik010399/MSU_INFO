@@ -1,12 +1,12 @@
 //
-//  matrixUtils.cpp
+//  matrixFunctions.cpp
 //  MSU_INFO
 //
 //  Created by Кирилл Мащенко on 20.09.2018.
 //  Copyright © 2018 Кирилл Мащенко. All rights reserved.
 //
 
-#include "matrixUtils.hpp"
+#include "matrixFunctions.hpp"
 #include <stdio.h>
 #include <math.h>
 #include <iostream>
@@ -50,17 +50,16 @@ int enterMatrix(double* matrix, int n, FILE* fin)
 
 void printMatrix(double* matrix, int n, int m)
 {
-    int i;
-    int j;
+    int i, j;
     int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
     {
         for (j = 0; j < min_; ++j)
         {
-            cout<<matrix[i*n+j]<<' ';
+            printf("%f ", matrix[i*n+j]);
         }
-        cout<<endl;
+        printf("\n");
     }
 }
 

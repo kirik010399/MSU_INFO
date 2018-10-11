@@ -6,12 +6,9 @@
 //  Copyright © 2018 Кирилл Мащенко. All rights reserved.
 //
 
-#include "invertingManager.hpp"
+#include "invertingFunctions.hpp"
 #include <math.h>
-#include <iostream>
 //#define eps 1e-100
-
-using namespace std; 
 
 int invertMatrix(double* matrix, double* inverseMatrix, int n)
 {
