@@ -108,7 +108,7 @@ int main()
     returnFlag = invertMatrix(matrix, inverseMatrix, n);
     t = clock() - t;
     
-    if (returnFlag)
+    if (returnFlag!=-1)
     {
         cout<<endl<<"Inverse Matrix:"<<endl;
         printMatrix(inverseMatrix, n, m);
