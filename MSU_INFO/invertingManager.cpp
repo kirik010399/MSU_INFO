@@ -22,6 +22,17 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
     
     for (i = 0; i < n; ++i)
     {
+        for (j = 0; j < n; ++j)
+        {
+            if (i == j)
+                inverseMatrix[i*n+j] = 1;
+            else
+                inverseMatrix[i*n+j] = 0;
+        }
+    }
+    
+    for (i = 0; i < n; ++i)
+    {
         if (fabs(matrix[i*n+i]) < eps)
             return -1;
         
