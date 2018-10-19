@@ -4,9 +4,9 @@
 
 using namespace std;
 
-double func(int i, int j)
+double func(int i, int j, int n)
 {
-    return i+j==999 ?1 :0;
+    return n - fmax(i,j);
 }
 
 int enterData(double* matrix, double *vector, int n, FILE* fin)
@@ -36,7 +36,7 @@ int enterData(double* matrix, double *vector, int n, FILE* fin)
             
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j);
+                matrix[i*n+j] = func(i, j, n);
                 
                 if (j % 2 == 0)
                     vector[i] += matrix[i*n+j];
