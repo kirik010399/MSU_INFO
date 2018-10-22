@@ -47,46 +47,38 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printMatrix(double* matrix, int n, int m)
+void printVector(double* vector, int n, int m)
 {
-    int i, j;
+    int i;
     int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
-    {
-        for (j = 0; j < min_; ++j)
-        {
-            cout<<matrix[i*n+j]<<' ';
-        }
-        cout<<endl;
-    }
+        cout<<vector[i]<<' ';
+    
+    cout<<endl;
 }
 
-double residualNorm(double* matrix, double* inverseMatrix, int n)
+pair<double, double> residualNorm(double* matrix, double* vector, int n)
 {
-    int i, j, k;
-    double a, sum = 0.0, max = 0.0;
-        
+    double inv1, inv2;
+    int i, j;
+    pair<double, double> p;
+    
+    inv1 = 0.0;
+    inv2 = 0.0;
+    
     for (i = 0; i < n; ++i)
     {
-        sum = 0.0;
-        
+        inv1 -= matrix[i*n+i];
         for (j = 0; j < n; ++j)
-        {
-            a = 0.0;
-            
-            for (k = 0; k < n; ++k)
-                a += matrix[i*n+k] * inverseMatrix[k*n+j];
-            
-            if (i == j)
-                a -= 1.0;
-            
-            sum += fabs(a);
-        }
+            inv2 -= matrix[i*n+j] * matrix[j*n+i];
         
-        if (sum > max)
-            max = sum;
+        inv1 += vector[i];
+        inv2 += vector[i] * vector[i];
     }
     
-    return max;
+    p.first = inv1;
+    p.second = inv2;
+    
+    return p;
 }

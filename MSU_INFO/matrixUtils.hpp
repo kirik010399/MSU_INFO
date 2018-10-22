@@ -10,10 +10,13 @@
 #define matrixUtils_hpp
 
 #include <stdio.h>
+#include <algorithm>
+
+using namespace std; 
 
 double func(int i, int j);
 int enterMatrix(double* matrix, int n, FILE* fin);
-void printMatrix(double* matrix, int n, int m);
-double residualNorm(double* matrix, double* inverseMatrix, int n);
+void printVector(double* vector, int n, int m);
+pair<double, double> residualNorm(double* matrix, double* vector, int n);
 
 #endif /* matrixUtils_hpp */
