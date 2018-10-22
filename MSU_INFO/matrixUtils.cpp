@@ -44,6 +44,15 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         }
     }
     
+    for (i = 0; i < n; ++i)
+    {
+        for (j = 0; j < n; ++j)
+        {
+            if (matrix[i*n+j] != matrix[j*n+i])
+                return -1;
+        }
+    }
+    
     return 0;
 }
 
