@@ -15,7 +15,7 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return i+j==999?1:0;
+    return 1.0/(1.0+i+j);
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)
@@ -79,6 +79,7 @@ pair<double, double> residualNorm(double* matrix, double* vector, int n)
     for (i = 0; i < n; ++i)
     {
         inv1 -= matrix[i*n+i];
+        
         for (j = 0; j < n; ++j)
             inv2 -= matrix[i*n+j] * matrix[j*n+i];
         
