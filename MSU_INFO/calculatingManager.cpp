@@ -32,7 +32,7 @@ void values(double *matrix, int n, double *vector, double left, double right)
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
     
-//    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
+    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
     
     if (right - left > eps && c != 0)
     {
@@ -45,40 +45,42 @@ void values(double *matrix, int n, double *vector, double left, double right)
             vector[k + j] = (left+right)/2;
         
         k += c;
-    }
+    }//95
 }
 
 int n_(double* matrix, int n, double lam)
 {
     int i, res;
-    double x, y, u, v, a, matrix_k, b_k1, gam;
+    double x, y, u, v, a, maxx, b, gam;
     
     x = matrix[0] - lam;
     y = 1.0;
-    res = x < 0.0 ? 1 : 0;
+    
+    if (x*y < 0)
+        res = 1;
+    else
+        res = 0;
     
     for (i = 1; i < n; ++i)
     {
-        matrix_k = matrix[i*n+i] - lam;
-        b_k1 = matrix[i*n + i-1];
+        a = matrix[i*n+i] - lam;
+        b = matrix[i*n + i-1];
         
-        a = fabs(b_k1 * b_k1 * y);
+        maxx = fabs(b*b*y);
         
-        if (fabs(x) > a)
-            a = fabs(x);
+        if (fabs(x) > maxx)
+            maxx = fabs(x);
         
-        if (a < 1e-50)
-            a = 1e-15;
+        gam = (1/eps)/maxx;
         
-        gam = 1e-15/a;
-        u = gam * (matrix_k * x - b_k1 * b_k1 * y);
+        u = gam * (a*x - b*b*y);
         v = gam * x;
         
-        if (u * x < 0.0)
+        if (u*x < 0.0)
             ++res;
         
         x = u;
-        y = v;//стр 97
+        y = v;//97
     }
     
     return res;
