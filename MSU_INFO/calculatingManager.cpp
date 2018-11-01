@@ -15,42 +15,36 @@ using namespace std;
 
 void calculateValues(double* matrix, double* vector, int n)
 {
-    int i, j;
-    int count;
     double left, right;
-    double currentLeft, currentRight, currentMiddle;
     
     Rotation(matrix, n);
     
-    right = MatrixNorm(matrix, n) + 1e-10;
+    right = MatrixNorm(matrix, n) + eps;
     left = -right;
     
-    i = 0;
-    currentLeft = left;
-    currentRight = right;
+    values(matrix, n, vector, left, right);
+}
+
+void values(double *matrix, int n, double *vector, double left, double right)
+{
+    static int k = 0;
+    int c, j;
     
-    while (i < n)
+    c = n_(matrix, n, right) - n_(matrix, n, left);
+    
+//    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
+    
+    if (right - left > eps && c != 0)
     {
-        while (currentRight - currentLeft > eps)
-        {
-            currentMiddle = 0.5 * (currentLeft + currentRight);
-            
-            if (n_(matrix, n, currentMiddle) < i+1)
-                currentLeft = currentMiddle;
-                else
-                    currentRight = currentMiddle;
-        }
+        values(matrix, n, vector, left, (left+right)/2);
+        values(matrix, n, vector, (left+right)/2, right);
+    }
+    else if (c != 0)
+    {
+        for (j = 0; j < c; ++j)
+            vector[k + j] = (left+right)/2;
         
-        currentMiddle = 0.5 * (currentLeft + currentRight);
-        count = n_(matrix, n, currentRight) - n_(matrix, n, currentLeft);
-        
-        for (j = 0; j < count; ++j)
-            vector[i + j] = currentMiddle;
-            
-        i += count;
-        
-        currentLeft = currentMiddle;
-        currentRight = right;
+        k += c;
     }
 }
 
@@ -76,7 +70,7 @@ int n_(double* matrix, int n, double lam)
         if (a < 1e-50)
             a = 1e-15;
         
-        gam = 1e15/a;
+        gam = 1e-15/a;
         u = gam * (matrix_k * x - b_k1 * b_k1 * y);
         v = gam * x;
         
@@ -84,7 +78,7 @@ int n_(double* matrix, int n, double lam)
             ++res;
         
         x = u;
-        y = v;
+        y = v;//стр 97
     }
     
     return res;
@@ -99,13 +93,13 @@ void Rotation(double* matrix, int n)
     {
         for (j = i+1; j < n; ++j)
         {
-            x = matrix[i*n+ i-1];
-            y = matrix[j*n+ i-1];
+            x = matrix[i*n + i-1];
+            y = matrix[j*n + i-1];
             
             if (fabs(y) < 1e-100)
                 continue;
             
-            r = sqrt(x * x + y * y);
+            r = sqrt(x*x+y*y);
             
             if (r < 1e-100)
                 continue;

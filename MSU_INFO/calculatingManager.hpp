@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 void calculateValues(double* matrix, double* vector, int n);
+void values(double *matrix, int n, double *vector, double left, double right);
 int n_(double* a, int n, double lambda);
 void Rotation(double* a, int n);
 double MatrixNorm(double* a, int n);
