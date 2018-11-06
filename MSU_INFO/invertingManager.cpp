@@ -61,12 +61,20 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
                     swap(inverseMatrix[notNullStrInd*n+j], inverseMatrix[i*n+j]);
             }
         }
+
+        a = 1.0/matrix[i*n+i];
+        
+        for (j = i; j < n; ++j)
+            matrix[i*n+j] *= a;
+        
+        for (j = 0; j < n; ++j)
+            inverseMatrix[i*n+j] *= a;
         
         for (j = 0; j < n; ++j)
         {
             if (i != j)
             {
-                a = matrix[j*n+i]/matrix[i*n+i];
+                a = matrix[j*n+i];
                 
                 for (k = i; k < n; ++k)
                     matrix[j*n+k] -= matrix[i*n+k] * a;
