@@ -17,6 +17,7 @@ int main()
     int inputType;
     int returnFlag;
     pair<double, double> p;
+    double left, right;
     
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
     
@@ -106,8 +107,23 @@ int main()
         return -2;
     }
     
+    cout<<"Enter left and right borders:"<<endl ;
+
+    if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
+    {
+        cout<<"Data isn't correct"<<endl;
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []vector;
+        
+        return -2;
+    }
+    
     t = clock();
-    calculateValues(matrix, vector, n);
+    calculateValues(matrix, vector, left, right, n);
     t = clock() - t;
     
     cout<<endl<<"Values vector:"<<endl;
