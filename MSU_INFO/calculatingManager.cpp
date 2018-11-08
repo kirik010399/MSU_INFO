@@ -9,7 +9,6 @@
 #include "calculatingManager.hpp"
 #include <math.h>
 #include <iostream>
-#define eps 1e-10
 
 using namespace std;
 
@@ -44,21 +43,21 @@ void calculateValues(double* matrix, double* vector, int n)
         {
             matrix[i*n+j]/=alp;
             
-            if (i!=j && matrix[i*n+j] <eps)
+            if (i!=j && matrix[i*n+j] < 1e-100)
                 matrix[i*n+j] = 0;
         }
     }//97
     
-    for (i = 0; i < n; ++i)
-    {
-        for (j = 0; j < n; ++j)
-        {
-            cout<<matrix[i*n+j]<<' ';
-        }
-        cout<<endl;
-    }
+//    for (i = 0; i < n; ++i)
+//    {
+//        for (j = 0; j < n; ++j)
+//        {
+//            cout<<matrix[i*n+j]<<' ';
+//        }
+//        cout<<endl;
+//    }
     
-    right = MatrixNorm(matrix, n) + eps;//95
+    right = MatrixNorm(matrix, n) + 1e-10;//95
     left = -right;
     
     values(matrix, n, vector, left, right);
@@ -76,7 +75,7 @@ void values(double *matrix, int n, double *vector, double left, double right)
     
 //    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
     
-    if (right - left > eps && c != 0)
+    if (right - left > 1e-10 && c != 0)
     {
         values(matrix, n, vector, left, (left+right)/2);
         values(matrix, n, vector, (left+right)/2, right);
@@ -113,7 +112,7 @@ int n_(double* matrix, int n, double lam)
         if (fabs(x) > maxx)
             maxx = fabs(x);
         
-        gam = (1/eps)/maxx;
+        gam = (1/1e-100)/maxx;
         
         u = gam * (a*x - b*b*y);
         v = gam * x;
@@ -131,14 +130,26 @@ int n_(double* matrix, int n, double lam)
 void Rotation(double* matrix, int n)
 {
     int i, j, k;
-    double x, y, r, matrix_ii, matrix_ij, matrix_ji, matrix_jj, cosPhi, sinPhi;
+    double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
+    double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
     
-    for (i = 1; i < n-1; ++i)
+//    cout<<endl;
+//    for (int ii = 0; ii < n; ++ii)
+//    {
+//        for (int jj = 0; jj < n; ++jj)
+//        {
+//            cout<<matrix[ii*n+jj]<<' ';
+//        }
+//        cout<<endl;
+//    }
+//    cout<<endl;
+    
+    for (i = 0; i < n-2; ++i)
     {
-        for (j = i+1; j < n; ++j)
+       for (j = i+2; j < n; ++j)
         {
-            x = matrix[i*n + i-1];
-            y = matrix[j*n + i-1];
+            x = matrix[(i+1)*n+i];
+            y = matrix[j*n+i];
             
             if (fabs(y) < 1e-100)
                 continue;
@@ -151,31 +162,43 @@ void Rotation(double* matrix, int n)
             cosPhi = x/r;
             sinPhi = -y/r;
             
-            matrix[(i-1)*n+i] = r;
-            matrix[i*n + i-1] = r;
-            
-            matrix[j*n + i-1] = 0.0;
-            matrix[(i-1)*n+j] = 0.0;
-            
-            for (k = i+2; k < n; ++k)
+            for (k = i; k < n; ++k)
             {
-                matrix[i*n+k] = matrix[i*n+k] * cosPhi - matrix[j*n+k] * sinPhi;
-                matrix[k*n+i] = matrix[i*n+k];
+                matrix_ik = matrix[(i+1)*n+k];
+                matrix_jk = matrix[j*n+k];
                 
-                matrix[j*n+k] = matrix[i*n+k] * sinPhi + matrix[j*n+k] * cosPhi;
-                matrix[k*n+j] = matrix[j*n+k];
-            }//B^
+                matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
+                
+                if (k != i+1 && k != j)
+                {
+//                    cout<<"!";
+                    matrix[k*n+i+1] = matrix[(i+1)*n+k];
+                    matrix[k*n+j] = matrix[j*n+k];
+                }
+            }//*Tij
             
-            matrix_ii = matrix[i*n+i] * cosPhi - matrix[i*n+j] * sinPhi;
-            matrix_ji = matrix[j*n+i] * cosPhi - matrix[j*n+j] * sinPhi;
-            matrix_ij = matrix[i*n+i] * sinPhi + matrix[i*n+j] * cosPhi;
-            matrix_jj = matrix[j*n+i] * sinPhi + matrix[j*n+j] * cosPhi;
-            
-            matrix[i*n+i] = matrix_ii * cosPhi - matrix_ji * sinPhi;
-            matrix[j*n+i] = matrix_ij * cosPhi - matrix_jj * sinPhi;
-            matrix[i*n+j] = matrix[j*n+i];
-            matrix[j*n+j] = matrix_ij * sinPhi + matrix_jj * cosPhi;
-        }
+            matrix_ii = matrix[(i+1)*n+i+1];
+            matrix_ji = matrix[j*n+i+1];
+            matrix_ij = matrix[(i+1)*n+j];
+            matrix_jj = matrix[j*n+j];
+
+            matrix[(i+1)*n+i+1] = matrix_ii * cosPhi - matrix_ij * sinPhi;
+            matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
+            matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
+            matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;
+        }//63
+        
+//        cout<<endl;
+//        for (int ii = 0; ii < n; ++ii)
+//        {
+//            for (int jj = 0; jj < n; ++jj)
+//            {
+//                cout<<matrix[ii*n+jj]<<' ';
+//            }
+//            cout<<endl;
+//        }
+//        cout<<endl;
     }
 }
 
