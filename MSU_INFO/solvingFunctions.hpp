@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-int solveSystem(double* matrix, double* vector, double* result, int n);
+int solveSystem(double* a, double* b, double* x, int n);
 
 #endif /* solvingFunctions_hpp */

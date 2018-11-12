@@ -9,23 +9,23 @@ using namespace std;
 int main()
 {
     int n, m;
-    double *matrix;
-    double *vector;
-    double *result;
+    double *a;
+    double *b;
+    double *x;
     FILE* fin = NULL;
     clock_t t;
-    int inputType;
-    int returnFlag;
+    int type;
+    int ret;
     
     printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
     
-    if (scanf("%d", &inputType) != 1)
+    if (scanf("%d", &type) != 1)
     {
         printf("Data isn't correct\n");
         return -2;
     }
 
-    if (inputType == 1)
+    if (type == 1)
     {
         fin = fopen("input.txt", "r");
         
@@ -43,7 +43,7 @@ int main()
             return -2;
         }
     }
-    else if (inputType == 2)
+    else if (type == 2)
     {
         printf("Enter size of matrix: ");
     
@@ -59,36 +59,36 @@ int main()
         return -2;
     }
     
-    matrix = new double [n*n];
-    vector = new double [n];
-    result = new double [n];
+    a = new double [n*n];
+    b = new double [n];
+    x = new double [n];
     
-    if (!(matrix && vector && result))
+    if (!(a && b && x))
     {
         printf("No memory, enter matrix with less dimensions\n");
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         
         return -2;
     }
 
-    returnFlag = enterData(matrix, vector, n, fin);
+    ret = enterData(a, b, n, fin);
     
-    if (returnFlag == -1)
+    if (ret == -1)
     {
         printf("Data isn't correct\n");
 
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         
         return -2;
     }
@@ -99,12 +99,12 @@ int main()
     {
         printf("Data isn't correct\n");
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         
         return -2;
     }
@@ -112,46 +112,46 @@ int main()
     printf("\n");
     
     t = clock();
-    returnFlag = solveSystem(matrix, vector, result, n);
+    ret = solveSystem(a, b, x, n);
     t = clock() - t;
     
-    if (returnFlag != -1)
+    if (ret != -1)
     {
         printf("Result:\n");
-        printResult(result, n, m);
+        printResult(x, n, m);
         
-        if (inputType == 1)
+        if (type == 1)
             fseek(fin, 1, SEEK_SET);
         
-        returnFlag = enterData(matrix, vector, n, fin);
+        ret = enterData(a, b, n, fin);
         
-        printf("\nResidual norm: %f\n", residualNorm(matrix, vector, result, n));
+        printf("\nInaccuracy norm: %f\n", inaccuracyNorm(a, b, x, n));
         
-        if (inputType == 2)
-            printf("Error norm: %f\n", errorNorm(result, n));
+        if (type == 2)
+            printf("Error norm: %f\n", errorNorm(x, n));
         
-        printf("Solving time =  %lu milliseconds", t);
+        printf("Solving time =  %lu seconds\n", t/CLOCKS_PER_SEC);
     }
     else
     {
         printf("Error while solving system\n");
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         
         return -1;
     }
     
-    if (inputType == 1)
+    if (type == 1)
         fclose(fin);
     
-    delete []matrix;
-    delete []vector;
-    delete []result;
+    delete []a;
+    delete []b;
+    delete []x;
     
     return 0;
 }

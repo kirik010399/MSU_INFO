@@ -5,10 +5,10 @@
 
 using namespace std; 
 
-int solveSystem(double* matrix, double* vector, double* result, int n)
+int solveSystem(double* a, double* b, double* x, int n)
 {
     int i, j, k;
-    double a;
+    double value;
     int *var;
     
     var = new int[n];
@@ -22,7 +22,7 @@ int solveSystem(double* matrix, double* vector, double* result, int n)
     
     for (i = 0; i < n; ++i)
     {
-        a = fabs(matrix[i*n+i]);
+        value = fabs(a[i*n+i]);
         maxStrInd = i;
         maxColInd = i;
         
@@ -30,81 +30,53 @@ int solveSystem(double* matrix, double* vector, double* result, int n)
         {
             for (k = i; k < n; ++k)
             {
-                if (fabs(matrix[j*n+k]) > a)// Search for max in matrix
+                if (fabs(a[j*n+k]) > value)// Search for max in matrix
                 {
-                    a = matrix[j*n+k];
+                    value = fabs(a[j*n+k]);
                     maxStrInd = j;
                     maxColInd = k;
                 }
             }
         }
         
-//        cout<<endl<<maxStrInd<<" "<<maxColInd<<endl;
-//        
-//        for (int p = 0; p < n; ++p)
-//        {
-//            for (int q = 0; q < n; ++q)
-//                cout<<matrix[p*n+q]<<' ';
-//            cout<<' '<<vector[p];
-//            cout<<endl;
-//        }
-        
-        if (fabs(a) < eps)
+        if (fabs(value) < eps)
         {
             delete []var;
             return -1;
         }
         
-        if (maxStrInd != i) // Swap strings (j <-> max)
+        if (maxStrInd != i) // Swap strings (i <-> max)
         {
             for (j = 0; j < n; ++j)
-                swap(matrix[maxStrInd*n+j], matrix[i*n+j]);
+                swap(a[maxStrInd*n+j], a[i*n+j]);
             
-            swap(vector[maxStrInd], vector[i]);
+            swap(b[maxStrInd], b[i]);
         }
-//
-//        cout<<endl;
-//        for (int p = 0; p < n; ++p)
-//        {
-//            for (int q = 0; q < n; ++q)
-//                cout<<matrix[p*n+q]<<' ';
-//            cout<<' '<<vector[p];
-//            cout<<endl;
-//        }
         
         swap(var[i], var[maxColInd]);//swap variables
 
-        if (maxColInd != j) // Swap columns (j <-> max)
+        if (maxColInd != i) // Swap columns (i <-> max)
         {
             for (j = 0; j < n; ++j)
-                swap(matrix[j*n+maxColInd], matrix[j*n+i]);
+                swap(a[j*n+maxColInd], a[j*n+i]);
         }
-        
-//        cout<<endl;
-//        for (int p = 0; p < n; ++p)
-//        {
-//            for (int q = 0; q < n; ++q)
-//                cout<<matrix[p*n+q]<<' ';
-//            cout<<' '<<vector[p];
-//            cout<<endl;
-//        }
         
         for(j = 0; j < n; ++j) // Subtraction from all lines
         {
             if (j != i)
             {
-                a = matrix[j*n+i]/matrix[i*n+i];
+                value = a[j*n+i]/a[i*n+i];
                 
                 for(k = i; k < n; ++k)
-                    matrix[j*n+k] -= a*matrix[i*n+k];
+                    a[j*n+k] -= value*a[i*n+k];
                 
-                vector[j] -= a*vector[i];
+                b[j] -= value*b[i];
             }
         }
     }
     
     for (i = 0; i < n; ++i)
-        result[var[i]] = vector[i]/matrix[i*n+i];
+        x[var[i]] = b[i]/a[i*n+i];
     
     delete []var;
     return 0;
