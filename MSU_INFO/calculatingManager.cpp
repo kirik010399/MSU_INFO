@@ -12,12 +12,23 @@
 
 using namespace std;
 
-void calculateValues(double* matrix, double* vector, int n)
+void calculateValues(double* matrix, double* vector, double eps, int n)
 {
     int i, j, alp;
     double left, right;
     double maxA, maxB;
     
+//        for (i = 0; i < n; ++i)
+//        {
+//            for (j = 0; j < n; ++j)
+//            {
+//                cout<<matrix[i*n+j]<<' ';
+//            }
+//            cout<<endl;
+//        }
+//
+//
+//
     Rotation(matrix, n);
     
     maxA = matrix[0];
@@ -56,17 +67,17 @@ void calculateValues(double* matrix, double* vector, int n)
 //        }
 //        cout<<endl;
 //    }
-    
-    right = MatrixNorm(matrix, n) + 1e-10;//95
+//
+    right = MatrixNorm(matrix, n) + eps;//95
     left = -right;
     
-    values(matrix, n, vector, left, right);
+    values(matrix, n, vector, left, right, eps);
     
     for (i = 0; i < n; ++i)
         vector[i]*=alp;
 }
 
-void values(double *matrix, int n, double *vector, double left, double right)
+void values(double *matrix, int n, double *vector, double left, double right, double eps)
 {
     static int k = 0;
     int c, j;
@@ -77,8 +88,8 @@ void values(double *matrix, int n, double *vector, double left, double right)
     
     if (right - left > 1e-10 && c != 0)
     {
-        values(matrix, n, vector, left, (left+right)/2);
-        values(matrix, n, vector, (left+right)/2, right);
+        values(matrix, n, vector, left, (left+right)/2, eps);
+        values(matrix, n, vector, (left+right)/2, right, eps);
     }
     else if (c != 0)
     {
@@ -112,7 +123,7 @@ int n_(double* matrix, int n, double lam)
         if (fabs(x) > maxx)
             maxx = fabs(x);
         
-        gam = (1/1e-100)/maxx;
+        gam = (1/1e-18)/maxx;
         
         u = gam * (a*x - b*b*y);
         v = gam * x;

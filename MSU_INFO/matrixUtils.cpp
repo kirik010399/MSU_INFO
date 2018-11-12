@@ -13,9 +13,15 @@
 
 using namespace std;
 
-double func(int i, int j)
+double func(int i, int j, int n)
 {
-    return 1.0/(1.0+i+j);
+    if (i == n-1)
+        return j+1;
+    if (j == n-1)
+        return i+1;
+    if (i == j)
+        return 1;
+    return 0; 
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)
@@ -39,7 +45,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j);
+                matrix[i*n+j] = func(i, j, n);
             }
         }
     }
@@ -48,7 +54,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     {
         for (j = 0; j < n; ++j)
         {
-            if (matrix[i*n+j] != matrix[j*n+i])
+            if (!(fabs(matrix[i*n+j] - matrix[j*n+i]) < 1e-100))
                 return -1;
         }
     }
@@ -78,13 +84,11 @@ pair<double, double> residualNorm(double* matrix, double* vector, int n)
     
     for (i = 0; i < n; ++i)
     {
-        inv1 -= matrix[i*n+i];
+        inv1 += vector[i] - matrix[i*n+i];
+        inv2 += vector[i] * vector[i];
         
         for (j = 0; j < n; ++j)
-            inv2 -= matrix[i*n+j] * matrix[j*n+i];
-        
-        inv1 += vector[i];
-        inv2 += vector[i] * vector[i];
+            inv2 -= matrix[i*n+j] * matrix[i*n+j];
     }
     
     p.first = inv1;
