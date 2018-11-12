@@ -1,11 +1,3 @@
-//
-//  calculatingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "calculatingManager.hpp"
 #include <math.h>
 #include <iostream>
@@ -26,9 +18,7 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     int c, j;
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
-    
-//    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
-    
+        
     if (right - left > eps && c != 0)
     {
         values(matrix, n, vector, left, (left+right)/2, eps);
@@ -86,7 +76,7 @@ void Otr(double* matrix, int n)
             for (k = i+1; k < n; k++)
                 a += matrix[j*n+k] * matrix[k*n+i];
             
-            matrix[i * n + j] = a;
+            matrix[i*n+j] = a;
         }
         
         a = 0.0;

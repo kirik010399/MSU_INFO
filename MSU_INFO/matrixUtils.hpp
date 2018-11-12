@@ -1,22 +1,20 @@
-//
-//  matrixUtils.hpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #ifndef matrixUtils_hpp
 #define matrixUtils_hpp
 
 #include <stdio.h>
 #include <algorithm>
 
-using namespace std; 
+using namespace std;
+
+struct myPair
+{
+    double inv1;
+    double inv2;
+};
 
 double func(int i, int j, int n);
 int enterMatrix(double* matrix, int n, FILE* fin);
 void printVector(double* vector, int n, int m);
-pair<double, double> residualNorm(double* matrix, double* vector, int n);
+myPair residualNorm(double* matrix, double* vector, int n);
 
 #endif /* matrixUtils_hpp */

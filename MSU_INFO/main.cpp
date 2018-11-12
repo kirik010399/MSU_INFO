@@ -17,14 +17,14 @@ int main()
     int inputType;
     int returnFlag;
     double eps;
-    pair<double, double> p;
+    myPair p;
     double left, right;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    printf("Choosy type of entering data: 1 - from file, 2 - from formula\n");
     
     if (scanf("%d", &inputType) != 1)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         return -2;
     }
          
@@ -34,31 +34,31 @@ int main()
         
         if (!fin)
         {
-            cout<<"File don't exist"<<endl;
+            printf("File don't exist\n");
             fclose(fin);
             return -1;
         }
         
         if (fscanf(fin, "%d", &n) != 1 || n <= 0)
         {
-            cout<<"Data isn't correct"<<endl;
+            printf("Data isn't correct\n");
             fclose(fin);
             return -2;
         }
     }
     else if (inputType == 2)
     {
-        cout<<"Enter size: ";
+        printf("Enter size: \n");
     
         if (scanf("%d", &n) != 1 || n <= 0)
         {
-            cout<<"Data isn't correct"<<endl;
+            printf("Data isn't correct\n");
             return -2;
         }
     }
     else
     {
-        cout<<"Input type isn't correct"<<endl;
+        printf("Input type isn't correct\n");
         return -2;
     }
     
@@ -67,7 +67,7 @@ int main()
     
     if (!(matrix && vector))
     {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
+        printf("No memory, enter matrix with less dimensions\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -82,7 +82,7 @@ int main()
     
     if (returnFlag == -1)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -93,11 +93,11 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of printing vector: ";
+    printf("Enter size of printing vector: ");
     
     if (scanf("%d", &m) != 1 || m <= 0)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -108,11 +108,11 @@ int main()
         return -2;
     }
     
-    cout<<"Enter left and right borders:"<<endl ;
+    printf("Enter left and right borders:\n") ;
 
     if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -123,11 +123,11 @@ int main()
         return -2;
     }
 
-    cout<<"Enter accuracy: ";
+    printf("Enter accuracy: \n");
     
     if (scanf("%lf", &eps) != 1 || eps <= 0)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
@@ -142,7 +142,7 @@ int main()
     calculateValues(matrix, vector, left, right, eps, n);
     t = clock() - t;
     
-    cout<<endl<<"Values vector:"<<endl;
+    printf("\nValues vector:\n");
     printVector(vector, n, m);
     
     if (inputType == 1)
@@ -151,9 +151,9 @@ int main()
     returnFlag = enterMatrix(matrix, n, fin);
     p = residualNorm(matrix, vector, n);
     
-    cout<<endl<<"The norm of residual: in first inv: "<<p.first<<", in second inv: "<<p.second<<endl;
+    printf("\nThe norm of residual: in first inv: %lf, in second inv: %lf\n", p.inv1, p.inv2);
     
-    cout<<"Calculating time =  "<< t << " milliseconds"<<endl;
+    printf("Calculating time =  %lu milliseconds\n", t);
 
     if (inputType == 1)
         fclose(fin);

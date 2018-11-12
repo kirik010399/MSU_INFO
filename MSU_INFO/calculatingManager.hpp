@@ -1,11 +1,3 @@
-//
-//  calculatingManager.hpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #ifndef calculatingManager_hpp
 #define calculatingManager_hpp
 

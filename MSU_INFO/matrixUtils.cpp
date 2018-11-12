@@ -1,11 +1,3 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "matrixUtils.hpp"
 #include <stdio.h>
 #include <math.h>
@@ -73,11 +65,11 @@ void printVector(double* vector, int n, int m)
     cout<<endl;
 }
 
-pair<double, double> residualNorm(double* matrix, double* vector, int n)
+myPair residualNorm(double* matrix, double* vector, int n)
 {
     double inv1, inv2;
     int i, j;
-    pair<double, double> p;
+    myPair p;
     
     inv1 = 0.0;
     inv2 = 0.0;
@@ -91,8 +83,8 @@ pair<double, double> residualNorm(double* matrix, double* vector, int n)
             inv2 -= matrix[i*n+j] * matrix[i*n+j];
     }
     
-    p.first = inv1;
-    p.second = inv2;
+    p.inv1 = inv1;
+    p.inv2 = inv2;
     
     return p;
 }
