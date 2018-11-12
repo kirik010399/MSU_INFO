@@ -44,72 +44,74 @@ void values(double *matrix, int n, double *vector, double left, double right, do
 }
 
 
-void Otr(double* a, int n)
+void Otr(double* matrix, int n)
 {
-    int i;
-    int j;
-    int k;
-    double tmp1;
-    double tmp2;
+    int i, j, k;
+    double a, b;
     
-    for (i = 0; i < n - 2; ++i)
+    for (i = 0; i < n-2; ++i)
     {
-        tmp1 = 0.0;
+        a = 0.0;
         
         for (j = i+2; j < n; ++j)
-            tmp1 += a[j*n+i]*a[j*n+i];
+            a += matrix[j*n+i]*matrix[j*n+i];
         
-        tmp2 = sqrt(a[(i+1)*n+i]*a[(i+1)*n+i] + tmp1);
+        b = sqrt(matrix[(i+1)*n+i]*matrix[(i+1)*n+i] + a);
         
-        if (tmp2 < 1e-100)
+        if (b < 1e-100)
         {
-            a[(i+1)*n+i] = 0.0;
-            a[(i+2)*n+i] = 0.0;
+            matrix[(i+1)*n+i] = 0.0;
+            matrix[(i+2)*n+i] = 0.0;
             
             continue;
         }
         
-        if (tmp1 < 1e-100)
+        if (a < 1e-100)
         {
-            a[(i+2)*n+i] = 0.0;
-            
+            matrix[(i+2)*n+i] = 0.0;
             continue;
         }
         
-        a[(i+1)*n+i] -= tmp2;
+        matrix[(i+1)*n+i] -= b;
         
-        tmp1 = 1.0/sqrt(a[(i+1)*n+i] * a[(i+1)*n+i] + tmp1);
+        a = 1.0/sqrt(matrix[(i+1)*n+i] * matrix[(i+1)*n+i] + a);
         
-        for (j = i + 1; j < n; ++j)
-            a[j*n+i] *= tmp1;
+        for (j = i+1; j < n; ++j)
+            matrix[j*n+i] *= a;
         
         for (j = i+1; j < n; ++j)
         {
-            tmp1 = 0.0;
+            a = 0.0;
+            
             for (k = i+1; k < n; k++)
-                tmp1 += a[j*n+k] * a[k*n+i];
-            a[i * n + j] = tmp1;
+                a += matrix[j*n+k] * matrix[k*n+i];
+            
+            matrix[i * n + j] = a;
         }
         
-        tmp1 = 0.0;
-        for (j = i + 1; j < n; ++j)
-            tmp1 += a[i*n+j] * a[j*n+i];
-        tmp1 *= 2.0;
+        a = 0.0;
+        for (j = i+1; j < n; ++j)
+            a += matrix[i*n+j] * matrix[j*n+i];
+        
+        a *= 2.0;
+        for (j = i+1; j < n; ++j)
+            matrix[i*n+j] = 2.0 * matrix[i*n+j] - a * matrix[j*n+i];
         
         for (j = i+1; j < n; ++j)
-            a[i*n+j] = 2.0 * a[i*n+j] - tmp1 * a[j*n+i];
-        
-        for (j = i+1; j < n; ++j)
+        {
             for (k = i+1; k < n; ++k)
-                a[j*n+k] -= a[i*n+j] * a[k*n+i] + a[i*n+k] * a[j*n+i];
+            {
+                matrix[j*n+k] -= matrix[i*n+j] * matrix[k*n+i] + matrix[i*n+k] * matrix[j*n+i];
+            }
+        }
         
-        a[(i+1)*n+i] = tmp2;
-        a[i*n + i+1] = tmp2;
+        matrix[(i+1)*n+i] = b;
+        matrix[i*n + i+1] = b;
         
         for (j = i + 2; j < n; ++j)
         {
-            a[j*n+i] = 0.0;
-            a[i*n+j] = 0.0;
+            matrix[j*n+i] = 0.0;
+            matrix[i*n+j] = 0.0;
         }
     }
 }
