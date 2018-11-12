@@ -16,6 +16,7 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
+    double eps;
     pair<double, double> p;
     double left, right;
     
@@ -121,9 +122,24 @@ int main()
         
         return -2;
     }
+
+    cout<<"Enter accuracy: ";
+    
+    if (scanf("%lf", &eps) != 1 || eps <= 0)
+    {
+        cout<<"Data isn't correct"<<endl;
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []vector;
+        
+        return -2;
+    }
     
     t = clock();
-    calculateValues(matrix, vector, left, right, n);
+    calculateValues(matrix, vector, left, right, eps, n);
     t = clock() - t;
     
     cout<<endl<<"Values vector:"<<endl;

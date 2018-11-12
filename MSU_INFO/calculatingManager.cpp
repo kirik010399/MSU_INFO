@@ -9,28 +9,30 @@
 #include "calculatingManager.hpp"
 #include <math.h>
 #include <iostream>
-#define eps 1e-100
+//#define eps 1e-100
 
 using namespace std;
 
-void calculateValues(double* matrix, double* vector, double left, double right, int n)
+void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
 {
     Otr(matrix, n);
     
-    values(matrix, n, vector, left, right);
+    values(matrix, n, vector, left, right, eps);
 }
 
-void values(double *matrix, int n, double *vector, double left, double right)
+void values(double *matrix, int n, double *vector, double left, double right, double eps)
 {
     static int k = 0;
     int c, j;
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
     
+//    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
+    
     if (right - left > eps && c != 0)
     {
-        values(matrix, n, vector, left, (left+right)/2);
-        values(matrix, n, vector, (left+right)/2, right);
+        values(matrix, n, vector, left, (left+right)/2, eps);
+        values(matrix, n, vector, (left+right)/2, right, eps);
     }
     else if (c != 0)
     {
