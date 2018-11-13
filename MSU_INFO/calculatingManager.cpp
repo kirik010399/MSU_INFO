@@ -86,7 +86,7 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     
 //    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
     
-    if (right - left > 1e-10 && c != 0)
+    if (right - left > eps && c != 0)
     {
         values(matrix, n, vector, left, (left+right)/2, eps);
         values(matrix, n, vector, (left+right)/2, right, eps);
