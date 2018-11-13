@@ -60,9 +60,9 @@ void printVector(double* vector, int n, int m)
     int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
-        cout<<vector[i]<<' ';
+        printf("%lf ", vector[i]);
     
-    cout<<endl;
+    printf("\n");
 }
 
 myPair residualNorm(double* matrix, double* vector, int n)
