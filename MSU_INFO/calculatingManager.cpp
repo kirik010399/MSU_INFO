@@ -34,76 +34,75 @@ void values(double *matrix, int n, double *vector, double left, double right, do
 }
 
 
-void Otr(double* matrix, int n)
+void Otr(double *matrix, int n)
 {
-    int i, j, k;
-    double a, b;
+    double sk, akk, xk, xy;
+    double *x, *y, *z;
     
-    for (i = 0; i < n-2; ++i)
+    x = new double [n];
+    y = new double [n];
+    z = new double [n];
+    
+    for (int k = 0; k < n-2; k++)
     {
-        a = 0.0;
+        sk = 0;
         
-        for (j = i+2; j < n; ++j)
-            a += matrix[j*n+i]*matrix[j*n+i];
+        for (int j = k+2; j < n; j++)
+            sk += matrix[j*n+k] * matrix[j*n+k];
         
-        b = sqrt(matrix[(i+1)*n+i]*matrix[(i+1)*n+i] + a);
+        akk = sqrt(matrix[(k+1)*n+k] * matrix[(k+1)*n+k] + sk);
         
-        if (b < 1e-100)
-        {
-            matrix[(i+1)*n+i] = 0.0;
-            matrix[(i+2)*n+i] = 0.0;
-            
+        x[0] = matrix[(k+1)*n+k] - akk;
+        
+        for (int j = 1; j < n-k-1; j++)
+            x[j] = matrix[(j+k+1)*n+k];
+        
+        xk = sqrt(x[0] * x[0] + sk);
+        
+        if (xk < 1e-100)
             continue;
-        }
         
-        if (a < 1e-100)
+        xk = 1.0/xk;
+        
+        for (int j = 0; j < n-k-1; j++)
+            x[j] *= xk;
+        
+        for (int i = 0; i < n-k-1; i++)
         {
-            matrix[(i+2)*n+i] = 0.0;
-            continue;
-        }
-        
-        matrix[(i+1)*n+i] -= b;
-        
-        a = 1.0/sqrt(matrix[(i+1)*n+i] * matrix[(i+1)*n+i] + a);
-        
-        for (j = i+1; j < n; ++j)
-            matrix[j*n+i] *= a;
-        
-        for (j = i+1; j < n; ++j)
-        {
-            a = 0.0;
+            y[i] = 0;
             
-            for (k = i+1; k < n; k++)
-                a += matrix[j*n+k] * matrix[k*n+i];
-            
-            matrix[i*n+j] = a;
+            for (int j = 0; j < n-k-1; j++)
+                y[i] += matrix[n*(k+1+i)+(k+1+j)] * x[j];
         }
         
-        a = 0.0;
-        for (j = i+1; j < n; ++j)
-            a += matrix[i*n+j] * matrix[j*n+i];
+        xy = 0.0;
+        for (int i = 0; i < n-k-1; i++)
+            xy += x[i] * y[i];
         
-        a *= 2.0;
-        for (j = i+1; j < n; ++j)
-            matrix[i*n+j] = 2.0 * matrix[i*n+j] - a * matrix[j*n+i];
+        xy *= 2;
+        for (int i = 0; i < n-k-1; i++)
+            z[i] = 2 * y[i] - xy * x[i];
         
-        for (j = i+1; j < n; ++j)
+        for (int i = 0; i < n-k-1; i++)
         {
-            for (k = i+1; k < n; ++k)
+            for (int j = 0; j < n-k-1; j++)
             {
-                matrix[j*n+k] -= matrix[i*n+j] * matrix[k*n+i] + matrix[i*n+k] * matrix[j*n+i];
+                matrix[n*(k+1+i)+(k+1+j)] = matrix[n*(k+1+i)+(k+1+j)] - z[j] * x[i] - x[j] * z[i];
             }
         }
         
-        matrix[(i+1)*n+i] = b;
-        matrix[i*n + i+1] = b;
-        
-        for (j = i + 2; j < n; ++j)
+        for (int i = k+2; i < n; i++)
         {
-            matrix[j*n+i] = 0.0;
-            matrix[i*n+j] = 0.0;
+            matrix[n*i+k] = 0.0;
+            matrix[n*(k+1)-(n-i)] = 0.0;
         }
+        
+        matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
     }
+    
+    delete []x;
+    delete []y;
+    delete []z;
 }
 
 int n_(double* matrix, int n, double lam)
