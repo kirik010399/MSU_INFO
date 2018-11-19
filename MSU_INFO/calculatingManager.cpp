@@ -11,6 +11,8 @@ int calculateValues(double* matrix, double* vector, double left, double right, d
     int i, j, alp;
     double maxA, maxB;
     
+    eps = fmax(1e-10, eps);
+    
     for (i = 0; i < n; ++i)
         vector[i] = 0; 
     
@@ -58,7 +60,7 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
     
-    if (right - left > 1e-10 && c != 0)
+    if (right - left > eps && c != 0)
     {
         values(matrix, n, vector, left, (left+right)/2, eps);
         values(matrix, n, vector, (left+right)/2, right, eps);
