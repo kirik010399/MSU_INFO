@@ -14,12 +14,11 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
-    double eps;
     struct myPair p;
     double left, right;
     
-    printf("Choosy type of entering data: 1 - from file, 2 - from formula\n");
-    
+    printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
+
     if (scanf("%d", &inputType) != 1)
     {
         printf("Data isn't correct\n");
@@ -120,24 +119,9 @@ int main()
         
         return -2;
     }
-
-    printf("Enter accuracy: \n");
-    
-    if (scanf("%lf", &eps) != 1 || eps <= 0)
-    {
-        printf("Data isn't correct\n");
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        free(matrix);
-        free(vector);
-        
-        return -2;
-    }
     
     t = clock();
-    calculateValues(matrix, vector, left, right, eps, n);
+    calculateValues(matrix, vector, left, right, n);
     t = clock() - t;
     
     printf("\nValues vector:\n");

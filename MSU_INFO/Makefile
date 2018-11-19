@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp matrixUtils.cpp calculatingManager.cpp -o program
+	gcc main.c matrixUtils.c calculatingManager.c -o program

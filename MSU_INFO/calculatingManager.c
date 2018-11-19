@@ -2,24 +2,23 @@
 #include <math.h>
 #include <stdlib.h>
 
-void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+void calculateValues(double* matrix, double* vector, double left, double right, int n)
 {
     Otr(matrix, n);
-    
-    values(matrix, n, vector, left, right, eps);
+    values(matrix, n, vector, left, right);
 }
 
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
+void values(double *matrix, int n, double *vector, double left, double right)
 {
     static int k = 0;
     int c, j;
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
         
-    if (right - left > eps && c != 0)
+    if (right - left > 1e-10 && c != 0)
     {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
+        values(matrix, n, vector, left, (left+right)/2);
+        values(matrix, n, vector, (left+right)/2, right);
     }
     else if (c != 0)
     {
