@@ -1,11 +1,3 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "matrixUtils.hpp"
 #include <stdio.h>
 #include <math.h>
@@ -62,10 +54,11 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printVector(double* vector, int n, int m)
+void printVector(double* vector, int n, int m, int k)
 {
     int i;
-    int min_ = fmin(n,m);
+    int min_ = fmin(n, m);
+    min_ = fmin(min_, k); 
     
     for (i = 0; i < min_; ++i)
         cout<<vector[i]<<' ';
@@ -84,11 +77,11 @@ pair<double, double> residualNorm(double* matrix, double* vector, int n)
     
     for (i = 0; i < n; ++i)
     {
-        inv1 += vector[i] - matrix[i*n+i];
-        inv2 += vector[i] * vector[i];
+        inv1 += matrix[i*n+i] - vector[i];
+        inv2 -= vector[i] * vector[i];
         
         for (j = 0; j < n; ++j)
-            inv2 -= matrix[i*n+j] * matrix[i*n+j];
+            inv2 += matrix[i*n+j] * matrix[i*n+j];
     }
     
     p.first = inv1;

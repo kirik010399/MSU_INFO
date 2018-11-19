@@ -16,7 +16,9 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
+    int retSize;
     double eps;
+    double left, right;
     pair<double, double> p;
     
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
@@ -107,6 +109,21 @@ int main()
         return -2;
     }
     
+    printf("Enter left and right borders:\n") ;
+    
+    if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
+    {
+        printf("Data isn't correct\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        delete []matrix;
+        delete []vector;
+        
+        return -2;
+    }
+    
     cout<<"Enter accuracy: ";
     
     if (scanf("%lf", &eps) != 1 || eps <= 0)
@@ -123,11 +140,11 @@ int main()
     }
     
     t = clock();
-    calculateValues(matrix, vector, eps, n);
+    retSize = calculateValues(matrix, vector, left, right, eps, n);
     t = clock() - t;
     
     cout<<endl<<"Values vector:"<<endl;
-    printVector(vector, n, m);
+    printVector(vector, n, m, retSize);
     
     if (inputType == 1)
         fseek(fin, 1, SEEK_SET);
