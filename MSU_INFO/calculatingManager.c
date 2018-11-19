@@ -1,9 +1,6 @@
-#include "calculatingManager.hpp"
+#include "calculatingManager.h"
 #include <math.h>
-#include <iostream>
-//#define eps 1e-100
-
-using namespace std;
+#include <stdlib.h>
 
 void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
 {
@@ -33,15 +30,14 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     }//95
 }
 
-
 void Otr(double *matrix, int n)
 {
     double sk, akk, xk, xy;
     double *x, *y, *z;
     
-    x = new double [n];
-    y = new double [n];
-    z = new double [n];
+    x = (double*)malloc(n * sizeof(double));
+    y = (double*)malloc(n * sizeof(double));
+    z = (double*)malloc(n * sizeof(double));
     
     for (int k = 0; k < n-2; k++)
     {
@@ -100,9 +96,9 @@ void Otr(double *matrix, int n)
         matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
     }
     
-    delete []x;
-    delete []y;
-    delete []z;
+    free(x);
+    free(y);
+    free(z);
 }
 
 int n_(double* matrix, int n, double lam)

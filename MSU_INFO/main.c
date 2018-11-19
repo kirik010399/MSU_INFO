@@ -1,11 +1,9 @@
-#include <iostream>
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "calculatingManager.hpp"
-#include <algorithm>
-
-using namespace std;
+#include "matrixUtils.h"
+#include "calculatingManager.h"
 
 int main()
 {
@@ -17,7 +15,7 @@ int main()
     int inputType;
     int returnFlag;
     double eps;
-    myPair p;
+    struct myPair p;
     double left, right;
     
     printf("Choosy type of entering data: 1 - from file, 2 - from formula\n");
@@ -62,8 +60,8 @@ int main()
         return -2;
     }
     
-    matrix = new double [n*n];
-    vector = new double [n];
+    matrix = (double*)malloc(n * n * sizeof(double));
+    vector = (double*)malloc(n * sizeof(double));
     
     if (!(matrix && vector))
     {
@@ -72,8 +70,8 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
+        free(matrix);
+        free(vector);
         
         return -2;
     }
@@ -87,8 +85,8 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
+        free(matrix);
+        free(vector);
         
         return -2;
     }
@@ -102,8 +100,8 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
+        free(matrix);
+        free(vector);
         
         return -2;
     }
@@ -117,8 +115,8 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
+        free(matrix);
+        free(vector);
         
         return -2;
     }
@@ -132,8 +130,8 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
+        free(matrix);
+        free(vector);
         
         return -2;
     }
@@ -158,8 +156,8 @@ int main()
     if (inputType == 1)
         fclose(fin);
     
-    delete []matrix;
-    delete []vector;
+    free(matrix);
+    free(vector);
     
     return 0;
 }

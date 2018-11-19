@@ -1,9 +1,6 @@
-#include "matrixUtils.hpp"
+#include "matrixUtils.h"
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
-
-using namespace std;
 
 double func(int i, int j, int n)
 {
@@ -65,11 +62,11 @@ void printVector(double* vector, int n, int m)
     printf("\n");
 }
 
-myPair residualNorm(double* matrix, double* vector, int n)
+struct myPair residualNorm(double* matrix, double* vector, int n)
 {
     double inv1, inv2;
     int i, j;
-    myPair p;
+    struct myPair p;
     
     inv1 = 0.0;
     inv2 = 0.0;
