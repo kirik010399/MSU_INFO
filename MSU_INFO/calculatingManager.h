@@ -1,11 +1,9 @@
-#ifndef calculatingManager_hpp
-#define calculatingManager_hpp
+#ifndef calculatingManager_h
+#define calculatingManager_h
 
 #include <stdio.h>
 
-int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n);
-void values(double *matrix, int n, double *vector, double left, double right, double eps);
-int n_(double* a, int n, double lam);
-void Otr(double* a, int n);
+void calculateValues(double* matrix, double* vector, double eps, int n);
+void Rotation(double* a, int n, double eps);
 
-#endif /* calculatingManager_hpp */
+#endif /* calculatingManager_h */

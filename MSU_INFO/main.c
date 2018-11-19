@@ -14,10 +14,8 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
-    int retSize = 0;
     double eps;
     struct myPair p;
-    double left, right;
     
     printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
 
@@ -106,23 +104,8 @@ int main()
         
         return -2;
     }
-    
-    printf("Enter left and right borders:\n") ;
 
-    if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
-    {
-        printf("Data isn't correct\n");
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        free(matrix);
-        free(vector);
-        
-        return -2;
-    }
-
-    printf("Enter accuracy: \n");
+    printf("Enter accuracy: ");
     
     if (scanf("%lf", &eps) != 1 || eps <= 0)
     {
@@ -138,11 +121,11 @@ int main()
     }
 
     t = clock();
-    retSize = calculateValues(matrix, vector, left, right, eps, n);
+    calculateValues(matrix, vector, eps, n);
     t = clock() - t;
     
     printf("\nValues vector:\n");
-    printVector(vector, n, m, retSize);
+    printVector(vector, n, m);
     
     if (inputType == 1)
         fseek(fin, 1, SEEK_SET);

@@ -2,134 +2,152 @@
 #include <math.h>
 #include <stdlib.h>
 
-int k = 0;
-
-int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+void calculateValues(double* matrix, double* vector, double eps, int n)
 {
-    int i;
+    double sk, r, r1, x1, x2, c, d;
+    int i, j, k;
+    double *cos, *sin;
+    
+    Rotation(matrix, n, eps);
+    
+    cos = (double*)malloc((n-1) * sizeof(double));
+    sin = (double*)malloc((n-1) * sizeof(double));
+    
+    for (k = n; k > 2; --k)
+    {
+        while (fabs(matrix[(k-1)*n+k-2]) > eps && fabs(matrix[(k-2)*n + k-1]) > eps)
+        {
+            sk = matrix[(k-1)*n+(k-1)];
+            
+            for (i = 0; i < k; ++i)
+                matrix[i*n+i] -= sk;
+            
+            //QR
+            for (i = 0; i < k-1; ++i)
+            {
+                r = sqrt(matrix[i*n+i]*matrix[i*n+i] + matrix[(i+1)*n+i]*matrix[(i+1)*n+i]);
+                
+                if (r < eps)
+                {
+                    if (matrix[i*n+i] > 0)
+                        cos[i] = 1;
+                    else
+                        cos[i] = -1;
+                    
+                    sin[i] = 0;
+                }
+                else
+                {
+                    r1 = 1/r;
+                    cos[i] = matrix[i*n+i] * r1;
+                    sin[i] = -matrix[(i+1)*n+i] * r1;
+                }
+                
+                x1 = matrix[i*n+(i+1)];
+                x2 = matrix[(i+1)*n+(i+1)];
+                
+                matrix[i*n+i+1] = x1 * cos[i] - x2 * sin[i];
+                matrix[(i+1)*n+(i+1)] = x1 * sin[i] + x2 * cos[i];
+                
+                if (i != k - 2)
+                    matrix[(i+1)*n+(i+2)] *= cos[i];
+                
+                matrix[i*n+i] = r;
+                matrix[(i+1)*n+i] = 0;
+            }
+            
+            //RQ
+            for (i = 0; i < k - 1; ++i)
+            {
+                for (j = i; j < i + 2; ++j)
+                {
+                    if ((fabs(sin[i]) < eps) && (fabs(cos[i]) < eps))
+                        break;
+                    
+                    x1 = matrix[j*n+i];
+                    x2 = matrix[j*n+(i+1)];
+                    
+                    matrix[j*n+i] = x1 * cos[i] - x2 * sin[i];
+                    matrix[j*n+(i+1)] = x1 * sin[i] + x2 * cos[i];
+                }
+                
+                matrix[i*n+(i+1)] = matrix[(i+1)*n+i];
+            }
+            
+            for (i = 0; i < k; ++i)
+                matrix[i*n+i] += sk;
+        }
+    }
+    
+    if (n >= 2)
+    {
+        c = matrix[0] + matrix[n+1];
+        d = (c * c - 4 * matrix[0] * matrix[n+1] + 4 * matrix[1] * matrix[n]);
+        
+        if (d < eps)
+            d = 0;
+        else
+            d = sqrt(d);
+        
+        matrix[0] = (c + d) / 2;
+        matrix[n + 1] = (c - d) / 2;
+    }
     
     for (i = 0; i < n; ++i)
-        vector[i] = 0;
+        vector[i] = matrix[i*n+i];
     
-    eps = fmax(1e-10, eps);
-
-    Otr(matrix, n);
-    values(matrix, n, vector, left, right, eps);
-    
-    return k;
+    free(cos);
+    free(sin);
 }
 
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
+void Rotation(double* matrix, int n, double eps)
 {
-    int c, j;
+    int i, j, k;
+    double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
+    double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
     
-    c = n_(matrix, n, right) - n_(matrix, n, left);
-        
-    if (right - left > eps && c != 0)
+    for (i = 0; i < n-2; ++i)
     {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
-    }
-    else if (c != 0)
-    {
-        for (j = 0; j < c; ++j)
-            vector[k + j] = (left+right)/2;
-        
-        k += c;
-    }//95
-}
-
-void Otr(double *matrix, int n)
-{
-    double sk, akk, xk, xy;
-    double *x, *y, *z;
-    
-    x = (double*)malloc(n * sizeof(double));
-    y = (double*)malloc(n * sizeof(double));
-    z = (double*)malloc(n * sizeof(double));
-    
-    for (int k = 0; k < n-2; k++)
-    {
-        sk = 0;
-        
-        for (int j = k+2; j < n; j++)
-            sk += matrix[j*n+k] * matrix[j*n+k];
-        
-        akk = sqrt(matrix[(k+1)*n+k] * matrix[(k+1)*n+k] + sk);
-        
-        x[0] = matrix[(k+1)*n+k] - akk;
-        
-        for (int j = 1; j < n-k-1; j++)
-            x[j] = matrix[(j+k+1)*n+k];
-        
-        xk = sqrt(x[0] * x[0] + sk);
-        
-        if (xk < 1e-100)
-            continue;
-        
-        xk = 1.0/xk;
-        
-        for (int j = 0; j < n-k-1; j++)
-            x[j] *= xk;
-        
-        for (int i = 0; i < n-k-1; i++)
+        for (j = i+2; j < n; ++j)
         {
-            y[i] = 0;
+            x = matrix[(i+1)*n+i];
+            y = matrix[j*n+i];
             
-            for (int j = 0; j < n-k-1; j++)
-                y[i] += matrix[n*(k+1+i)+(k+1+j)] * x[j];
-        }
-        
-        xy = 0.0;
-        for (int i = 0; i < n-k-1; i++)
-            xy += x[i] * y[i];
-        
-        xy *= 2;
-        for (int i = 0; i < n-k-1; i++)
-            z[i] = 2 * y[i] - xy * x[i];
-        
-        for (int i = 0; i < n-k-1; i++)
-        {
-            for (int j = 0; j < n-k-1; j++)
+            if (fabs(y) < eps)
+                continue;
+            
+            r = sqrt(x*x+y*y);
+            
+            if (r < eps)
+                continue;
+            
+            cosPhi = x/r;
+            sinPhi = -y/r;
+            
+            for (k = i; k < n; ++k)
             {
-                matrix[n*(k+1+i)+(k+1+j)] = matrix[n*(k+1+i)+(k+1+j)] - z[j] * x[i] - x[j] * z[i];
-            }
-        }
-        
-        for (int i = k+2; i < n; i++)
-        {
-            matrix[n*i+k] = 0.0;
-            matrix[n*(k+1)-(n-i)] = 0.0;
-        }
-        
-        matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
+                matrix_ik = matrix[(i+1)*n+k];
+                matrix_jk = matrix[j*n+k];
+                
+                matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
+                
+                if (k != i+1 && k != j)
+                {
+                    matrix[k*n+i+1] = matrix[(i+1)*n+k];
+                    matrix[k*n+j] = matrix[j*n+k];
+                }
+            }//*Tij
+            
+            matrix_ii = matrix[(i+1)*n+i+1];
+            matrix_ji = matrix[j*n+i+1];
+            matrix_ij = matrix[(i+1)*n+j];
+            matrix_jj = matrix[j*n+j];
+            
+            matrix[(i+1)*n+i+1] = matrix_ii * cosPhi - matrix_ij * sinPhi;
+            matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
+            matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
+            matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;//*Tij^t
+        }//67
     }
-    
-    free(x);
-    free(y);
-    free(z);
-}
-
-int n_(double* matrix, int n, double lam)
-{
-    int i;
-    int res;
-    double elem;
-    
-    elem = matrix[0] - lam;
-    
-    if (elem < 0)
-        res = 1;
-    else
-        res = 0;
-    
-    for (i = 1; i < n; ++i)
-    {
-        elem = matrix[i*n+i] - lam - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem;
-        
-        if (elem < 0)
-            ++res;
-    }
-    
-    return res;
 }
