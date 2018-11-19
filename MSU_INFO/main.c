@@ -14,6 +14,8 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
+    int retSize = 0;
+    double eps;
     struct myPair p;
     double left, right;
     
@@ -119,13 +121,28 @@ int main()
         
         return -2;
     }
+
+    printf("Enter accuracy: \n");
     
+    if (scanf("%lf", &eps) != 1 || eps <= 0)
+    {
+        printf("Data isn't correct\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        free(matrix);
+        free(vector);
+        
+        return -2;
+    }
+
     t = clock();
-    calculateValues(matrix, vector, left, right, n);
+    retSize = calculateValues(matrix, vector, left, right, eps, n);
     t = clock() - t;
     
     printf("\nValues vector:\n");
-    printVector(vector, n, m);
+    printVector(vector, n, m, retSize);
     
     if (inputType == 1)
         fseek(fin, 1, SEEK_SET);
