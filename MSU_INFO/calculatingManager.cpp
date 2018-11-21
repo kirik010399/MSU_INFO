@@ -16,7 +16,7 @@ int calculateValues(double* matrix, double* vector, double left, double right, d
     for (i = 0; i < n; ++i)
         vector[i] = 0; 
     
-    Rotation(matrix, n);
+    Reflection(matrix, eps, n);
     
     maxA = matrix[0];
     maxB = matrix[1];
@@ -112,54 +112,73 @@ int n_(double* matrix, int n, double lam)
     return res;
 }
 
-void Rotation(double* matrix, int n)
+void Reflection(double *matrix, double eps, int n)
 {
-    int i, j, k;
-    double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
-    double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
+    double sk, akk, xk, xy;
+    double *x, *y, *z;
     
-    for (i = 0; i < n-2; ++i)
+    x = new double[n];
+    y = new double[n];
+    z = new double[n];
+    
+    for (int k = 0; k < n-2; k++)
     {
-       for (j = i+2; j < n; ++j)
+        sk = 0;
+        
+        for (int j = k+2; j < n; j++)
+            sk += matrix[j*n+k] * matrix[j*n+k];
+        
+        akk = sqrt(matrix[(k+1)*n+k] * matrix[(k+1)*n+k] + sk);
+        
+        x[0] = matrix[(k+1)*n+k] - akk;
+        
+        for (int j = 1; j < n-k-1; j++)
+            x[j] = matrix[(j+k+1)*n+k];
+        
+        xk = sqrt(x[0] * x[0] + sk);
+        
+        if (xk < eps)
+            continue;
+        
+        xk = 1.0/xk;
+        
+        for (int j = 0; j < n-k-1; j++)
+            x[j] *= xk;
+        
+        for (int i = 0; i < n-k-1; i++)
         {
-            x = matrix[(i+1)*n+i];
-            y = matrix[j*n+i];
+            y[i] = 0;
             
-            if (fabs(y) < 1e-100)
-                continue;
-            
-            r = sqrt(x*x+y*y);
-            
-            if (r < 1e-100)
-                continue;
-            
-            cosPhi = x/r;
-            sinPhi = -y/r;
-            
-            for (k = i; k < n; ++k)
+            for (int j = 0; j < n-k-1; j++)
+                y[i] += matrix[n*(k+1+i)+(k+1+j)] * x[j];
+        }
+        
+        xy = 0.0;
+        for (int i = 0; i < n-k-1; i++)
+            xy += x[i] * y[i];
+        
+        xy *= 2;
+        for (int i = 0; i < n-k-1; i++)
+            z[i] = 2 * y[i] - xy * x[i];
+        
+        for (int i = 0; i < n-k-1; i++)
+        {
+            for (int j = 0; j < n-k-1; j++)
             {
-                matrix_ik = matrix[(i+1)*n+k];
-                matrix_jk = matrix[j*n+k];
-                
-                matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
-                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
-                
-                if (k != i+1 && k != j)
-                {
-                    matrix[k*n+i+1] = matrix[(i+1)*n+k];
-                    matrix[k*n+j] = matrix[j*n+k];
-                }
-            }//*Tij
-            
-            matrix_ii = matrix[(i+1)*n+i+1];
-            matrix_ji = matrix[j*n+i+1];
-            matrix_ij = matrix[(i+1)*n+j];
-            matrix_jj = matrix[j*n+j];
-
-            matrix[(i+1)*n+i+1] = matrix_ii * cosPhi - matrix_ij * sinPhi;
-            matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
-            matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
-            matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;//Tij^t
-        }//67
+                matrix[n*(k+1+i)+(k+1+j)] = matrix[n*(k+1+i)+(k+1+j)] - z[j] * x[i] - x[j] * z[i];
+            }
+        }
+        
+        for (int i = k+2; i < n; i++)
+        {
+            matrix[n*i+k] = 0.0;
+            matrix[n*(k+1)-(n-i)] = 0.0;
+        }
+        
+        matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
     }
+    
+    delete []x;
+    delete []y;
+    delete []z;
 }
