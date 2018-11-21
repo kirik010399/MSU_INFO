@@ -14,7 +14,6 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
-    int retSize = 0;
     double eps;
     struct myPair p;
     double left, right;
@@ -138,11 +137,11 @@ int main()
     }
 
     t = clock();
-    retSize = calculateValues(matrix, vector, left, right, eps, n);
+    calculateValues(matrix, vector, left, right, eps, n);
     t = clock() - t;
     
     printf("\nValues vector:\n");
-    printVector(vector, n, m, retSize);
+    printVector(vector, n, m);
     
     if (inputType == 1)
         fseek(fin, 1, SEEK_SET);

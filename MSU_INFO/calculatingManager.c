@@ -2,25 +2,22 @@
 #include <math.h>
 #include <stdlib.h>
 
-int k = 0;
-
-int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
 {
     int i;
     
     for (i = 0; i < n; ++i)
         vector[i] = 0;
     
-    eps = fmax(1e-10, eps);
+    eps = fmax(1e-10, eps);//TODO segmentation fault without it
 
-    Otr(matrix, n);
+    Reflection(matrix, n);
     values(matrix, n, vector, left, right, eps);
-    
-    return k;
 }
 
 void values(double *matrix, int n, double *vector, double left, double right, double eps)
 {
+    static int k = 0;
     int c, j;
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
@@ -39,7 +36,7 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     }//95
 }
 
-void Otr(double *matrix, int n)
+void Reflection(double *matrix, int n)
 {
     double sk, akk, xk, xy;
     double *x, *y, *z;

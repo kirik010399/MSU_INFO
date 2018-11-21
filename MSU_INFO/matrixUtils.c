@@ -51,11 +51,10 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printVector(double* vector, int n, int m, int k)
+void printVector(double* vector, int n, int m)
 {
     int i;
     int min_ = fmin(n,m);
-    min_ = fmin(min_, k); 
     
     for (i = 0; i < min_; ++i)
         printf("%lf ", vector[i]);
