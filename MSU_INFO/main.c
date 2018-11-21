@@ -16,7 +16,6 @@ int main()
     int returnFlag;
     double eps;
     struct myPair p;
-    double left, right;
     
     printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
 
@@ -105,21 +104,6 @@ int main()
         
         return -2;
     }
-    
-    printf("Enter left and right borders:\n") ;
-
-    if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
-    {
-        printf("Data isn't correct\n");
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        free(matrix);
-        free(vector);
-        
-        return -2;
-    }
 
     printf("Enter accuracy: \n");
     
@@ -137,21 +121,24 @@ int main()
     }
 
     t = clock();
-    calculateValues(matrix, vector, left, right, eps, n);
+    calculateValues(matrix, vector, eps, n);
     t = clock() - t;
     
     printf("\nValues vector:\n");
     printVector(vector, n, m);
     
     if (inputType == 1)
-        fseek(fin, 1, SEEK_SET);
+    {
+        fseek(fin, 0, SEEK_SET);
+        fscanf(fin, "%d", &n);
+    }
     
     returnFlag = enterMatrix(matrix, n, fin);
     p = residualNorm(matrix, vector, n);
     
     printf("\nThe norm of residual: in first inv: %lf, in second inv: %lf\n", p.inv1, p.inv2);
     
-    printf("Calculating time =  %lu milliseconds\n", t);
+    printf("Calculating time =  %lu seconds\n", t/CLOCKS_PER_SEC);
 
     if (inputType == 1)
         fclose(fin);

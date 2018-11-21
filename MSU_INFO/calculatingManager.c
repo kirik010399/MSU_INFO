@@ -2,16 +2,17 @@
 #include <math.h>
 #include <stdlib.h>
 
-void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+void calculateValues(double* matrix, double* vector, double eps, int n)
 {
-    int i;
-    
-    for (i = 0; i < n; ++i)
-        vector[i] = 0;
+    double left, right;
     
     eps = fmax(1e-10, eps);//TODO segmentation fault without it
 
-    Reflection(matrix, n);
+    Reflection(matrix, eps, n);
+    
+    right = MatrixNorm(matrix, n) + eps;
+    left = -right;
+    
     values(matrix, n, vector, left, right, eps);
 }
 
@@ -36,7 +37,7 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     }//95
 }
 
-void Reflection(double *matrix, int n)
+void Reflection(double *matrix, double eps, int n)
 {
     double sk, akk, xk, xy;
     double *x, *y, *z;
@@ -61,7 +62,7 @@ void Reflection(double *matrix, int n)
         
         xk = sqrt(x[0] * x[0] + sk);
         
-        if (xk < 1e-100)
+        if (xk < eps)
             continue;
         
         xk = 1.0/xk;
@@ -130,3 +131,25 @@ int n_(double* matrix, int n, double lam)
     
     return res;
 }
+
+double MatrixNorm(double* matrix, int n)
+{
+    int i, j;
+    double sum, res;
+    
+    res = 0.0;
+    
+    for (i = 0; i < n; ++i)
+    {
+        sum = 0.0;
+        for (j = 0; j < n; ++j)
+            sum += fabs(matrix[i*n+j]);
+        
+        if (res < sum)
+            res = sum;
+    }
+    
+    return res;
+}
+
+

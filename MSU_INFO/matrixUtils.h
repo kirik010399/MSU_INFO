@@ -1,5 +1,5 @@
-#ifndef matrixUtils_hpp
-#define matrixUtils_hpp
+#ifndef matrixUtils_h
+#define matrixUtils_h
 
 #include <stdio.h>
 
@@ -14,4 +14,4 @@ int enterMatrix(double* matrix, int n, FILE* fin);
 void printVector(double* vector, int n, int m);
 struct myPair residualNorm(double* matrix, double* vector, int n);
 
-#endif /* matrixUtils_hpp */
+#endif /* matrixUtils_h */
