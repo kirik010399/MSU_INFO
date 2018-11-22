@@ -87,10 +87,6 @@ int main()
     cout<<"Enter size of printing matrix: ";
     cin>>m;
     
-    cout<<endl<<"Entering matrix:"<<endl;
-    printMatrix(matrix, n, m);
-    cout<<endl; 
-    
     t = clock();
     returnFlag = invertMatrix(matrix, inverseMatrix, n);
     t = clock() - t;
@@ -107,7 +103,7 @@ int main()
         
         cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
         
-        cout<<"Inversion time =  "<< t << " milliseconds"<<endl;
+        cout<<"Inversion time =  "<< t/CLOCKS_PER_SEC << " seconds"<<endl;
     }
     else
     {
