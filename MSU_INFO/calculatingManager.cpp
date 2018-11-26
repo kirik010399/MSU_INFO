@@ -30,15 +30,18 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         {
             if (fabs(vector[i1]) < fabs(vector[i]))
                 i1 = i;
-        }
+        }//p.92 (11)
         
-        j1 = (i1 > 0 ? 0 : 1);
+        if (i1 > 0)
+            j1 = 0;
+        else
+            j1 = 1;//to j1!=i1
         
         for (j = 0; j < n; ++j)
         {
             if (j != i1 && fabs(matrix[i1*n+j1]) < fabs(matrix[i1*n+j]))
                 j1 = j;
-        }
+        }//p.92 (11)
         
         x = -2.0 * matrix[i1*n+j1];//p.89, up
         y = matrix[i1*n+i1] - matrix[j1*n+j1];//p.89, up
@@ -72,10 +75,10 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         
         x = matrix[i1*(n+1)];
         matrix[i1*n+i1] = x * cosPhi - matrix[i1*n+j1] * sinPhi;
-        
+
         y = matrix[j1*n+i1];
         matrix[j1*n+j1] = y * sinPhi + matrix[j1*(n+1)] * cosPhi;
-        
+
         matrix[i1*n+j1] = 0;
         matrix[j1*n+i1] = 0;
         
