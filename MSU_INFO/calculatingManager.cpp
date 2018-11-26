@@ -91,7 +91,7 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         {
             if (i != i1)
                 vector[i1] += matrix[i*n+i1] * matrix[i*n+i1];
-        }
+        }//recalculating vector. p.92 (12)-(13)
         
         vector[j1] = 0.0;
         
@@ -99,7 +99,7 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         {
             if (j != j1)
                 vector[j1] += matrix[j*n+j1] * matrix[j*n+j1];
-        }
+        }//recalculating vector. p.92 (12)-(13)
     }
     
     //now vector is result
