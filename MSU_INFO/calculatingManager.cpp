@@ -6,7 +6,7 @@ using namespace std;
 
 void calculateValues(double* matrix, double* vector, double eps, int n)
 {
-    int i, j, iNil, jNil;
+    int i, j, i1, j1;
     double x, y;
     double cosPhi, sinPhi;
     
@@ -20,25 +20,28 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
             if (i != j)
                 vector[i] += matrix[i*n+j] * matrix[i*n+j];
         }
-    }
+    }//vector = b, sum of squares not diag elements
     
     while (VectorNorm(vector, n) > eps)
     {
-        iNil = 0;
+        i1 = 0;
         
         for (i = 0; i < n; ++i)
-            if (fabs(vector[iNil]) < fabs(vector[i]))
-                iNil = i;
+        {
+            if (fabs(vector[i1]) < fabs(vector[i]))
+                i1 = i;
+        }
         
-        jNil = (iNil > 0 ? 0 : 1);
+        j1 = (i1 > 0 ? 0 : 1);
         
         for (j = 0; j < n; ++j)
-            if (j != iNil)
-                if (fabs(matrix[iNil*n+jNil]) < fabs(matrix[iNil*n+j]))
-                    jNil = j;
+        {
+            if (j != i1 && fabs(matrix[i1*n+j1]) < fabs(matrix[i1*n+j]))
+                j1 = j;
+        }
         
-        x = -2.0 * matrix[iNil*n+jNil];
-        y = matrix[iNil*n+iNil] - matrix[jNil*n+jNil];
+        x = -2.0 * matrix[i1*n+j1];//p.89, up
+        y = matrix[i1*n+i1] - matrix[j1*n+j1];//p.89, up
         
         if (fabs(y) < 1e-100)
         {
@@ -47,46 +50,53 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         }
         else
         {
-            cosPhi = sqrt(2)/2 * sqrt(1.0 + fabs(y) / sqrt(x * x + y * y));
-            sinPhi = 0.5 * (x * y > 0 ? 1.0 : -1.0) * fabs(x) / (cosPhi * sqrt(x * x + y * y));
-        }
+            cosPhi = 1/sqrt(2) * sqrt(1.0 + fabs(y) / sqrt(x*x+y*y));
+            sinPhi = 0.5 * (x*y > 0 ? 1.0: -1.0) * fabs(x) / (cosPhi * sqrt(x*x+y*y));
+        }//p.89, (8)
         
         for (j = 0; j < n; ++j)
         {
-            x = matrix[iNil*n+j];
-            matrix[iNil*n+j] = x * cosPhi - matrix[jNil*n+j] * sinPhi;
-            matrix[jNil*n+j] = x * sinPhi + matrix[jNil*n+j] * cosPhi;
-        }
+            x = matrix[i1*n+j];
+            matrix[i1*n+j] = x * cosPhi - matrix[j1*n+j] * sinPhi;
+            matrix[j1*n+j] = x * sinPhi + matrix[j1*n+j] * cosPhi;
+        }//*Tij, p.87, only i1 and j1 strings
         
         for (j = 0; j < n; ++j)
         {
-            if (j != iNil && j != jNil)
+            if (j != i1 && j != j1)
             {
-                matrix[j*n+iNil] = matrix[iNil*n+j];
-                matrix[j*n+jNil] = matrix[jNil*n+j];
+                matrix[j*n+i1] = matrix[i1*n+j];
+                matrix[j*n+j1] = matrix[j1*n+j];
             }
-        }
+        }//from simmetrical, don't want to change i1 and j1 columns
         
-        x = matrix[iNil * (n + 1)];
-        matrix[iNil*n+iNil] = x * cosPhi - matrix[iNil*n+jNil] * sinPhi;
+        x = matrix[i1*(n+1)];
+        matrix[i1*n+i1] = x * cosPhi - matrix[i1*n+j1] * sinPhi;
         
-        y = matrix[jNil*n+iNil];
-        matrix[jNil*n+jNil] = y * sinPhi + matrix[jNil*(n+1)] * cosPhi;
+        y = matrix[j1*n+i1];
+        matrix[j1*n+j1] = y * sinPhi + matrix[j1*(n+1)] * cosPhi;
         
-        matrix[iNil*n+jNil] = 0.0;
-        matrix[jNil*n+iNil] = 0.0;
+        matrix[i1*n+j1] = 0;
+        matrix[j1*n+i1] = 0;
         
-        vector[iNil] = 0.0;
+        vector[i1] = 0;
+        
         for (i = 0; i < n; ++i)
-            if (i != iNil)
-                vector[iNil] += matrix[i*n+iNil] * matrix[i*n+iNil];
-        
-        vector[jNil] = 0.0;
-        for (j = 0; j < n; ++j)
-            if (j != jNil)
-                vector[jNil] += matrix[j*n+jNil] * matrix[j*n+jNil];
+        {
+            if (i != i1)
+                vector[i1] += matrix[i*n+i1] * matrix[i*n+i1];
         }
+        
+        vector[j1] = 0.0;
+        
+        for (j = 0; j < n; ++j)
+        {
+            if (j != j1)
+                vector[j1] += matrix[j*n+j1] * matrix[j*n+j1];
+        }
+    }
     
+    //now vector is result
     for (i = 0; i < n; ++i)
         vector[i] = matrix[i*n+i];
 }
