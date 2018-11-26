@@ -22,7 +22,7 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         }
     }//vector = b, sum of squares not diag elements
     
-    while (VectorNorm(vector, n) > eps)
+    while (VectorNorm(vector, n) > eps)//limit->0
     {
         i1 = 0;
         
@@ -61,29 +61,29 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         {
             x = matrix[i1*n+j];
             y = matrix[j1*n+j];
-            
+
             matrix[i1*n+j] = x * cosPhi - y * sinPhi;
             matrix[j1*n+j] = x * sinPhi + y * cosPhi;
-            
+
             if (j != i1 && j != j1)
             {
                 matrix[j*n+i1] = matrix[i1*n+j];
                 matrix[j*n+j1] = matrix[j1*n+j];
             }//from simmetrical, don't want to change i1 and j1 columns
         }//*Tij, p.87, only i1 and j1 strings changes
-        
+
         x = matrix[i1*(n+1)];
         y = matrix[i1*n+j1];
-        
-        matrix[i1*n+i1] = x * cosPhi - y * sinPhi;
+
+        matrix[i1*n+i1] = x * cosPhi - y * sinPhi;//*Tij^t
 
         y = matrix[j1*n+i1];
         x = matrix[j1*(n+1)];
-        
-        matrix[j1*n+j1] = y * sinPhi + x * cosPhi;
 
-        matrix[i1*n+j1] = 0;
-        matrix[j1*n+i1] = 0;//Tij^t
+        matrix[j1*n+j1] = y * sinPhi + x * cosPhi;//*Tij^t
+
+        matrix[i1*n+j1] = 0;//*Tij^t
+        matrix[j1*n+i1] = 0;//*Tij^t
         
         vector[i1] = 0;
         
