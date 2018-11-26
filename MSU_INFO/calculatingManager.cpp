@@ -60,27 +60,30 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         for (j = 0; j < n; ++j)
         {
             x = matrix[i1*n+j];
-            matrix[i1*n+j] = x * cosPhi - matrix[j1*n+j] * sinPhi;
-            matrix[j1*n+j] = x * sinPhi + matrix[j1*n+j] * cosPhi;
-        }//*Tij, p.87, only i1 and j1 strings
-        
-        for (j = 0; j < n; ++j)
-        {
+            y = matrix[j1*n+j];
+            
+            matrix[i1*n+j] = x * cosPhi - y * sinPhi;
+            matrix[j1*n+j] = x * sinPhi + y * cosPhi;
+            
             if (j != i1 && j != j1)
             {
                 matrix[j*n+i1] = matrix[i1*n+j];
                 matrix[j*n+j1] = matrix[j1*n+j];
-            }
-        }//from simmetrical, don't want to change i1 and j1 columns
+            }//from simmetrical, don't want to change i1 and j1 columns
+        }//*Tij, p.87, only i1 and j1 strings changes
         
         x = matrix[i1*(n+1)];
-        matrix[i1*n+i1] = x * cosPhi - matrix[i1*n+j1] * sinPhi;
+        y = matrix[i1*n+j1];
+        
+        matrix[i1*n+i1] = x * cosPhi - y * sinPhi;
 
         y = matrix[j1*n+i1];
-        matrix[j1*n+j1] = y * sinPhi + matrix[j1*(n+1)] * cosPhi;
+        x = matrix[j1*(n+1)];
+        
+        matrix[j1*n+j1] = y * sinPhi + x * cosPhi;
 
         matrix[i1*n+j1] = 0;
-        matrix[j1*n+i1] = 0;
+        matrix[j1*n+i1] = 0;//Tij^t
         
         vector[i1] = 0;
         
