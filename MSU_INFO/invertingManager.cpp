@@ -9,9 +9,162 @@
 #include "invertingManager.hpp"
 #include <math.h>
 #include <iostream>
-//#define eps 1e-100
 
-using namespace std; 
+using namespace std;
+
+int continueFlag = 1;
+
+int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int rank, int threadsCount)
+{
+    int i, j, k;
+    int beginCol;
+    int lastCol;
+    double a, b = 0;
+    int returnFlag = 1;
+    int continueFlag = 1;
+    
+    double eps = fmax(pow(10, -n*3), 1e-100);
+    
+    if (rank == 0)
+    {
+        for (i = 0; i < n; ++i)
+        {
+            d[i] = 0;
+            
+            for (j = 0; j < n; ++j)
+            {
+                if (i == j)
+                    inverseMatrix[i*n+j] = 1;
+                else
+                    inverseMatrix[i*n+j] = 0;
+            }
+        }
+    }
+    
+    for (i = 0; i < n; i++)
+    {
+        synchronize(threadsCount);
+
+        if (rank == 0)
+        {
+            a = 0.0;
+            for (j = i + 1; j < n; j++)
+                a += matrix[j*n+i] * matrix[j*n+i];//(12)
+            
+            b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
+            
+            if (b < eps)
+            {
+                returnFlag = 0;
+            }//det = 0;
+            
+            if (returnFlag)
+            {
+                d[i] = matrix[i*n+i] - b;
+                
+                for (j = i+1; j < n; ++j)
+                    d[j] = matrix[j*n+i]; //(14)
+                
+                a = sqrt(d[i] * d[i] + a);//(15)
+                
+                if (a < eps)
+                {
+                    continueFlag = 0;
+                }
+                else
+                {
+                    continueFlag = 1;
+                    
+                    for (j = i; j < n; ++j)
+                        d[j] /= a; //(16)
+                }
+            }
+        }
+        
+        synchronize(threadsCount);
+        
+        if(!continueFlag)
+            continue;
+        
+        if (returnFlag && continueFlag)
+        {
+            beginCol = (n - i - 1) * rank;
+            beginCol = beginCol/threadsCount + i + 1;
+            lastCol = (n - i - 1) * (rank + 1);
+            lastCol = lastCol/threadsCount + i + 1;
+            
+            for (k = beginCol; k < lastCol; k++)
+            {
+                a = 0.0;
+                for (j = i; j < n; ++j)
+                    a += d[j] * matrix[j*n+k];
+                
+                a *= 2.0;//from formula
+                for (j = i; j < n; ++j)
+                    matrix[j*n+k] -= a * d[j];
+            }
+        }
+        
+        synchronize(threadsCount);
+        
+        if (returnFlag && continueFlag)
+        {
+            beginCol = n * rank;
+            beginCol = beginCol/threadsCount;
+            lastCol = n * (rank + 1);
+            lastCol = lastCol/threadsCount;
+            
+            for (k = beginCol; k < lastCol; k++)
+            {
+                a = 0.0;
+                for (j = i; j < n; ++j)
+                    a += d[j] * inverseMatrix[j*n+k];
+                
+                a *= 2.0;//from formula
+                for (j = i; j < n; ++j)
+                    inverseMatrix[j*n+k] -= a * d[j];
+                
+            }
+        }
+        
+        synchronize(threadsCount);
+        
+        if (rank == 0 && returnFlag && continueFlag)
+            matrix[i*n+i] = b;//on diag R
+    }
+    
+    synchronize(threadsCount);
+    
+    //R in up triangle, Q in down triangle and in d
+    
+    if (returnFlag && continueFlag)
+    {
+        beginCol = n * rank;
+        beginCol = beginCol/threadsCount;
+        lastCol = n * (rank + 1);
+        lastCol = lastCol/threadsCount;
+        
+        for (k = beginCol; k < lastCol; k++)
+        {
+            for (i = n - 1; i >= 0; --i)
+            {
+                a = inverseMatrix[i*n+k];
+                
+                for (j = i + 1; j < n; ++j)
+                    a -= matrix[i*n+j] * inverseMatrix[j*n+k];
+                
+                inverseMatrix[i*n+k] = a/matrix[i*n+i];
+            }
+        }//Reverse Gauss
+    }
+    
+    if (!returnFlag)
+    {
+        return -1;
+    }
+    
+    return 0;
+}
 
 void synchronize(int total_threads)
 {
@@ -42,93 +195,4 @@ void synchronize(int total_threads)
             pthread_cond_wait(&condvar_out,&mutex);
     
     pthread_mutex_unlock(&mutex);
-}
-
-int invertMatrix(double* a, double* x, int n, int my_rank, int total_threads)
-{
-    int i, j, k;
-    int first_row;
-    int last_row;
-    double tmp1, tmp2 = 0;
-    
-    if (my_rank == 0)
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                x[i * n + j] = (double)(i == j);
-    
-    for (i = 0; i < n - 1; i++)
-    {
-        if (my_rank == 0)
-        {
-            tmp1 = 0.0;
-            for (j = i + 1; j < n; j++)
-                tmp1 += a[j * n + i] * a[j * n + i];
-            
-            tmp2 = sqrt(tmp1 + a[i * n + i] * a[i * n + i]);
-            
-            a[i * n + i] -= tmp2;
-            
-            tmp1 = sqrt(tmp1 + a[i * n + i] * a[i * n + i]);
-            
-            tmp1 = 1.0/tmp1;
-            for (j = i; j < n; j++)
-                a[j * n + i] *= tmp1;
-        }
-        
-        synchronize(total_threads);
-        
-        first_row = (n - i - 1) * my_rank;
-        first_row = first_row/total_threads + i + 1;
-        last_row = (n - i - 1) * (my_rank + 1);
-        last_row = last_row/total_threads + i + 1;
-        
-        for (k = first_row; k < last_row; k++)
-        {
-            tmp1 = 0.0;
-            for (j = i; j < n; j++)
-                tmp1 += a[j * n + i] * a[j * n + k];
-            
-            tmp1 *= 2.0;
-            for (j = i; j < n; j++)
-                a[j * n + k] -= tmp1 * a[j * n + i];
-        }
-        synchronize(total_threads);
-        
-        first_row = n * my_rank;
-        first_row = first_row/total_threads;
-        last_row = n * (my_rank + 1);
-        last_row = last_row/total_threads;
-        
-        for (k = first_row; k < last_row; k++)
-        {
-            tmp1 = 0.0;
-            for (j = i; j < n; j++)
-                tmp1 += a[j * n + i] * x[j * n + k];
-            
-            tmp1 *= 2.0;
-            for (j = i; j < n; j++)
-                x[j * n + k] -= tmp1 * a[j * n + i];
-            
-        }
-        synchronize(total_threads);
-        
-        if (my_rank == 0)
-            a[i * n + i] = tmp2;
-    }
-    
-    first_row = n * my_rank;
-    first_row = first_row/total_threads;
-    last_row = n * (my_rank + 1);
-    last_row = last_row/total_threads;
-    
-    for (k = first_row; k < last_row; k++)
-        for (i = n - 1; i >= 0; i--)
-        {
-            tmp1 = x[i * n + k];
-            for (j = i + 1; j < n; j++)
-                tmp1 -= a[i * n + j] * x[j * n + k];
-            x[i * n + k] = tmp1/a[i * n + i];
-        }
-    
-    return 0;
 }
