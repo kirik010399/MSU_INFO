@@ -7,8 +7,6 @@
 
 using namespace std;
 
-#define INPUT_FILE "data.dat"
-
 long double getTime();
 
 typedef struct
@@ -39,7 +37,7 @@ int main()
     double *inverseMatrix;
     double *d;
     FILE* fin = NULL;
-    long int t;
+    long double t;
     int threadsCount;
     pthread_t *threads;
     Args *args;
