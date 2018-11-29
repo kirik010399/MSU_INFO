@@ -21,9 +21,9 @@ typedef struct
     double *d;
 } Args;
 
-void *Inversion(void *p_arg)
+void *Inversion(void *Arg)
 {
-    Args *arg = (Args*)p_arg;
+    Args *arg = (Args*)Arg;
     int res;
     
     res = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
