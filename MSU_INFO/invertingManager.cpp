@@ -53,13 +53,9 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
             b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
             
             if (b < eps)
-            {
-                returnFlag = 0;
-            }//det = 0;
+                returnFlag = 0; //det = 0;
             else
-            {
                 returnFlag = 1;
-            }
             
             if (returnFlag)
             {
