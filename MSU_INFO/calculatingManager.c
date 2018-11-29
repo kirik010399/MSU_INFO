@@ -13,7 +13,7 @@ int calculateValues(double* matrix, double* vector, double left, double right, d
     
     eps = fmax(1e-10, eps);
 
-    Otr(matrix, n);
+    Rotation(matrix, n);
     values(matrix, n, vector, left, right, eps);
     
     return k;
@@ -39,75 +39,56 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     }//95
 }
 
-void Otr(double *matrix, int n)
+void Rotation(double* matrix, int n)
 {
-    double sk, akk, xk, xy;
-    double *x, *y, *z;
+    int i, j, k;
+    double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
+    double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
     
-    x = (double*)malloc(n * sizeof(double));
-    y = (double*)malloc(n * sizeof(double));
-    z = (double*)malloc(n * sizeof(double));
-    
-    for (int k = 0; k < n-2; k++)
+    for (i = 0; i < n-2; ++i)
     {
-        sk = 0;
-        
-        for (int j = k+2; j < n; j++)
-            sk += matrix[j*n+k] * matrix[j*n+k];
-        
-        akk = sqrt(matrix[(k+1)*n+k] * matrix[(k+1)*n+k] + sk);
-        
-        x[0] = matrix[(k+1)*n+k] - akk;
-        
-        for (int j = 1; j < n-k-1; j++)
-            x[j] = matrix[(j+k+1)*n+k];
-        
-        xk = sqrt(x[0] * x[0] + sk);
-        
-        if (xk < 1e-100)
-            continue;
-        
-        xk = 1.0/xk;
-        
-        for (int j = 0; j < n-k-1; j++)
-            x[j] *= xk;
-        
-        for (int i = 0; i < n-k-1; i++)
+        for (j = i+2; j < n; ++j)
         {
-            y[i] = 0;
+            x = matrix[(i+1)*n+i];
+            y = matrix[j*n+i];
             
-            for (int j = 0; j < n-k-1; j++)
-                y[i] += matrix[n*(k+1+i)+(k+1+j)] * x[j];
-        }
-        
-        xy = 0.0;
-        for (int i = 0; i < n-k-1; i++)
-            xy += x[i] * y[i];
-        
-        xy *= 2;
-        for (int i = 0; i < n-k-1; i++)
-            z[i] = 2 * y[i] - xy * x[i];
-        
-        for (int i = 0; i < n-k-1; i++)
-        {
-            for (int j = 0; j < n-k-1; j++)
+            if (fabs(y) < 1e-100)
+                continue;
+            
+            r = sqrt(x*x+y*y);
+            
+            if (r < 1e-100)
+                continue;
+            
+            cosPhi = x/r;
+            sinPhi = -y/r;
+            
+            for (k = i; k < n; ++k)
             {
-                matrix[n*(k+1+i)+(k+1+j)] = matrix[n*(k+1+i)+(k+1+j)] - z[j] * x[i] - x[j] * z[i];
+                matrix_ik = matrix[(i+1)*n+k];
+                matrix_jk = matrix[j*n+k];
+                
+                matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
+                
+                if (k != i+1 && k != j)
+                {
+                    matrix[k*n+i+1] = matrix[(i+1)*n+k];
+                    matrix[k*n+j] = matrix[j*n+k];
+                }//from sym
             }
-        }
-        
-        for (int i = k+2; i < n; i++)
-        {
-            matrix[n*i+k] = 0.0;
-            matrix[n*(k+1)-(n-i)] = 0.0;
-        }
-        
-        matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
+            
+            matrix_ii = matrix[(i+1)*n+i+1];
+            matrix_ji = matrix[j*n+i+1];
+            matrix_ij = matrix[(i+1)*n+j];
+            matrix_jj = matrix[j*n+j];
+            
+            matrix[(i+1)*n+i+1] = matrix_ii * cosPhi - matrix_ij * sinPhi;
+            matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
+            matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
+            matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;
+        }//63 *Tij T
     }
-    
-    free(x);
-    free(y);
-    free(z);
 }
 
 int n_(double* matrix, int n, double lam)
@@ -125,7 +106,7 @@ int n_(double* matrix, int n, double lam)
     
     for (i = 1; i < n; ++i)
     {
-        elem = matrix[i*n+i] - lam - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem;
+        elem = matrix[i*n+i] - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem - lam;
         
         if (elem < 0)
             ++res;
