@@ -137,24 +137,21 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
     
     //R in up triangle, Q in down triangle and in d
     
-    if (returnFlag && continueFlag)
+    beginCol = n * rank/threadsCount;
+    lastCol = n * (rank + 1)/threadsCount;
+    
+    for (k = beginCol; k < lastCol; k++)
     {
-        beginCol = n * rank/threadsCount;
-        lastCol = n * (rank + 1)/threadsCount;
-        
-        for (k = beginCol; k < lastCol; k++)
+        for (i = n - 1; i >= 0; --i)
         {
-            for (i = n - 1; i >= 0; --i)
-            {
-                a = inverseMatrix[i*n+k];
-                
-                for (j = i + 1; j < n; ++j)
-                    a -= matrix[i*n+j] * inverseMatrix[j*n+k];
-                
-                inverseMatrix[i*n+k] = a/matrix[i*n+i];
-            }
-        }//Reverse Gauss
-    }
+            a = inverseMatrix[i*n+k];
+            
+            for (j = i + 1; j < n; ++j)
+                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
+            
+            inverseMatrix[i*n+k] = a/matrix[i*n+i];
+        }
+    }//Reverse Gauss
     
     if (!returnFlag)
     {

@@ -15,7 +15,7 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return 1.0/(1.0+i+j);
+    return fabs(i-j);
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)
