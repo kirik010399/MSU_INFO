@@ -1,5 +1,6 @@
 #include <iostream>
 #include <time.h>
+#include <pthread.h>
 #include <math.h>
 #include "matrixUtils.hpp"
 #include "invertingManager.hpp"
@@ -220,6 +221,9 @@ int main()
             
             delete []matrix;
             delete []inverseMatrix;
+            delete []threads;
+            delete []args;
+            delete []d;
             
             return -1;
         }
@@ -231,8 +235,12 @@ int main()
     printMatrix(inverseMatrix, n, m);
     
     if (inputType == 1)
-        fseek(fin, 1, SEEK_SET);
-    
+    {
+        fseek(fin, 0, SEEK_SET);
+        fscanf(fin, "%d", &n);
+        fscanf(fin, "%d", &threadsCount);
+    }
+
     returnFlag = enterMatrix(matrix, n, fin);
     
     cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
@@ -254,6 +262,6 @@ int main()
 long double getTime()
 {
     struct timeval t;
-    gettimeofday(&t,nullptr);
+    gettimeofday(&t, 0);
     return t.tv_sec + t.tv_usec/1000000.0;
 }
