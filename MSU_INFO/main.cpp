@@ -9,7 +9,7 @@ using namespace std;
 
 #define INPUT_FILE "data.dat"
 
-long int getTime(void);
+long double getTime();
 
 typedef struct
 {
@@ -239,7 +239,7 @@ int main()
     
     cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
     
-    cout<<"Inversion time =  "<< t << " milliseconds"<<endl;
+    cout<<"Inversion time =  "<< t << " seconds"<<endl;
     
     if (inputType == 1)
         fclose(fin);
@@ -253,11 +253,9 @@ int main()
     return 0;
 }
 
-long int getTime(void)
+long double getTime()
 {
-    struct timeval buf;
-    
-    gettimeofday(&buf, 0);
-    
-    return buf.tv_sec * 100 + buf.tv_usec/10000;
+    struct timeval t;
+    gettimeofday(&t,nullptr);
+    return t.tv_sec + t.tv_usec/1000000.0;
 }

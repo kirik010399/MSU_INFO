@@ -13,6 +13,7 @@
 using namespace std;
 
 int continueFlag = 1;
+int returnFlag = 1;
 
 int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int rank, int threadsCount)
 {
@@ -20,8 +21,6 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
     int beginCol;
     int lastCol;
     double a, b = 0;
-    int returnFlag = 1;
-    int continueFlag = 1;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
     
@@ -57,6 +56,10 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
             {
                 returnFlag = 0;
             }//det = 0;
+            else
+            {
+                returnFlag = 1;
+            }
             
             if (returnFlag)
             {
@@ -86,6 +89,9 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
         if(!continueFlag)
             continue;
         
+        if (!returnFlag)
+            return -1;
+        
         if (returnFlag && continueFlag)
         {
             beginCol = (n - i - 1) * rank;
@@ -109,10 +115,8 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
         
         if (returnFlag && continueFlag)
         {
-            beginCol = n * rank;
-            beginCol = beginCol/threadsCount;
-            lastCol = n * (rank + 1);
-            lastCol = lastCol/threadsCount;
+            beginCol = n * rank/threadsCount;
+            lastCol = n * (rank + 1)/threadsCount;
             
             for (k = beginCol; k < lastCol; k++)
             {
@@ -139,10 +143,8 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
     
     if (returnFlag && continueFlag)
     {
-        beginCol = n * rank;
-        beginCol = beginCol/threadsCount;
-        lastCol = n * (rank + 1);
-        lastCol = lastCol/threadsCount;
+        beginCol = n * rank/threadsCount;
+        lastCol = n * (rank + 1)/threadsCount;
         
         for (k = beginCol; k < lastCol; k++)
         {
