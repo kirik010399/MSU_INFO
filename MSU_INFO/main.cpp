@@ -130,7 +130,10 @@ int main()
     printVector(vector, n, m);
     
     if (inputType == 1)
-        fseek(fin, 1, SEEK_SET);
+    {
+        fseek(fin, 0, SEEK_SET);
+        fscanf(fin, "%d", &n);
+    }
     
     returnFlag = enterMatrix(matrix, n, fin);
     p = residualNorm(matrix, vector, n);

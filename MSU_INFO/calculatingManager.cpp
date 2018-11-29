@@ -18,17 +18,6 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
     double left, right;
     double maxA, maxB;
     
-//        for (i = 0; i < n; ++i)
-//        {
-//            for (j = 0; j < n; ++j)
-//            {
-//                cout<<matrix[i*n+j]<<' ';
-//            }
-//            cout<<endl;
-//        }
-//
-//
-//
     Rotation(matrix, n);
     
     maxA = matrix[0];
@@ -59,17 +48,10 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
         }
     }//97
     
-//    for (i = 0; i < n; ++i)
-//    {
-//        for (j = 0; j < n; ++j)
-//        {
-//            cout<<matrix[i*n+j]<<' ';
-//        }
-//        cout<<endl;
-//    }
-//
     right = MatrixNorm(matrix, n) + eps;//95
     left = -right;
+    
+    eps = fmax(eps, 1e-10);//don't need more precision(segmentation fault without it) TODO
     
     values(matrix, n, vector, left, right, eps);
     
@@ -83,8 +65,6 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     int c, j;
     
     c = n_(matrix, n, right) - n_(matrix, n, left);
-    
-//    cout<<left<<' '<<right<<' '<<k<<' '<<c<<endl;
     
     if (right - left > eps && c != 0)
     {
@@ -144,17 +124,6 @@ void Rotation(double* matrix, int n)
     double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
     double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
     
-//    cout<<endl;
-//    for (int ii = 0; ii < n; ++ii)
-//    {
-//        for (int jj = 0; jj < n; ++jj)
-//        {
-//            cout<<matrix[ii*n+jj]<<' ';
-//        }
-//        cout<<endl;
-//    }
-//    cout<<endl;
-    
     for (i = 0; i < n-2; ++i)
     {
        for (j = i+2; j < n; ++j)
@@ -179,15 +148,14 @@ void Rotation(double* matrix, int n)
                 matrix_jk = matrix[j*n+k];
                 
                 matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
-                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
+                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
                 
                 if (k != i+1 && k != j)
                 {
-//                    cout<<"!";
                     matrix[k*n+i+1] = matrix[(i+1)*n+k];
                     matrix[k*n+j] = matrix[j*n+k];
-                }
-            }//*Tij
+                }//from sym
+            }
             
             matrix_ii = matrix[(i+1)*n+i+1];
             matrix_ji = matrix[j*n+i+1];
@@ -198,18 +166,7 @@ void Rotation(double* matrix, int n)
             matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
             matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
             matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;
-        }//63
-        
-//        cout<<endl;
-//        for (int ii = 0; ii < n; ++ii)
-//        {
-//            for (int jj = 0; jj < n; ++jj)
-//            {
-//                cout<<matrix[ii*n+jj]<<' ';
-//            }
-//            cout<<endl;
-//        }
-//        cout<<endl;
+        }//63 *Tij T
     }
 }
 
