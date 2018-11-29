@@ -30,7 +30,7 @@ void *Inversion(void *Arg)
     return new int(res);
 }
 
-int main()
+int main(int argc, char **argv)
 {
     int i;
     int n, m;
@@ -47,9 +47,13 @@ int main()
     void *res;
     int *intRes;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
-    
-    if (scanf("%d", &inputType) != 1)
+    if (argc == 1)
+    {
+        cout<<"Data isn't correct"<<endl;
+        return -2;
+    }
+        
+    if (sscanf(argv[1], "%d", &inputType) != 1)
     {
         cout<<"Data isn't correct"<<endl;
         return -2;
@@ -57,6 +61,12 @@ int main()
     
     if (inputType == 1)
     {
+        if (argc != 3)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
+            
         fin = fopen("input.txt", "r");
         
         if (!fin)
@@ -82,17 +92,19 @@ int main()
     }
     else if (inputType == 2)
     {
-        cout<<"Enter size: ";
-        
-        if (scanf("%d", &n) != 1 || n <= 0)
+        if (argc != 5)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
         }
         
-        cout<<"Enter treads count: ";
+        if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
         
-        if (scanf("%d", &threadsCount) != 1 || threadsCount <= 0)
+        if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
@@ -143,22 +155,41 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of printing matrix: ";
-    
-    if (scanf("%d", &m) != 1 || m <= 0)
+    if (inputType == 1)
     {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []inverseMatrix;
-        delete []threads;
-        delete []args;
-        delete []d;
-        
-        return -2;
+        if (sscanf(argv[2], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []matrix;
+            delete []inverseMatrix;
+            delete []threads;
+            delete []args;
+            delete []d;
+            
+            return -2;
+        }
+    }
+    else
+    {
+        if (sscanf(argv[4], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []matrix;
+            delete []inverseMatrix;
+            delete []threads;
+            delete []args;
+            delete []d;
+            
+            return -2;
+        }
     }
     
     for (i = 0; i < threadsCount; i++)
