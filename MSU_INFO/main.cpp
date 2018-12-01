@@ -17,6 +17,7 @@ int main()
     int inputType;
     int returnFlag;
     double eps;
+    int k;
     pair<double, double> p;
     
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
@@ -92,9 +93,9 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of printing vector: ";
+    cout<<"Enter number of value: ";
     
-    if (scanf("%d", &m) != 1 || m <= 0)
+    if (scanf("%d", &k) != 1 || k <= 0 || k > n)
     {
         cout<<"Data isn't correct"<<endl;
         
@@ -123,11 +124,11 @@ int main()
     }
     
     t = clock();
-    calculateValues(matrix, vector, eps, n);
+    calculateValues(matrix, vector, eps, k, n);
     t = clock() - t;
     
-    cout<<endl<<"Values vector:"<<endl;
-    printVector(vector, n, m);
+    cout<<endl<<"Value:"<<endl;
+    printVector(vector, k);
     
     if (inputType == 1)
     {

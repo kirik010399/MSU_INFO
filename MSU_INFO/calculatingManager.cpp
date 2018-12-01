@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void calculateValues(double* matrix, double* vector, double eps, int n)
+void calculateValues(double* matrix, double* vector, double eps, int k, int n)
 {
     int i, j, alp;
     double left, right;
@@ -51,33 +51,31 @@ void calculateValues(double* matrix, double* vector, double eps, int n)
     right = MatrixNorm(matrix, n) + eps;//95
     left = -right;
     
-    eps = fmax(eps, 1e-10);//don't need more precision(segmentation fault without it) TODO
+    eps = fmax(eps, 1e-10);
     
-    values(matrix, n, vector, left, right, eps);
-    
+    values(matrix, n, vector, left, right, k, eps);
+
     for (i = 0; i < n; ++i)
         vector[i]*=alp;
 }
 
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
+void values(double *matrix, int n, double *vector, double left, double right, int k, double eps)
 {
-    static int k = 0;
-    int c, j;
+    double c;
+    int j;
     
-    c = n_(matrix, n, right) - n_(matrix, n, left);
-    
-    if (right - left > eps && c != 0)
+    while(right-left > eps)
     {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
-    }
-    else if (c != 0)
-    {
-        for (j = 0; j < c; ++j)
-            vector[k + j] = (left+right)/2;
+        c = (left+right)/2;
         
-        k += c;
-    }//95
+        if (n_(matrix, n, c) < k)
+            left = c;
+        else
+            right = c;
+    }
+    
+    for (j = 0; j < n_(matrix, n, right) - n_(matrix, n, left); ++j)
+        vector[k + j - 1] = (left+right)/2;
 }
 
 int n_(double* matrix, int n, double lam)

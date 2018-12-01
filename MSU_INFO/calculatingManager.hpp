@@ -11,8 +11,8 @@
 
 #include <stdio.h>
 
-void calculateValues(double* matrix, double* vector, double eps, int n);
-void values(double *matrix, int n, double *vector, double left, double right, double eps);
+void calculateValues(double* matrix, double* vector, double eps, int k, int n);
+void values(double *matrix, int n, double *vector, double left, double right, int k, double eps);
 int n_(double* a, int n, double lambda);
 void Rotation(double* a, int n);
 double MatrixNorm(double* a, int n);

@@ -62,15 +62,9 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printVector(double* vector, int n, int m)
+void printVector(double* vector, int k)
 {
-    int i;
-    int min_ = fmin(n,m);
-    
-    for (i = 0; i < min_; ++i)
-        cout<<vector[i]<<' ';
-    
-    cout<<endl;
+    cout<<vector[k-1]<<endl;
 }
 
 pair<double, double> residualNorm(double* matrix, double* vector, int n)
