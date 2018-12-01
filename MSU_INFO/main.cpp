@@ -25,7 +25,7 @@ void *Inversion(void *Arg)
     Args *arg = (Args*)Arg;
     int res;
     
-    res = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
+    res = invertMatrix(arg->matrix, arg->inverseMatrix, arg->d, arg->n, arg->rank, arg->threadsCount);
     
     return new int(res);
 }
