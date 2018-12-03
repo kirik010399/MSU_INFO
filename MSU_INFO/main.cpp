@@ -20,7 +20,7 @@ typedef struct
     double *d;
 } Args;
 
-void *Inversion(void *Arg)
+void *invert(void *Arg)
 {
     Args *arg = (Args*)Arg;
     int res;
@@ -50,20 +50,29 @@ int main(int argc, char **argv)
     if (argc == 1)
     {
         cout<<"Data isn't correct"<<endl;
+        cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+        cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+        cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
         return -2;
     }
         
     if (sscanf(argv[1], "%d", &inputType) != 1)
     {
         cout<<"Data isn't correct"<<endl;
+        cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+        cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+        cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
         return -2;
     }
     
     if (inputType == 1)
     {
-        if (argc != 3)
+        if (argc != 4)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             return -2;
         }
             
@@ -79,13 +88,19 @@ int main(int argc, char **argv)
         if (fscanf(fin, "%d", &n) != 1 || n <= 0)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             fclose(fin);
             return -2;
         }
         
-        if (fscanf(fin, "%d", &threadsCount) != 1 || threadsCount <= 0)
+        if (sscanf(argv[2], "%d", &threadsCount) != 1 || threadsCount <= 0)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             fclose(fin);
             return -2;
         }
@@ -95,18 +110,27 @@ int main(int argc, char **argv)
         if (argc != 5)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             return -2;
         }
         
         if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             return -2;
         }
         
         if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0)
         {
             cout<<"Data isn't correct"<<endl;
+            cout<<"Correct format: "<<endl<<"<Type of entering, 1 - from file, 2 - from formula>"<<endl;
+            cout<<"Format for file: 1, <threadCount>, <sizeOfPrinting>"<<endl;
+            cout<<"Format for formula: 2, <size>, <threadCount>, <sizeOfPrinting>"<<endl;
             return -2;
         }
     }
@@ -157,7 +181,7 @@ int main(int argc, char **argv)
     
     if (inputType == 1)
     {
-        if (sscanf(argv[2], "%d", &m) != 1 || m <= 0)
+        if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             
@@ -206,9 +230,9 @@ int main(int argc, char **argv)
     
     for (i = 0; i < threadsCount; i++)
     {
-        if (pthread_create(threads + i, 0, Inversion, args + i))
+        if (pthread_create(threads + i, 0, invert, args + i))
         {
-            printf("Cannot create thread %d!\n", i);
+            printf("Can't create thread %d!\n", i);
             
             if (inputType == 1)
                 fclose(fin);
@@ -227,7 +251,7 @@ int main(int argc, char **argv)
     {
         if (pthread_join(threads[i], &res))
         {
-            printf("Cannot wait thread %d!\n", i);
+            printf("Can't wait thread %d!\n", i);
             
             if (inputType == 1)
                 fclose(fin);
@@ -269,7 +293,6 @@ int main(int argc, char **argv)
     {
         fseek(fin, 0, SEEK_SET);
         fscanf(fin, "%d", &n);
-        fscanf(fin, "%d", &threadsCount);
     }
 
     returnFlag = enterMatrix(matrix, n, fin);
