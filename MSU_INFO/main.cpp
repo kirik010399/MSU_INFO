@@ -18,16 +18,16 @@ typedef struct
     int rank;
     int threadsCount;
     double *d;
+    int retFlag;
 } Args;
 
 void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
-    int res;
     
-    res = invertMatrix(arg->matrix, arg->inverseMatrix, arg->d, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
     
-    return new int(res);
+    return NULL;
 }
 
 int main()
@@ -44,8 +44,6 @@ int main()
     Args *args;
     int inputType;
     int returnFlag;
-    void *res;
-    int *intRes;
     
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
     
@@ -72,13 +70,6 @@ int main()
             fclose(fin);
             return -2;
         }
-        
-        if (fscanf(fin, "%d", &threadsCount) != 1 || threadsCount <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
-            fclose(fin);
-            return -2;
-        }
     }
     else if (inputType == 2)
     {
@@ -89,18 +80,18 @@ int main()
             cout<<"Data isn't correct"<<endl;
             return -2;
         }
-        
-        cout<<"Enter treads count: ";
-        
-        if (scanf("%d", &threadsCount) != 1 || threadsCount <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
-            return -2;
-        }
     }
     else
     {
         cout<<"Input type isn't correct"<<endl;
+        return -2;
+    }
+    
+    cout<<"Enter treads count: ";
+    
+    if (scanf("%d", &threadsCount) != 1 || threadsCount <= 0)
+    {
+        cout<<"Data isn't correct"<<endl;
         return -2;
     }
     
@@ -169,6 +160,7 @@ int main()
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
         args[i].d = d;
+        args[i].retFlag = 0;
     }
     
     t = getTime();
@@ -177,7 +169,7 @@ int main()
     {
         if (pthread_create(threads + i, 0, Inversion, args + i))
         {
-            printf("Cannot create thread %d!\n", i);
+            printf("Can't create thread %d!\n", i);
             
             if (inputType == 1)
                 fclose(fin);
@@ -194,9 +186,9 @@ int main()
     
     for (i = 0; i < threadsCount; i++)
     {
-        if (pthread_join(threads[i], &res))
+        if (pthread_join(threads[i], 0))
         {
-            printf("Cannot wait thread %d!\n", i);
+            printf("Can't wait thread %d!\n", i);
             
             if (inputType == 1)
                 fclose(fin);
@@ -209,10 +201,11 @@ int main()
             
             return -1;
         }
-        
-        intRes = (int *)res;
-        
-        if(intRes && *intRes != 0)
+    }
+    
+    for (i = 0; i < threadsCount; i++)
+    {
+        if (args[i].retFlag != 0)
         {
             cout<<"Error while inverting matrix"<<endl;
             
