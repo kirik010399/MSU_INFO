@@ -17,7 +17,6 @@ typedef struct
     double *inverseMatrix;
     int rank;
     int threadsCount;
-    double *d;
     int retFlag;
 } Args;
 
@@ -25,7 +24,7 @@ void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg->d, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -36,7 +35,6 @@ int main()
     int n, m;
     double *matrix;
     double *inverseMatrix;
-    double *d;
     FILE* fin = NULL;
     long double t;
     int threadsCount;
@@ -99,7 +97,6 @@ int main()
     inverseMatrix = new double [n*n];
     threads = new pthread_t[threadsCount];
     args = new Args[threadsCount];
-    d = new double [n];
     
     if (!(matrix && inverseMatrix && threads && args))
     {
@@ -112,7 +109,6 @@ int main()
         delete []inverseMatrix;
         delete []threads;
         delete []args;
-        delete []d;
         return -2;
     }
     
@@ -129,7 +125,6 @@ int main()
         delete []inverseMatrix;
         delete []threads;
         delete []args;
-        delete []d;
 
         return -2;
     }
@@ -147,7 +142,6 @@ int main()
         delete []inverseMatrix;
         delete []threads;
         delete []args;
-        delete []d;
         
         return -2;
     }
@@ -159,7 +153,6 @@ int main()
         args[i].inverseMatrix = inverseMatrix;
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
-        args[i].d = d;
         args[i].retFlag = 0;
     }
     
@@ -178,7 +171,6 @@ int main()
             delete []inverseMatrix;
             delete []threads;
             delete []args;
-            delete []d;
             
             return -1;
         }
@@ -197,7 +189,6 @@ int main()
             delete []inverseMatrix;
             delete []threads;
             delete []args;
-            delete []d;
             
             return -1;
         }
@@ -216,7 +207,6 @@ int main()
             delete []inverseMatrix;
             delete []threads;
             delete []args;
-            delete []d;
             
             return -1;
         }
@@ -246,7 +236,6 @@ int main()
     delete []inverseMatrix;
     delete []threads;
     delete []args;
-    delete []d;
     
     return 0;
 }
