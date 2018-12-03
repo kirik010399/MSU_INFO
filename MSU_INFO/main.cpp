@@ -25,7 +25,7 @@ void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg->d, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -231,7 +231,6 @@ int main()
     {
         fseek(fin, 0, SEEK_SET);
         fscanf(fin, "%d", &n);
-        fscanf(fin, "%d", &threadsCount);
     }
 
     returnFlag = enterMatrix(matrix, n, fin);
