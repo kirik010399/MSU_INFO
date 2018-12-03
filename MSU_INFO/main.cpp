@@ -18,16 +18,16 @@ typedef struct
     int rank;
     int threadsCount;
     double *d;
+    int retFlag;
 } Args;
 
 void *invert(void *Arg)
 {
     Args *arg = (Args*)Arg;
-    int res;
     
-    res = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg-> d, arg->n, arg->rank, arg->threadsCount);
     
-    return new int(res);
+    return NULL;
 }
 
 int main(int argc, char **argv)
@@ -44,8 +44,6 @@ int main(int argc, char **argv)
     Args *args;
     int inputType;
     int returnFlag;
-    void *res;
-    int *intRes;
     
     if (argc == 1)
     {
@@ -224,6 +222,7 @@ int main(int argc, char **argv)
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
         args[i].d = d;
+        args[i].retFlag = 0;
     }
     
     t = getTime();
@@ -249,7 +248,7 @@ int main(int argc, char **argv)
     
     for (i = 0; i < threadsCount; i++)
     {
-        if (pthread_join(threads[i], &res))
+        if (pthread_join(threads[i], 0))
         {
             printf("Can't wait thread %d!\n", i);
             
@@ -264,10 +263,11 @@ int main(int argc, char **argv)
             
             return -1;
         }
-        
-        intRes = (int *)res;
-        
-        if(intRes && *intRes != 0)
+    }
+    
+    for (i = 0; i < threadsCount; i++)
+    {
+        if (args[i].retFlag != 0)
         {
             cout<<"Error while inverting matrix"<<endl;
             

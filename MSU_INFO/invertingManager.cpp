@@ -83,10 +83,12 @@ int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n, int ra
         synchronize(threadsCount);
         
         if(!continueFlag)
-            continue;
-        
-        if (!returnFlag)
-            return -1;
+        {
+            if (!returnFlag)
+                return -1;
+            else
+                continue; 
+        }
         
         if (returnFlag && continueFlag)
         {
