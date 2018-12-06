@@ -16,7 +16,7 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
     cin>>inputType;
     
     if (inputType == 1)
@@ -103,7 +103,7 @@ int main()
         
         cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
         
-        cout<<"Inversion time =  "<< t/CLOCKS_PER_SEC << " seconds"<<endl;
+        cout<<"Inversion time =  "<< t * 1.0/CLOCKS_PER_SEC << " seconds"<<endl;
     }
     else
     {
