@@ -1,11 +1,3 @@
-//
-//  invertingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "invertingManager.hpp"
 #include <math.h>
 #include <iostream>
@@ -87,7 +79,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
         beginRow = (n - i - 1) * rank;
         beginRow = beginRow/threadsCount + i + 1;
         lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
+        lastRow = lastRow/threadsCount + i + 1;
         
         for (j = beginRow; j < lastRow; ++j)
         {
@@ -104,7 +96,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     synchronize(threadsCount);
     
     beginCol = n * rank/threadsCount;
-    lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
+    lastCol = n * (rank + 1)/threadsCount;
     
     for (k = beginCol; k < lastCol; ++k)
     {
