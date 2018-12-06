@@ -4,14 +4,16 @@
 
 using namespace std;
 
+int continueFlag = 1;
 int returnFlag = 1;
+double cosPhi = 0, sinPhi = 0;
 
-int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
+int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int threadsCount)
 {
     int i, j, k;
-    double tmp1, tmp2;
-    double r;
-    double cosPhi = 0, sinPhi = 0;
+    double x, y;
+    double r = 0, matrix_ik, matrix_jk;
+    double a;
 
     int beginCol, lastCol;
     
@@ -24,14 +26,14 @@ int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
             for (j = 0; j < n; ++j)
             {
                 if (i == j)
-                    x[i*n+j] = 1;
+                    inverseMatrix[i*n+j] = 1;
                 else
-                    x[i*n+j] = 0;
+                    inverseMatrix[i*n+j] = 0;
             }
         }
     }
     
-    for (i = 0; i < n-1; i++)
+    for (i = 0; i < n-1; ++i)
     {
         for (j = i + 1; j < n; ++j)
         {
@@ -39,45 +41,53 @@ int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
 
             if (rank == 0)
             {
-                tmp1 = a[i*n+i];
-                tmp2 = a[j*n+i];
+                x = matrix[i*n+i];
+                y = matrix[j*n+i];
                 
-                r = sqrt(tmp1*tmp1+tmp2*tmp2);
-                
-                cout<<r<<endl;
-                
-                if (r < eps)
-                    returnFlag = 0; //det = 0;
+                if (fabs(y) < eps)
+                    continueFlag = 0;
                 else
-                    returnFlag = 1;
-                
-                if (returnFlag)
+                    continueFlag = 1;
+
+                if (continueFlag)
                 {
-                    cosPhi = tmp1 / r;
-                    sinPhi = -tmp2 / r;
+                    r = sqrt(x*x+y*y);
                     
-                    a[i * n + i] = r;
-                    a[j * n + i] = 0.0;
+                    if (r < eps)
+                        returnFlag = 0;
+                    else
+                        returnFlag = 1;
+                    
+                    if (returnFlag)
+                    {
+                        cosPhi = x/r;
+                        sinPhi = -y/r;
+                    }
                 }
             }
             
             synchronize(threadsCount);
             
-            if (!returnFlag)
-                return -1;
+            if(!continueFlag)
+            {
+                if (!returnFlag)
+                    return -1;
+                else
+                    continue;
+            }
             
-            beginCol = (n - i - 1) * rank;
-            beginCol = beginCol/threadsCount + i + 1;
-            lastCol = (n - i - 1) * (rank + 1);
-            lastCol = lastCol/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
+            beginCol = (n - i) * rank;
+            beginCol = beginCol/threadsCount + i;
+            lastCol = (n - i) * (rank + 1);
+            lastCol = lastCol/threadsCount + i;//равномерное распределение междлу i до n
             
             for (k = beginCol; k < lastCol; ++k)
             {
-                tmp1 = a[i * n + k];
-                tmp2 = a[j * n + k];
+                matrix_ik = matrix[i*n+k];
+                matrix_jk = matrix[j*n+k];
                 
-                a[i * n + k] = tmp1 * cosPhi - tmp2 * sinPhi;
-                a[j * n + k] = tmp1 * sinPhi + tmp2 * cosPhi;
+                matrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
             }
             
             synchronize(threadsCount);
@@ -87,11 +97,11 @@ int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
             
             for (k = beginCol; k < lastCol; ++k)
             {
-                tmp1 = x[i * n + k];
-                tmp2 = x[j * n + k];
+                matrix_ik = inverseMatrix[i*n+k];
+                matrix_jk = inverseMatrix[j*n+k];
                 
-                x[i * n + k] = tmp1 * cosPhi - tmp2 * sinPhi;
-                x[j * n + k] = tmp1 * sinPhi + tmp2 * cosPhi;
+                inverseMatrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                inverseMatrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
             }
         }
     }
@@ -103,14 +113,17 @@ int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
     
     for (k = beginCol; k < lastCol; ++k)
     {
-        for (i = n - 1; i >= 0; --i)
+        for (i = n-1; i >= 0; --i)
         {
-            tmp1 = x[i * n + k];
+            if (matrix[i*n+i] < eps)
+                return -1;
+            
+            a = inverseMatrix[i*n+k];
             
             for (j = i + 1; j < n; ++j)
-                tmp1 -= a[i * n + j] * x[j * n + k];
+                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
             
-            x[i * n + k] = tmp1 / a[i * n + i];
+            inverseMatrix[i*n+k] = a / matrix[i*n+i];
         }
     }
     
