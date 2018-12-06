@@ -1,11 +1,3 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "matrixUtils.hpp"
 #include <stdio.h>
 #include <math.h>
@@ -13,14 +5,15 @@
 
 using namespace std;
 
-double func(int i, int j)
+double func(int i, int j, int n)
 {
-    return fabs(i-j);
+    return n - fmax(i,j);
 }
 
-int enterMatrix(double* matrix, int n, FILE* fin)
+int enterData(double* matrix, double *vector, int n, FILE* fin)
 {
-    int i, j;
+    int i;
+    int j;
     
     if (fin)
     {
@@ -31,15 +24,23 @@ int enterMatrix(double* matrix, int n, FILE* fin)
                 if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
                     return -1;
             }
+            
+            if (fscanf(fin, "%lf", &vector[i]) != 1)
+                return -1;
         }
     }
     else
     {
         for (i = 0; i < n; ++i)
         {
+            vector[i] = 0;
+            
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j);
+                matrix[i*n+j] = func(i, j, n);
+                
+                if (j % 2 == 0)
+                    vector[i] += matrix[i*n+j];
             }
         }
     }
@@ -47,46 +48,50 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printMatrix(double* matrix, int n, int m)
+void printResult(double* result, int n, int m)
 {
-    int i, j;
+    int i;
     int min_ = fmin(n,m);
     
     for (i = 0; i < min_; ++i)
-    {
-        for (j = 0; j < min_; ++j)
-        {
-            cout<<matrix[i*n+j]<<' ';
-        }
-        cout<<endl;
-    }
+        printf("%f ", result[i]);
+    
+    printf("\n");
 }
 
-double residualNorm(double* matrix, double* inverseMatrix, int n)
+double residualNorm(double* matrix, double* vector, double* result, int n)
 {
-    int i, j, k;
-    double a, sum = 0.0, max = 0.0;
-        
+    int i, j;
+    double res = 0;
+    double a;
+    
     for (i = 0; i < n; ++i)
     {
-        sum = 0.0;
+        a = 0.0;
         
         for (j = 0; j < n; ++j)
-        {
-            a = 0.0;
-            
-            for (k = 0; k < n; ++k)
-                a += matrix[i*n+k] * inverseMatrix[k*n+j];
-            
-            if (i == j)
-                a -= 1.0;
-            
-            sum += fabs(a);
-        }
+            a += matrix[i*n+j] * result[j];
         
-        if (sum > max)
-            max = sum;
+        a -= vector[i];
+        
+        res += a*a;
     }
     
-    return max;
+    return sqrt(res);
+}
+
+double errorNorm(double *result, int n)
+{
+    double error = 0;
+    int i;
+    
+    for (i = 0; i < n; ++i)
+    {
+        if (i % 2)
+            error += result[i]*result[i];
+        else
+            error += (result[i]-1)*(result[i]-1);
+    }
+    
+    return sqrt(error);
 }

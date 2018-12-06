@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <math.h>
 #include "matrixUtils.hpp"
-#include "invertingManager.hpp"
+#include "solvingManager.hpp"
 #include <sys/time.h>
 
 using namespace std;
@@ -14,7 +14,8 @@ typedef struct
 {
     int n;
     double *matrix;
-    double *inverseMatrix;
+    double *vector;
+    double *result;
     int rank;
     int threadsCount;
     int retFlag;
@@ -24,7 +25,7 @@ void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = invertMatrix(arg->matrix, arg->inverseMatrix, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -34,7 +35,8 @@ int main()
     int i;
     int n, m;
     double *matrix;
-    double *inverseMatrix;
+    double *vector;
+    double *result;
     FILE* fin = NULL;
     long double t;
     int threadsCount;
@@ -94,11 +96,12 @@ int main()
     }
     
     matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
+    vector = new double [n];
+    result = new double [n];
     threads = new pthread_t[threadsCount];
     args = new Args[threadsCount];
     
-    if (!(matrix && inverseMatrix && threads && args))
+    if (!(matrix && vector && result && threads && args))
     {
         cout<<"No memory, enter matrix with less dimensions"<<endl;
         
@@ -106,14 +109,15 @@ int main()
             fclose(fin);
         
         delete []matrix;
-        delete []inverseMatrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
         return -2;
     }
     
-    returnFlag = enterMatrix(matrix, n, fin);
-    
+    returnFlag = enterData(matrix, vector, n, fin);
+
     if (returnFlag == -1)
     {
         cout<<"Data isn't correct"<<endl;
@@ -122,7 +126,8 @@ int main()
             fclose(fin);
         
         delete []matrix;
-        delete []inverseMatrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
 
@@ -139,7 +144,8 @@ int main()
             fclose(fin);
         
         delete []matrix;
-        delete []inverseMatrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
         
@@ -150,7 +156,8 @@ int main()
     {
         args[i].n = n;
         args[i].matrix = matrix;
-        args[i].inverseMatrix = inverseMatrix;
+        args[i].vector = vector;
+        args[i].result = result;
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
         args[i].retFlag = 0;
@@ -168,7 +175,8 @@ int main()
                 fclose(fin);
             
             delete []matrix;
-            delete []inverseMatrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []args;
             
@@ -186,7 +194,8 @@ int main()
                 fclose(fin);
             
             delete []matrix;
-            delete []inverseMatrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []args;
             
@@ -200,13 +209,14 @@ int main()
     {
         if (args[i].retFlag != 0)
         {
-            cout<<"Error while inverting matrix"<<endl;
+            cout<<"Error while solving system"<<endl;
             
             if (inputType == 1)
                 fclose(fin);
             
             delete []matrix;
-            delete []inverseMatrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []args;
             
@@ -214,8 +224,8 @@ int main()
         }
     }
     
-    cout<<endl<<"Inverse Matrix:"<<endl;
-    printMatrix(inverseMatrix, n, m);
+    cout<<"Result:"<<endl;
+    printResult(result, n, m);
     
     if (inputType == 1)
     {
@@ -223,17 +233,21 @@ int main()
         fscanf(fin, "%d", &n);
     }
 
-    returnFlag = enterMatrix(matrix, n, fin);
+    returnFlag = enterData(matrix, vector, n, fin);
     
-    cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
+    cout<<"Residual norm: "<<residualNorm(matrix, vector, result, n)<<endl;
     
-    cout<<"Inversion time =  "<< t << " seconds"<<endl;
+    if (inputType == 2)
+        cout<<"Error norm: "<<errorNorm(result, n)<<endl; ;
+    
+    cout<<"Solving time = "<<t<<" milliseconds"<<endl;
     
     if (inputType == 1)
         fclose(fin);
     
     delete []matrix;
-    delete []inverseMatrix;
+    delete []vector;
+    delete []result;
     delete []threads;
     delete []args;
     

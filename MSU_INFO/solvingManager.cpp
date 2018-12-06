@@ -1,12 +1,4 @@
-//
-//  invertingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
-#include "invertingManager.hpp"
+#include "solvingManager.hpp"
 #include <math.h>
 #include <iostream>
 
@@ -14,29 +6,14 @@ using namespace std;
 
 int returnFlag = 1;
 
-int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int threadsCount)
+int solveSystem(double* matrix, double* vector, double* result, int n, int rank, int threadsCount)
 {
     int i, j, k, maxElemIndex;
     double a, maxElem;
 
     int beginRow, lastRow;
-    int beginCol, lastCol;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
-    
-    if (rank == 0)
-    {
-        for (i = 0; i < n; ++i)
-        {
-            for (j = 0; j < n; ++j)
-            {
-                if (i == j)
-                    inverseMatrix[i*n+j] = 1;
-                else
-                    inverseMatrix[i*n+j] = 0;
-            }
-        }
-    }
     
     for (i = 0; i < n; i++)
     {
@@ -56,13 +33,15 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
                 }
             }
             
-            for (j = 0; j < n; ++j)
-                swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
+            if (maxElemIndex != i)
+            {
+                for (j = i; j < n; ++j)
+                    swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
+                
+                swap (vector[i], vector[maxElemIndex]);
+            }
             
-            for (j = 0; j < n; ++j)
-                swap (inverseMatrix[i*n+j], inverseMatrix[maxElemIndex*n+j]);
-            
-            if (fabs(matrix[i*n+i]) < eps)
+            if (maxElem < eps)
                 returnFlag = 0; //det = 0;
             else
                 returnFlag = 1;
@@ -74,8 +53,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
                 for (j = i; j < n; ++j)
                     matrix[i*n+j] *= a;
                 
-                for (j = 0; j < n; ++j)
-                    inverseMatrix[i*n+j] *= a;
+                vector[i] *= a;
             }
         }
         
@@ -96,27 +74,20 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
             for (k = i; k < n; ++k)
                 matrix[j*n+k] -= matrix[i*n+k] * a;
             
-            for (k = 0; k < n; ++k)
-                inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
+            vector[j] -= vector[i] * a;
         }
     }
     
     synchronize(threadsCount);
     
-    beginCol = n * rank/threadsCount;
-    lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
-    
-    for (k = beginCol; k < lastCol; ++k)
+    for (i = n-1; i >= 0; --i)
     {
-        for (i = n-1; i >= 0; --i)
-        {
-            a = inverseMatrix[i*n+k];
-            
-            for (j = i+1; j < n; ++j)
-                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
-            
-            inverseMatrix[i*n+k] = a;
-        }
+        a = vector[i];
+        
+        for (j = i+1; j < n; ++j)
+            a -= matrix[i * n + j] * result[j];
+        
+        result[i] = a;
     }
     
     return 0;
