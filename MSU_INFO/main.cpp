@@ -43,7 +43,7 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
     
     if (scanf("%d", &inputType) != 1)
     {
@@ -194,6 +194,8 @@ int main()
         }
     }
     
+    t = getTime() - t;
+    
     for (i = 0; i < threadsCount; i++)
     {
         if (args[i].retFlag != 0)
@@ -211,8 +213,6 @@ int main()
             return -1;
         }
     }
-    
-    t = getTime() - t;
     
     cout<<endl<<"Inverse Matrix:"<<endl;
     printMatrix(inverseMatrix, n, m);

@@ -87,7 +87,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
         beginRow = (n - i - 1) * rank;
         beginRow = beginRow/threadsCount + i + 1;
         lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;
+        lastRow = lastRow/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
         
         for (j = beginRow; j < lastRow; ++j)
         {
@@ -104,7 +104,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     synchronize(threadsCount);
     
     beginCol = n * rank/threadsCount;
-    lastCol = n * (rank + 1)/threadsCount;
+    lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
     
     for (k = beginCol; k < lastCol; ++k)
     {
