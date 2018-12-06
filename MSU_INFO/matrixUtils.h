@@ -12,6 +12,7 @@ struct myPair
 double func(int i, int j, int n);
 int enterMatrix(double* matrix, int n, FILE* fin);
 void printVector(double* vector, int n, int m, int k);
+void printMatrix(double *matrix, int n, int m);
 struct myPair residualNorm(double* matrix, double* vector, int n);
 
 #endif /* matrixUtils_hpp */
