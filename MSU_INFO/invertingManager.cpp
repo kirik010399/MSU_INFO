@@ -115,7 +115,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     {
         for (i = n-1; i >= 0; --i)
         {
-            if (matrix[i*n+i] < eps)
+            if (fabs(matrix[i*n+i]) < eps)
                 return -1;
             
             a = inverseMatrix[i*n+k];
