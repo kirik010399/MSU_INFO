@@ -1,11 +1,3 @@
-//
-//  invertingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "invertingManager.hpp"
 #include <math.h>
 #include <iostream>
@@ -14,12 +6,13 @@ using namespace std;
 
 int returnFlag = 1;
 
-int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int threadsCount)
+int invertMatrix(double* a, double* x, int n, int rank, int threadsCount)
 {
-    int i, j, k, maxElemIndex;
-    double a, maxElem;
+    int i, j, k;
+    double tmp1, tmp2;
+    double r;
+    double cosPhi = 0, sinPhi = 0;
 
-    int beginRow, lastRow;
     int beginCol, lastCol;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
@@ -31,91 +24,93 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
             for (j = 0; j < n; ++j)
             {
                 if (i == j)
-                    inverseMatrix[i*n+j] = 1;
+                    x[i*n+j] = 1;
                 else
-                    inverseMatrix[i*n+j] = 0;
+                    x[i*n+j] = 0;
             }
         }
     }
     
     for (i = 0; i < n; i++)
     {
-        synchronize(threadsCount);
-
-        if (rank == 0)
+        for (j = i + 1; j < n; ++j)
         {
-            maxElem = fabs(matrix[i*n+i]);
-            maxElemIndex = i;
-            
-            for (j = i + 1; j < n; ++j)
+            synchronize(threadsCount);
+
+            if (rank == 0)
             {
-                if (maxElem < fabs(matrix[j*n+i]))
+                tmp1 = a[i*n+i];
+                tmp2 = a[j*n+i];
+                
+                r = sqrt(tmp1*tmp1+tmp2*tmp2);
+                
+                cout<<r<<endl;
+                
+                if (r < eps)
+                    returnFlag = 0; //det = 0;
+                else
+                    returnFlag = 1;
+                
+                if (returnFlag)
                 {
-                    maxElem = fabs(matrix[j*n+i]);
-                    maxElemIndex = j;
+                    cosPhi = tmp1 / r;
+                    sinPhi = -tmp2 / r;
+                    
+                    a[i * n + i] = r;
+                    a[j * n + i] = 0.0;
                 }
             }
             
-            for (j = 0; j < n; ++j)
-                swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
+            synchronize(threadsCount);
             
-            for (j = 0; j < n; ++j)
-                swap (inverseMatrix[i*n+j], inverseMatrix[maxElemIndex*n+j]);
+            if (!returnFlag)
+                return -1;
             
-            if (fabs(matrix[i*n+i]) < eps)
-                returnFlag = 0; //det = 0;
-            else
-                returnFlag = 1;
+            beginCol = (n - i - 1) * rank;
+            beginCol = beginCol/threadsCount + i + 1;
+            lastCol = (n - i - 1) * (rank + 1);
+            lastCol = lastCol/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
             
-            if (returnFlag)
+            for (k = beginCol; k < lastCol; ++k)
             {
-                a = 1.0/matrix[i*n+i];
+                tmp1 = a[i * n + k];
+                tmp2 = a[j * n + k];
                 
-                for (j = i; j < n; ++j)
-                    matrix[i*n+j] *= a;
-                
-                for (j = 0; j < n; ++j)
-                    inverseMatrix[i*n+j] *= a;
+                a[i * n + k] = tmp1 * cosPhi - tmp2 * sinPhi;
+                a[j * n + k] = tmp1 * sinPhi + tmp2 * cosPhi;
             }
-        }
-        
-        synchronize(threadsCount);
-        
-        if (!returnFlag)
-            return -1;
-        
-        beginRow = (n - i - 1) * rank;
-        beginRow = beginRow/threadsCount + i + 1;
-        lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
-        
-        for (j = beginRow; j < lastRow; ++j)
-        {
-            a = matrix[j*n+i];
             
-            for (k = i; k < n; ++k)
-                matrix[j*n+k] -= matrix[i*n+k] * a;
+            synchronize(threadsCount);
+
+            beginCol = n * rank/threadsCount;
+            lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
             
-            for (k = 0; k < n; ++k)
-                inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
+            for (k = beginCol; k < lastCol; ++k)
+            {
+                tmp1 = x[i * n + k];
+                tmp2 = x[j * n + k];
+                
+                x[i * n + k] = tmp1 * cosPhi - tmp2 * sinPhi;
+                x[j * n + k] = tmp1 * sinPhi + tmp2 * cosPhi;
+            }
         }
     }
     
     synchronize(threadsCount);
-    
+   
     beginCol = n * rank/threadsCount;
     lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
     
     for (k = beginCol; k < lastCol; ++k)
     {
-        for (i = n-1; i >= 0; --i)
+        for (i = n - 1; i >= 0; --i)
         {
-            a = inverseMatrix[i*n+k];
+            tmp1 = x[i * n + k];
             
-            for (j = i+1; j < n; ++j)
-                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
+            for (j = i + 1; j < n; ++j)
+                tmp1 -= a[i * n + j] * x[j * n + k];
             
-            inverseMatrix[i*n+k] = a;
+            x[i * n + k] = tmp1 / a[i * n + i];
         }
     }
     
