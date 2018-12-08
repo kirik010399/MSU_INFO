@@ -240,7 +240,7 @@ int main()
     if (inputType == 2)
         cout<<"Error norm: "<<errorNorm(result, n)<<endl; ;
     
-    cout<<"Solving time = "<<t<<" milliseconds"<<endl;
+    cout<<"Solving time = "<<t<<" seconds"<<endl;
     
     if (inputType == 1)
         fclose(fin);

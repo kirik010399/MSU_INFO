@@ -65,7 +65,7 @@ int solveSystem(double* matrix, double* vector, double* result, int n, int rank,
         beginRow = (n - i - 1) * rank;
         beginRow = beginRow/threadsCount + i + 1;
         lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;//равномерное распределение междлу i+1 до n
+        lastRow = lastRow/threadsCount + i + 1;//равномерно распределили междлу i+1 до n
         
         for (j = beginRow; j < lastRow; ++j)
         {
@@ -80,14 +80,17 @@ int solveSystem(double* matrix, double* vector, double* result, int n, int rank,
     
     synchronize(threadsCount);
     
-    for (i = n-1; i >= 0; --i)
+    if(rank == 0)
     {
-        a = vector[i];
-        
-        for (j = i+1; j < n; ++j)
-            a -= matrix[i * n + j] * result[j];
-        
-        result[i] = a;
+        for (i = n-1; i >= 0; --i)
+        {
+            a = vector[i];
+            
+            for (j = i+1; j < n; ++j)
+                a -= matrix[i * n + j] * result[j];
+            
+            result[i] = a;
+        }
     }
     
     return 0;
