@@ -9,51 +9,44 @@ int returnFlag = 1;
 int solveSystem(double* matrix, double* vector, double* result, int n, int rank, int threadsCount)
 {
     int i, j, k, maxElemIndex;
-    double a, maxElem;
+    double maxElem;
 
     int beginRow, lastRow;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
     
-    for (i = 0; i < n; i++)
+    for (j = 0; j < n; ++j)
     {
         synchronize(threadsCount);
-
+        
         if (rank == 0)
         {
-            maxElem = fabs(matrix[i*n+i]);
-            maxElemIndex = i;
+            maxElem = matrix[j*n+j];
+            maxElemIndex = j;
             
-            for (j = i + 1; j < n; ++j)
+            for (i = j+1; i < n; ++i)
             {
-                if (maxElem < fabs(matrix[j*n+i]))
+                if (fabs(matrix[i*n+j]) > fabs(maxElem))
                 {
-                    maxElem = fabs(matrix[j*n+i]);
-                    maxElemIndex = j;
+                    maxElem = matrix[i*n+j];
+                    maxElemIndex = i;
                 }
             }
             
-            if (maxElemIndex != i)
-            {
-                for (j = i; j < n; ++j)
-                    swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
-                
-                swap (vector[i], vector[maxElemIndex]);
-            }
-            
-            if (maxElem < eps)
+            if (fabs(maxElem) < eps)
                 returnFlag = 0; //det = 0;
             else
                 returnFlag = 1;
             
             if (returnFlag)
             {
-                a = 1.0/matrix[i*n+i];
-                
-                for (j = i; j < n; ++j)
-                    matrix[i*n+j] *= a;
-                
-                vector[i] *= a;
+                if (maxElemIndex != j)
+                {
+                    for (i = j; i < n; ++i)
+                        swap(matrix[maxElemIndex*n+i], matrix[j*n+i]);
+                    
+                    swap(vector[maxElemIndex], vector[j]);
+                }
             }
         }
         
@@ -62,19 +55,20 @@ int solveSystem(double* matrix, double* vector, double* result, int n, int rank,
         if (!returnFlag)
             return -1;
         
-        beginRow = (n - i - 1) * rank;
-        beginRow = beginRow/threadsCount + i + 1;
-        lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;//равномерно распределили междлу i+1 до n
+        beginRow = n * rank/threadsCount;
+        lastRow = n * (rank + 1)/threadsCount;
         
-        for (j = beginRow; j < lastRow; ++j)
+        for(i = beginRow; i < lastRow; ++i)
         {
-            a = matrix[j*n+i];
-            
-            for (k = i; k < n; ++k)
-                matrix[j*n+k] -= matrix[i*n+k] * a;
-            
-            vector[j] -= vector[i] * a;
+            if (i != j && fabs(matrix[i*n+j]) > eps)
+            {
+                maxElem = matrix[i*n+j]/matrix[j*n+j];
+                
+                for(k = j; k < n; ++k)
+                    matrix[i*n+k] -= maxElem*matrix[j*n+k];
+                
+                vector[i] -= maxElem*vector[j];
+            }
         }
     }
     
@@ -82,15 +76,8 @@ int solveSystem(double* matrix, double* vector, double* result, int n, int rank,
     
     if(rank == 0)
     {
-        for (i = n-1; i >= 0; --i)
-        {
-            a = vector[i];
-            
-            for (j = i+1; j < n; ++j)
-                a -= matrix[i * n + j] * result[j];
-            
-            result[i] = a;
-        }
+        for (i = 0; i < n; ++i)
+            result[i] = vector[i]/matrix[i*n+i];
     }
     
     return 0;
