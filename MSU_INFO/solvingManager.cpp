@@ -6,12 +6,10 @@ using namespace std;
 
 int returnFlag = 1;
 
-int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int threadsCount)
+int solveSystem(double* matrix, double* vector, double* result, int* var, int n, int rank, int threadsCount)
 {
-    int i, j, k;
-    double value;
-    int maxStrInd, maxColInd;
-
+    int i, j, k, maxStrIndex, maxColIndex;
+    double a, maxElem;
     int beginRow, lastRow;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
@@ -28,45 +26,52 @@ int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int 
 
         if (rank == 0)
         {
-            value = fabs(a[i*n+i]);
-            maxStrInd = i;
-            maxColInd = i;
+            maxElem = fabs(matrix[i*n+i]);
+            maxStrIndex = i;
+            maxColIndex = i;
             
             for (j = i; j < n; ++j)
             {
                 for (k = i; k < n; ++k)
                 {
-                    if (fabs(a[j*n+k]) > value)// Search for max in a
+                    if (fabs(matrix[j*n+k]) > maxElem)// Search for max in matrix
                     {
-                        value = fabs(a[j*n+k]);
-                        maxStrInd = j;
-                        maxColInd = k;
+                        maxElem = fabs(matrix[j*n+k]);
+                        maxStrIndex = j;
+                        maxColIndex = k;
                     }
                 }
             }
             
-            if (fabs(value) < eps)
+            if (fabs(maxElem) < eps)
                 returnFlag = 0; //det = 0;
             else
                 returnFlag = 1;
             
             if (returnFlag)
             {
-                if (maxStrInd != i) // Swap strings (i <-> max)
+                if (maxStrIndex != i) // Swap strings (i <-> max)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[maxStrInd*n+j], a[i*n+j]);
+                        swap(matrix[maxStrIndex*n+j], matrix[i*n+j]);
                     
-                    swap(b[maxStrInd], b[i]);
+                    swap(vector[maxStrIndex], vector[i]);
                 }
                 
-                swap(var[i], var[maxColInd]);//swap variables
+                swap(var[i], var[maxColIndex]);//swap variables
                 
-                if (maxColInd != i) // Swap columns (i <-> max)
+                if (maxColIndex != i) // Swap columns (i <-> max)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[j*n+maxColInd], a[j*n+i]);
+                        swap(matrix[j*n+maxColIndex], matrix[j*n+i]);
                 }
+                
+                a = 1.0/matrix[i*n+i];
+                
+                for (j = i; j < n; ++j)
+                    matrix[i*n+j] *= a;
+                
+                vector[i] *= a;
             }
         }
         
@@ -75,20 +80,19 @@ int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int 
         if (!returnFlag)
             return -1;
         
-        beginRow = n * rank/threadsCount ;
-        lastRow = n * (rank + 1)/threadsCount;
+        beginRow = (n - i - 1) * rank;
+        beginRow = beginRow/threadsCount + i + 1;
+        lastRow = (n - i - 1) * (rank + 1);
+        lastRow = lastRow/threadsCount + i + 1;
         
         for (j = beginRow; j < lastRow; ++j)
         {
-            if (j != i)
-            {
-                value = a[j*n+i]/a[i*n+i];
-                
-                for(k = i; k < n; ++k)
-                    a[j*n+k] -= value*a[i*n+k];
-                
-                b[j] -= value*b[i];
-            }
+            a = matrix[j*n+i];
+            
+            for (k = i; k < n; ++k)
+                matrix[j*n+k] -= matrix[i*n+k] * a;
+            
+            vector[j] -= vector[i] * a;
         }
     }
     
@@ -96,8 +100,15 @@ int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int 
     
     if(rank == 0)
     {
-        for (i = 0; i < n; ++i)
-            x[var[i]] = b[i]/a[i*n+i];
+        for (i = n-1; i >= 0; --i)
+        {
+            a = vector[i];
+            
+            for (j = i+1; j < n; ++j)
+                a -= matrix[i * n + j] * result[var[j]];
+            
+            result[var[i]] = a;
+        }
     }
     
     return 0;

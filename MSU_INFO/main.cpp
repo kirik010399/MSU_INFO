@@ -13,9 +13,9 @@ long double getTime();
 typedef struct
 {
     int n;
-    double *a;
-    double *b;
-    double *x;
+    double *matrix;
+    double *vector;
+    double *result;
     int *var;
     int rank;
     int threadsCount;
@@ -26,7 +26,7 @@ void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = solveSystem(arg->a, arg->b, arg->x, arg->var, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -35,9 +35,9 @@ int main()
 {
     int i;
     int n, m;
-    double *a;
-    double *b;
-    double *x;
+    double *matrix;
+    double *vector;
+    double *result;
     int *var;
 
     FILE* fin = NULL;
@@ -98,30 +98,30 @@ int main()
         return -2;
     }
     
-    a = new double [n*n];
-    b = new double [n];
-    x = new double [n];
+    matrix = new double [n*n];
+    vector = new double [n];
+    result = new double [n];
     var = new int[n];
     threads = new pthread_t[threadsCount];
     args = new Args[threadsCount];
     
-    if (!(a && b && x && threads && var))
+    if (!(matrix && vector && result && threads && var))
     {
-        cout<<"No memory, enter a with less dimensions"<<endl;
+        cout<<"No memory, enter matrix with less dimensions"<<endl;
         
         if (inputType == 1)
             fclose(fin);
         
-        delete []a;
-        delete []b;
-        delete []x;
+        delete []matrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
         delete []var;
         return -2;
     }
     
-    returnFlag = enterData(a, b, n, fin);
+    returnFlag = enterData(matrix, vector, n, fin);
 
     if (returnFlag == -1)
     {
@@ -130,9 +130,9 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []a;
-        delete []b;
-        delete []x;
+        delete []matrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
         delete []var;
@@ -149,9 +149,9 @@ int main()
         if (inputType == 1)
             fclose(fin);
         
-        delete []a;
-        delete []b;
-        delete []x;
+        delete []matrix;
+        delete []vector;
+        delete []result;
         delete []threads;
         delete []args;
         delete []var;
@@ -162,9 +162,9 @@ int main()
     for (i = 0; i < threadsCount; i++)
     {
         args[i].n = n;
-        args[i].a = a;
-        args[i].b = b;
-        args[i].x = x;
+        args[i].matrix = matrix;
+        args[i].vector = vector;
+        args[i].result = result;
         args[i].var = var; 
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
@@ -182,9 +182,9 @@ int main()
             if (inputType == 1)
                 fclose(fin);
             
-            delete []a;
-            delete []b;
-            delete []x;
+            delete []matrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []var;
             delete []args;
@@ -202,9 +202,9 @@ int main()
             if (inputType == 1)
                 fclose(fin);
             
-            delete []a;
-            delete []b;
-            delete []x;
+            delete []matrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []args;
             delete []var;
@@ -224,9 +224,9 @@ int main()
             if (inputType == 1)
                 fclose(fin);
             
-            delete []a;
-            delete []b;
-            delete []x;
+            delete []matrix;
+            delete []vector;
+            delete []result;
             delete []threads;
             delete []args;
             delete []var;
@@ -235,8 +235,8 @@ int main()
         }
     }
     
-    cout<<"x:"<<endl;
-    printResult(x, n, m);
+    cout<<"result:"<<endl;
+    printResult(result, n, m);
     
     if (inputType == 1)
     {
@@ -244,21 +244,21 @@ int main()
         fscanf(fin, "%d", &n);
     }
 
-    returnFlag = enterData(a, b, n, fin);
+    returnFlag = enterData(matrix, vector, n, fin);
     
-    cout<<"Residual norm: "<<residualNorm(a, b, x, n)<<endl;
+    cout<<"Residual norm: "<<residualNorm(matrix, vector, result, n)<<endl;
     
     if (inputType == 2)
-        cout<<"Error norm: "<<errorNorm(x, n)<<endl; ;
+        cout<<"Error norm: "<<errorNorm(result, n)<<endl; ;
     
     cout<<"Solving time = "<<t<<" seconds"<<endl;
     
     if (inputType == 1)
         fclose(fin);
     
-    delete []a;
-    delete []b;
-    delete []x;
+    delete []matrix;
+    delete []vector;
+    delete []result;
     delete []threads;
     delete []var;
     delete []args;
