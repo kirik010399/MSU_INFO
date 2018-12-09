@@ -31,7 +31,7 @@ void *Inversion(void *Arg)
     return NULL;
 }
 
-int main()
+int main(int argc, char **argv)
 {
     int i;
     int n, m;
@@ -39,7 +39,6 @@ int main()
     double *b;
     double *x;
     int *var;
-
     FILE* fin = NULL;
     long double t;
     int threadsCount;
@@ -48,9 +47,13 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
+    if (argc == 1)
+    {
+        cout<<"Incorrect mode"<<endl;
+        return -2;
+    }
     
-    if (scanf("%d", &inputType) != 1)
+    if (sscanf(argv[1], "%d", &inputType) != 1)
     {
         cout<<"Data isn't correct"<<endl;
         return -2;
@@ -58,6 +61,12 @@ int main()
     
     if (inputType == 1)
     {
+        if (argc != 4)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
+        
         fin = fopen("input.txt", "r");
         
         if (!fin)
@@ -73,12 +82,29 @@ int main()
             fclose(fin);
             return -2;
         }
+        
+        if (sscanf(argv[2], "%d", &threadsCount) != 1 || threadsCount <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            fclose(fin);
+            return -2;
+        }
     }
     else if (inputType == 2)
     {
-        cout<<"Enter size: ";
+        if (argc != 5)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
         
-        if (scanf("%d", &n) != 1 || n <= 0)
+        if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
+        
+        if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
@@ -87,14 +113,6 @@ int main()
     else
     {
         cout<<"Input type isn't correct"<<endl;
-        return -2;
-    }
-    
-    cout<<"Enter treads count: ";
-    
-    if (scanf("%d", &threadsCount) != 1 || threadsCount <= 0)
-    {
-        cout<<"Data isn't correct"<<endl;
         return -2;
     }
     
@@ -122,7 +140,7 @@ int main()
     }
     
     returnFlag = enterData(a, b, n, fin);
-
+    
     if (returnFlag == -1)
     {
         cout<<"Data isn't correct"<<endl;
@@ -140,23 +158,43 @@ int main()
         return -2;
     }
     
-    cout<<"Enter size of printing vector: ";
-    
-    if (scanf("%d", &m) != 1 || m <= 0)
+    if (inputType == 1)
     {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []a;
-        delete []b;
-        delete []x;
-        delete []threads;
-        delete []args;
-        delete []var;
-        
-        return -2;
+        if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []a;
+            delete []b;
+            delete []x;
+            delete []threads;
+            delete []args;
+            delete []var;
+            
+            return -2;
+        }
+    }
+    else
+    {
+        if (sscanf(argv[4], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []a;
+            delete []b;
+            delete []x;
+            delete []threads;
+            delete []args;
+            delete []var;
+            
+            return -2;
+        }
     }
     
     for (i = 0; i < threadsCount; i++)
