@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-int solveSystem(double* matrix, double* vector, double* result, int n, int rank, int threadsCount);
+int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int threadsCount);
 void synchronize(int total_threads);
 
 #endif /* solvingManager_hpp */
