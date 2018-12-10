@@ -12,7 +12,6 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     double a, maxElem;
 
     int beginRow, lastRow;
-    int beginCol, lastCol;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
     
@@ -76,38 +75,21 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
         if (!returnFlag)
             return -1;
         
-        beginRow = (n - i - 1) * rank;
-        beginRow = beginRow/threadsCount + i + 1;
-        lastRow = (n - i - 1) * (rank + 1);
-        lastRow = lastRow/threadsCount + i + 1;
+        beginRow = n * rank / threadsCount;
+        lastRow = n * (rank + 1) / threadsCount;
         
         for (j = beginRow; j < lastRow; ++j)
         {
-            a = matrix[j*n+i];
-            
-            for (k = i; k < n; ++k)
-                matrix[j*n+k] -= matrix[i*n+k] * a;
-            
-            for (k = 0; k < n; ++k)
-                inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
-        }
-    }
-    
-    synchronize(threadsCount);
-    
-    beginCol = n * rank/threadsCount;
-    lastCol = n * (rank + 1)/threadsCount;
-    
-    for (k = beginCol; k < lastCol; ++k)
-    {
-        for (i = n-1; i >= 0; --i)
-        {
-            a = inverseMatrix[i*n+k];
-            
-            for (j = i+1; j < n; ++j)
-                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
-            
-            inverseMatrix[i*n+k] = a;
+            if (i != j)
+            {
+                a = matrix[j*n+i];
+                
+                for (k = i; k < n; ++k)
+                    matrix[j*n+k] -= matrix[i*n+k] * a;
+                
+                for (k = 0; k < n; ++k)
+                    inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
+            }
         }
     }
     
