@@ -17,6 +17,7 @@ typedef struct
     double *vector;
     double *result;
     int *var;
+    maxElem *max_;
     int rank;
     int threadsCount;
     int retFlag;
@@ -26,7 +27,7 @@ void *Inversion(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->max_, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -39,6 +40,7 @@ int main()
     double *vector;
     double *result;
     int *var;
+    maxElem *max_;
 
     FILE* fin = NULL;
     long double t;
@@ -104,8 +106,9 @@ int main()
     var = new int[n];
     threads = new pthread_t[threadsCount];
     args = new Args[threadsCount];
+    max_ = new maxElem[threadsCount];
     
-    if (!(matrix && vector && result && threads && var))
+    if (!(matrix && vector && result && threads && var && max_))
     {
         cout<<"No memory, enter matrix with less dimensions"<<endl;
         
@@ -118,6 +121,7 @@ int main()
         delete []threads;
         delete []args;
         delete []var;
+        delete []max_;
         return -2;
     }
     
@@ -136,6 +140,7 @@ int main()
         delete []threads;
         delete []args;
         delete []var;
+        delete []max_;
 
         return -2;
     }
@@ -155,6 +160,7 @@ int main()
         delete []threads;
         delete []args;
         delete []var;
+        delete []max_;
         
         return -2;
     }
@@ -169,6 +175,7 @@ int main()
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
         args[i].retFlag = 0;
+        args[i].max_ = max_;
     }
     
     t = getTime();
@@ -188,6 +195,7 @@ int main()
             delete []threads;
             delete []var;
             delete []args;
+            delete []max_;
             
             return -1;
         }
@@ -208,6 +216,7 @@ int main()
             delete []threads;
             delete []args;
             delete []var;
+            delete []max_;
             
             return -1;
         }
@@ -230,6 +239,7 @@ int main()
             delete []threads;
             delete []args;
             delete []var;
+            delete []max_;
 
             return -1;
         }
@@ -262,6 +272,7 @@ int main()
     delete []threads;
     delete []var;
     delete []args;
+    delete []max_;
     
     return 0;
 }

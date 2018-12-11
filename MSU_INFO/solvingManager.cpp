@@ -6,7 +6,7 @@ using namespace std;
 
 int returnFlag = 1;
 
-int solveSystem(double* matrix, double* vector, double* result, int* var, int n, int rank, int threadsCount)
+int solveSystem(double* matrix, double* vector, double* result, int* var, maxElem *max_, int n, int rank, int threadsCount)
 {
     int i, j, k, maxStrIndex, maxColIndex;
     double a, maxElem;
@@ -23,6 +23,30 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, int n,
     for (i = 0; i < n; i++)
     {
         synchronize(threadsCount);
+        
+        beginRow = (n - i) * rank;
+        beginRow = beginRow/threadsCount + i;
+        lastRow = (n - i) * (rank + 1);
+        lastRow = lastRow/threadsCount + i;
+        
+        max_[rank] = fabs(matrix[beginRow*n+i]);
+        maxStrIndex = beginRow;
+        maxColIndex = i;
+        
+        for (j = beginRow; j < lastRow; ++j)
+        {
+            for (k = i; k < n; ++k)
+            {
+                if (fabs(matrix[j*n+k]) > maxElem)// Search for max in matrix
+                {
+                    maxElem = fabs(matrix[j*n+k]);
+                    maxStrIndex = j;
+                    maxColIndex = k;
+                }
+            }
+        }
+        
+        
 
         if (rank == 0)
         {
