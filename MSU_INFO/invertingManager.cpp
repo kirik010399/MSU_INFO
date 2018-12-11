@@ -6,9 +6,9 @@ using namespace std;
 
 int returnFlag = 1;
 
-int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int threadsCount)
+int invertMatrix(double* matrix, double* inverseMatrix, int n, maxElem* max_, int *var, int rank, int threadsCount)
 {
-    int i, j, k, maxElemIndex;
+    int i, j, k, maxStrIndex, maxColIndex;
     double a, maxElem;
 
     int beginRow, lastRow;
@@ -20,6 +20,8 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     {
         for (i = 0; i < n; ++i)
         {
+            var[i] = i;
+            
             for (j = 0; j < n; ++j)
             {
                 if (i == j)
@@ -34,43 +36,80 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     {
         synchronize(threadsCount);
 
+        beginRow = (n - i) * rank;
+        beginRow = beginRow/threadsCount + i;
+        lastRow = (n - i) * (rank + 1);
+        lastRow = lastRow/threadsCount + i;
+        
+        max_[rank].elem = fabs(matrix[beginRow*n+i]);
+        max_[rank].rowIndex = beginRow;
+        max_[rank].colIndex = i;
+        
+        for (j = beginRow; j < lastRow; ++j)
+        {
+            for (k = i; k < n; ++k)
+            {
+                if (fabs(matrix[j*n+k]) > max_[rank].elem)
+                {
+                    max_[rank].elem = fabs(matrix[j*n+k]);
+                    max_[rank].rowIndex = j;
+                    max_[rank].colIndex = k;
+                }
+            }
+        }
+        
+        synchronize(threadsCount);
+        
         if (rank == 0)
         {
-            maxElem = fabs(matrix[i*n+i]);
-            maxElemIndex = i;
+            maxElem = max_[0].elem;
+            maxStrIndex = max_[0].rowIndex;
+            maxColIndex = max_[0].colIndex;
             
-            for (j = i + 1; j < n; ++j)
+            for (k = 1; k < threadsCount; ++k)
             {
-                if (maxElem < fabs(matrix[j*n+i]))
+                if (maxElem < max_[k].elem)
                 {
-                    maxElem = fabs(matrix[j*n+i]);
-                    maxElemIndex = j;
+                    maxElem = max_[k].elem;
+                    maxStrIndex = max_[k].rowIndex;
+                    maxColIndex = max_[k].colIndex;
                 }
             }
             
-            for (j = 0; j < n; ++j)
-                swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
-            
-            for (j = 0; j < n; ++j)
-                swap (inverseMatrix[i*n+j], inverseMatrix[maxElemIndex*n+j]);
-            
-            if (fabs(matrix[i*n+i]) < eps)
+            if (fabs(maxElem) < eps)
                 returnFlag = 0; //det = 0;
             else
                 returnFlag = 1;
             
             if (returnFlag)
             {
+                if (maxStrIndex != i) // Swap strings (i <-> max)
+                {
+                    for (j = 0; j < n; ++j)
+                        swap(matrix[maxStrIndex*n+j], matrix[i*n+j]);
+                    
+                    for (j = 0; j < n; ++j)
+                        swap(inverseMatrix[maxStrIndex*n+j], inverseMatrix[i*n+j]);
+                }
+
+                if (maxColIndex != i) // Swap columns (i <-> max)
+                {
+                    swap(var[i], var[maxColIndex]);//swap variables
+                    
+                    for (j = 0; j < n; ++j)
+                        swap(matrix[j*n+maxColIndex], matrix[j*n+i]);
+                }
+                
                 a = 1.0/matrix[i*n+i];
                 
                 for (j = i; j < n; ++j)
                     matrix[i*n+j] *= a;
                 
-                for (j = 0; j < n; ++j)
+                for (j = i; j < n; ++j)
                     inverseMatrix[i*n+j] *= a;
             }
         }
-        
+    
         synchronize(threadsCount);
         
         if (!returnFlag)
@@ -111,6 +150,14 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
         }
     }
     
+    for (i = 0; i < n; ++i)
+        for (j = 0; j < n; ++j)
+            matrix[var[i] * n + j] = inverseMatrix[i * n + j];
+
+    for (i = 0; i < n; ++i)
+        for (j = 0; j < n; ++j)
+            inverseMatrix[i * n + j] = matrix[i * n + j];
+
     return 0;
 }
 

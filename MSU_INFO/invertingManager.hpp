@@ -3,7 +3,14 @@
 
 #include <stdio.h>
 
-int invertMatrix(double* matrix, double* inverseMatrix,  int n, int rank, int threadsCount);
+typedef struct
+{
+    double elem;
+    int rowIndex;
+    int colIndex;
+} maxElem;
+
+int invertMatrix(double* matrix, double* inverseMatrix, int n, maxElem* max_, int *var, int rank, int threadsCount);
 void synchronize(int total_threads);
 
 #endif /* invertingManager_hpp */
