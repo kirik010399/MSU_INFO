@@ -20,7 +20,7 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, maxEle
             var[i] = i;
     }
     
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; ++i)
     {
         synchronize(threadsCount);
         
@@ -29,41 +29,38 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, maxEle
         lastRow = (n - i) * (rank + 1);
         lastRow = lastRow/threadsCount + i;
         
-        max_[rank] = fabs(matrix[beginRow*n+i]);
-        maxStrIndex = beginRow;
-        maxColIndex = i;
+        max_[rank].elem = fabs(matrix[beginRow*n+i]);
+        max_[rank].rowIndex = beginRow;
+        max_[rank].colIndex = i;
         
         for (j = beginRow; j < lastRow; ++j)
         {
             for (k = i; k < n; ++k)
             {
-                if (fabs(matrix[j*n+k]) > maxElem)// Search for max in matrix
+                if (fabs(matrix[j*n+k]) > max_[rank].elem)
                 {
-                    maxElem = fabs(matrix[j*n+k]);
-                    maxStrIndex = j;
-                    maxColIndex = k;
+                    max_[rank].elem = fabs(matrix[j*n+k]);
+                    max_[rank].rowIndex = j;
+                    max_[rank].colIndex = k;
                 }
             }
         }
-        
-        
+
+        synchronize(threadsCount);
 
         if (rank == 0)
         {
-            maxElem = fabs(matrix[i*n+i]);
-            maxStrIndex = i;
-            maxColIndex = i;
+            maxElem = max_[0].elem;
+            maxStrIndex = max_[0].rowIndex;
+            maxColIndex = max_[0].colIndex;
             
-            for (j = i; j < n; ++j)
+            for (k = 1; k < threadsCount; ++k)
             {
-                for (k = i; k < n; ++k)
+                if (maxElem < max_[k].elem)
                 {
-                    if (fabs(matrix[j*n+k]) > maxElem)// Search for max in matrix
-                    {
-                        maxElem = fabs(matrix[j*n+k]);
-                        maxStrIndex = j;
-                        maxColIndex = k;
-                    }
+                    maxElem = max_[k].elem;
+                    maxStrIndex = max_[k].rowIndex;
+                    maxColIndex = max_[k].colIndex;
                 }
             }
             
