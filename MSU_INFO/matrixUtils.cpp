@@ -32,9 +32,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
             for (j = 0; j < n; ++j)
             {
                 matrix[i*n+j] = func(i, j);
-                cout<<matrix[i*n+j]<<' ';
             }
-            cout<<endl;
         }
     }
     

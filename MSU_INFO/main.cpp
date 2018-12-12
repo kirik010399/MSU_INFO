@@ -237,6 +237,8 @@ int main()
     cout<<endl<<"Inverse Matrix:"<<endl;
     printMatrix(inverseMatrix, n, m);
     
+    cout<<"Inversion time =  "<< t << " seconds"<<endl;
+    
     if (inputType == 1)
     {
         fseek(fin, 0, SEEK_SET);
@@ -246,8 +248,6 @@ int main()
     returnFlag = enterMatrix(matrix, n, fin);
     
     cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
-    
-    cout<<"Inversion time =  "<< t << " seconds"<<endl;
     
     if (inputType == 1)
         fclose(fin);

@@ -105,7 +105,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, maxElem* max_, in
                 for (j = i; j < n; ++j)
                     matrix[i*n+j] *= a;
                 
-                for (j = i; j < n; ++j)
+                for (j = 0; j < n; ++j)
                     inverseMatrix[i*n+j] *= a;
             }
         }
@@ -150,13 +150,18 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, maxElem* max_, in
         }
     }
     
-    for (i = 0; i < n; ++i)
-        for (j = 0; j < n; ++j)
-            matrix[var[i] * n + j] = inverseMatrix[i * n + j];
-
-    for (i = 0; i < n; ++i)
-        for (j = 0; j < n; ++j)
-            inverseMatrix[i * n + j] = matrix[i * n + j];
+    synchronize(threadsCount);
+    
+    if (rank == 0)
+    {
+        for (i = 0; i < n; ++i)
+            for (j = 0; j < n; ++j)
+                matrix[var[i] * n + j] = inverseMatrix[i * n + j];
+        
+        for (i = 0; i < n; ++i)
+            for (j = 0; j < n; ++j)
+                inverseMatrix[i * n + j] = matrix[i * n + j];
+    }
 
     return 0;
 }
