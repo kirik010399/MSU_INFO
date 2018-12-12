@@ -123,6 +123,9 @@ int n_(double* matrix, int n, double lam)
     
     for (i = 1; i < n; ++i)
     {
+        if (fabs(elem) < 1e-18)
+            elem = 1e-10;
+        
         elem = matrix[i*n+i] - lam - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem;
         
         if (elem < 0)
