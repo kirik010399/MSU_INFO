@@ -84,7 +84,7 @@ pair<double, double> residualNorm(double* matrix, double* vector, int n)
     }
     
     p.first = inv1;
-    p.second = inv2;
+    p.second = sqrt(fabs(inv1));
     
     return p;
 }

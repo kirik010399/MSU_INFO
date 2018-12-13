@@ -11,10 +11,11 @@ void calculateValues(double* a, double* result, double eps, int n)
     
     x1 = new double [n];
     x2 = new double [n];
+    
     NearTriangle(n, a, x1, eps);
     
     z*=eps;
-    for(int i = 0; i<n-2; ++i)
+    for(int i = 0; i < n-2; ++i)
     {
         result[n-1-i] = answer(n, n-i, a, x1, x2, eps,z);
     }
@@ -31,7 +32,7 @@ void calculateValues(double* a, double* result, double eps, int n)
     delete []x2;
 }
 
-double answer(int n,int p, double* a,double* x1,double* x2, double eps,double z)
+double answer(int n, int p, double* a,double* x1,double* x2, double eps,double z)
 {
     while(fabs(a[n*(p-1)+p-2]) > z)
     {
@@ -41,7 +42,7 @@ double answer(int n,int p, double* a,double* x1,double* x2, double eps,double z)
             t += a[n*(p-1)+(p-2)]/2;
         
         for(int i = 0; i<p; ++i)
-            a[i+i*n]-=t;
+            a[i+i*n] -= t;
         
         realization(n,p,a,x1, x2,eps);
         
@@ -53,7 +54,7 @@ double answer(int n,int p, double* a,double* x1,double* x2, double eps,double z)
 
 void realization(int n, int p, double* a,double* x1, double* x2,double eps)
 {
-    for(int i = 0; i<p-1; ++i)
+    for(int i = 0; i < p-1; ++i)
     {
         if(fabs(a[(i+1)*n+i]) < eps)
         {
@@ -69,6 +70,7 @@ void realization(int n, int p, double* a,double* x1, double* x2,double eps)
             x2[i]=a[(i+1)*n+i];
             
             double normaX = sqrt(s+x1[i]*x1[i]);
+            
             x1[i]/=normaX;
             x2[i]/=normaX;
             
@@ -146,7 +148,7 @@ void NearTriangle(int n, double* a, double* x, double eps)
             for(int t = i+1; t<n; ++t)
                 skal += x[t]*a[t*n+k];
             
-            skal*=2;
+            skal *= 2;
             for(int j = i+1; j<n; ++j)
                 a[k+n*j]-=skal*x[j];
         }
@@ -158,7 +160,7 @@ void NearTriangle(int n, double* a, double* x, double eps)
             for(int t = i+1; t<n; ++t)
                 skal += x[t]*a[k*n+t];
             
-            skal*=2;
+            skal *= 2;
             for(int j = i+1 ;j<n; ++j)
                 a[j+n*k]=a[j+n*k]-skal*x[j];
         }
