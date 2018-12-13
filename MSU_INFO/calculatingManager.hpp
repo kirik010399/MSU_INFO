@@ -1,21 +1,14 @@
-//
-//  calculatingManager.hpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #ifndef calculatingManager_hpp
 #define calculatingManager_hpp
 
 #include <stdio.h>
 
 void calculateValues(double* matrix, double* vector, double eps, int n);
-void values(double *matrix, int n, double *vector, double left, double right, double eps);
-int n_(double* a, int n, double lambda);
-void Rotation(double* a, int n);
-double MatrixNorm(double* a, int n);
+double answer(int n,int p, double* a,double* x1,double* x2, double eps,double z);
+void realization(int n, int p, double* a,double* x1, double* x2,double eps);
+double MatrixNorm(int n,double* a);
+void NearTriangle(int n, double* a, double* x, double eps);
+
 
 
 #endif /* calculatingManager_hpp */

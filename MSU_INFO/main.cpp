@@ -138,7 +138,7 @@ int main()
     returnFlag = enterMatrix(matrix, n, fin);
     p = residualNorm(matrix, vector, n);
     
-    cout<<endl<<"The norm of residual: in first inv: "<<p.first<<", in second inv: "<<p.second<<endl;
+    cout<<endl<<"The norm of residual: in first inv: "<<p.first<<", in second inv: "<<p.first<<endl;
     
     cout<<"Calculating time =  "<< t << " milliseconds"<<endl;
 

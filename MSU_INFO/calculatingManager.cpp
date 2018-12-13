@@ -1,193 +1,167 @@
-//
-//  calculatingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "calculatingManager.hpp"
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 
-void calculateValues(double* matrix, double* vector, double eps, int n)
+void calculateValues(double* a, double* result, double eps, int n)
 {
-    int i, j, alp;
-    double left, right;
-    double maxA, maxB;
+    double *x1, *x2;
+    double z = MatrixNorm(n, a);
     
-    Rotation(matrix, n);
+    x1 = new double [n];
+    x2 = new double [n];
+    NearTriangle(n, a, x1, eps);
     
-    maxA = matrix[0];
-    maxB = matrix[1];
-    
-    for (i = 1; i < n; ++i)
+    z*=eps;
+    for(int i = 0; i<n-2; ++i)
     {
-        if (fabs(matrix[i*n+i]) > maxA)
-            maxA = fabs(matrix[i*n+i]);
+        result[n-1-i] = answer(n, n-i, a, x1, x2, eps,z);
+    }
+    
+    double A = 1;
+    double B = -(a[0]+a[n+1]);
+    double C = (a[0]*a[n+1]-a[n]*a[1]);
+    double di = sqrt(B*B-4*A*C);
+    
+    result[0]=(-B-di)/(2*A);
+    result[1]=(-B+di)/(2*A);
+    
+    delete []x1;
+    delete []x2;
+}
 
-        if (i<n-1)
+double answer(int n,int p, double* a,double* x1,double* x2, double eps,double z)
+{
+    while(fabs(a[n*(p-1)+p-2]) > z)
+    {
+        double t = a[n*(p-1)+(p-1)];
+        
+        if(fabs(a[(p-1)*n+(p-1)])<eps)
+            t += a[n*(p-1)+(p-2)]/2;
+        
+        for(int i = 0; i<p; ++i)
+            a[i+i*n]-=t;
+        
+        realization(n,p,a,x1, x2,eps);
+        
+        for(int i = 0; i<p; ++i)
+            a[i+i*n] += t;
+    }
+    return a[(p-1)*n+(p-1)];
+}
+
+void realization(int n, int p, double* a,double* x1, double* x2,double eps)
+{
+    for(int i = 0; i<p-1; ++i)
+    {
+        if(fabs(a[(i+1)*n+i]) < eps)
         {
-            if (fabs(matrix[i*n + i+1]) > maxB)
-                maxB = fabs(matrix[i*n + i+1]);
+            x1[i]=0.;
+            x2[i]=1.;
+        }
+        else
+        {
+            double s = a[(i+1)*n+i]*a[(i+1)*n+i];
+            double MatrixNorm = sqrt(s+a[i*n+i]*a[i*n+i]);
+            
+            x1[i]=a[i*n+i]-MatrixNorm;
+            x2[i]=a[(i+1)*n+i];
+            
+            double normaX = sqrt(s+x1[i]*x1[i]);
+            x1[i]/=normaX;
+            x2[i]/=normaX;
+            
+            a[i+i*n] = MatrixNorm;
+        }
+        
+        for(int k = 0; k < p; ++k)
+        {
+            double skal = 0.;
+            skal = x1[i]*a[i*n+k]+x2[i]*a[(i+1)*n+k];
+            skal*=2;
+            a[i*n+k] -= skal*x1[i];
+            a[(i+1)*n+k] -= skal*x2[i];
+        }
+        
+        a[(i+1)*n+i]=0.;
+    }
+    
+    for(int i = 0; i<p-1; ++i)
+    {
+        for(int k = 0; k<p; ++k)
+        {
+            double skal = 0.;
+            skal = x1[i]*a[k*n+i] + x2[i] * a[k*n+(i+1)];
+            skal *= 2;
+            a[k*n+i] -= skal * x1[i];
+            a[k*n+(i+1)] -= skal * x2[i];
         }
     }
+}
 
-    alp = 4 * fmax(maxA, maxB);
-    
-    for (i = 0; i < n; ++i)
+double MatrixNorm(int n,double* a)
+{
+    double Max = 0.;
+    for(int i = 0; i<n; ++i)
     {
-        for (j = 0; j < n; ++j)
+        double sum = 0.;
+        
+        for(int j = 0; j<n; ++j)
+            sum += fabs(a[i*n+j]);
+        
+        if(Max<sum)
+            Max = sum;
+    }
+    return Max;
+}
+
+void NearTriangle(int n, double* a, double* x, double eps)
+{
+    for(int i = 0; i < n-2; ++i)
+    {
+        double s = 0.;
+        
+        for(int j = i+2; j < n; ++j)
         {
-            matrix[i*n+j]/=alp;
-            
-            if (i!=j && matrix[i*n+j] < 1e-100)
-                matrix[i*n+j] = 0;
+            s += a[i+j*n]*a[i+j*n];
+            x[j]=a[i+j*n];
         }
-    }//97
-    
-    right = MatrixNorm(matrix, n) + eps;//95
-    left = -right;
-    
-    eps = fmax(eps, 1e-10);//don't need more precision(segmentation fault without it) TODO
-    
-    values(matrix, n, vector, left, right, eps);
-    
-    for (i = 0; i < n; ++i)
-        vector[i]*=alp;
-}
-
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
-{
-    static int k = 0;
-    int c, j;
-    
-    c = n_(matrix, n, right) - n_(matrix, n, left);
-    
-    if (right - left > eps && c != 0)
-    {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
-    }
-    else if (c != 0)
-    {
-        for (j = 0; j < c; ++j)
-            vector[k + j] = (left+right)/2;
         
-        k += c;
-    }//95
-}
-
-int n_(double* matrix, int n, double lam)
-{
-    int i, res;
-    double x, y, u, v, a, maxx, b, gam;
-    
-    x = matrix[0] - lam;
-    y = 1.0;
-    
-    if (x*y < 0)
-        res = 1;
-    else
-        res = 0;
-    
-    for (i = 1; i < n; ++i)
-    {
-        a = matrix[i*n+i] - lam;
-        b = matrix[i*n + i-1];
+        if(s<1e-10)
+            continue;
         
-        maxx = fabs(b*b*y);
+        double norma = sqrt(s+a[i+n*(i+1)]*a[i+n*(i+1)]);
+        x[i+1]=a[i+n*(i+1)]-norma;
         
-        if (fabs(x) > maxx)
-            maxx = fabs(x);
+        double normaX = 1/sqrt(s+x[i+1]*x[i+1]);
         
-        gam = (1/1e-18)/maxx;
+        for(int j = i+1; j<n; ++j)
+            x[j]*=normaX;
         
-        u = gam * (a*x - b*b*y);
-        v = gam * x;
-        
-        if (u*x < 0.0)
-            ++res;
-        
-        x = u;
-        y = v;//97
-    }
-    
-    return res;
-}
-
-void Rotation(double* matrix, int n)
-{
-    int i, j, k;
-    double x, y, r, matrix_ik, matrix_jk, cosPhi, sinPhi;
-    double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
-    
-    for (i = 0; i < n-2; ++i)
-    {
-       for (j = i+2; j < n; ++j)
+        for(int k = i; k<n; ++k)
         {
-            x = matrix[(i+1)*n+i];
-            y = matrix[j*n+i];
+            double skal = 0.;
             
-            if (fabs(y) < 1e-100)
-                continue;
+            for(int t = i+1; t<n; ++t)
+                skal += x[t]*a[t*n+k];
             
-            r = sqrt(x*x+y*y);
-            
-            if (r < 1e-100)
-                continue;
-            
-            cosPhi = x/r;
-            sinPhi = -y/r;
-            
-            for (k = i; k < n; ++k)
-            {
-                matrix_ik = matrix[(i+1)*n+k];
-                matrix_jk = matrix[j*n+k];
-                
-                matrix[(i+1)*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
-                matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
-                
-                if (k != i+1 && k != j)
-                {
-                    matrix[k*n+i+1] = matrix[(i+1)*n+k];
-                    matrix[k*n+j] = matrix[j*n+k];
-                }//from sym
-            }
-            
-            matrix_ii = matrix[(i+1)*n+i+1];
-            matrix_ji = matrix[j*n+i+1];
-            matrix_ij = matrix[(i+1)*n+j];
-            matrix_jj = matrix[j*n+j];
-
-            matrix[(i+1)*n+i+1] = matrix_ii * cosPhi - matrix_ij * sinPhi;
-            matrix[j*n+i+1] = matrix_ji * cosPhi - matrix_jj * sinPhi;
-            matrix[(i+1)*n+j] = matrix_ii * sinPhi + matrix_ij * cosPhi;
-            matrix[j*n+j] = matrix_ji * sinPhi + matrix_jj * cosPhi;
-        }//63 *Tij T
-    }
-}
-
-double MatrixNorm(double* matrix, int n)
-{
-    int i, j;
-    double sum, res;
-    
-    res = 0.0;
-    for (i = 0; i < n; ++i)
-    {
-        sum = 0.0;
-        for (j = 0; j < n; ++j)
-            sum += fabs(matrix[i*n+j]);
+            skal*=2;
+            for(int j = i+1; j<n; ++j)
+                a[k+n*j]-=skal*x[j];
+        }
         
-        if (res < sum)
-            res = sum;
+        for(int k = 0; k<n; ++k)
+        {
+            double skal = 0;
+            
+            for(int t = i+1; t<n; ++t)
+                skal += x[t]*a[k*n+t];
+            
+            skal*=2;
+            for(int j = i+1 ;j<n; ++j)
+                a[j+n*k]=a[j+n*k]-skal*x[j];
+        }
     }
-    
-    return res;
 }
-
-
 
