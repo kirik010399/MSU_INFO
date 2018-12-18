@@ -4,9 +4,7 @@
 
 using namespace std;
 
-int continueFlag = 1;
 int returnFlag = 1;
-double cosPhi = 0, sinPhi = 0;
 
 int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int threadsCount)
 {
@@ -14,10 +12,13 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     double x, y;
     double r = 0, matrix_ik, matrix_jk;
     double a;
-
+    
     int beginCol, lastCol;
+    int beginRow, lastRow;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
+    
+    double cosPhi = 1, sinPhi = 0;
     
     if (rank == 0)
     {
@@ -35,73 +36,76 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     
     for (i = 0; i < n-1; ++i)
     {
-        for (j = i + 1; j < n; ++j)
+        synchronize(threadsCount);
+        
+        beginRow = (n - i - 1) * rank;
+        beginRow = beginRow/threadsCount + i + 1;
+        lastRow = (n - i - 1) * (rank + 1);
+        lastRow = lastRow/threadsCount + i + 1;
+        
+        for (j = beginRow + 1; j < lastRow; ++j)
         {
-            synchronize(threadsCount);
-
-            if (rank == 0)
+            x = matrix[beginRow*n+i];
+            y = matrix[j*n+i];
+            
+            r = sqrt(x*x+y*y);
+        
+            cosPhi = x/r;
+            sinPhi = -y/r;
+            
+            for (k = i; k < n; ++k)
             {
-                x = matrix[i*n+i];
-                y = matrix[j*n+i];
-                
-                if (fabs(y) < eps)
-                    continueFlag = 0;
-                else
-                    continueFlag = 1;
-
-                if (continueFlag)
-                {
-                    r = sqrt(x*x+y*y);
-                    
-                    if (r < eps)
-                        returnFlag = 0;
-                    else
-                        returnFlag = 1;
-                    
-                    if (returnFlag)
-                    {
-                        cosPhi = x/r;
-                        sinPhi = -y/r;
-                    }
-                }
-            }
-            
-            synchronize(threadsCount);
-            
-            if(!continueFlag)
-            {
-                if (!returnFlag)
-                    return -1;
-                else
-                    continue;
-            }
-            
-            beginCol = (n - i) * rank;
-            beginCol = beginCol/threadsCount + i;
-            lastCol = (n - i) * (rank + 1);
-            lastCol = lastCol/threadsCount + i;//равномерное распределение междлу i до n
-            
-            for (k = beginCol; k < lastCol; ++k)
-            {
-                matrix_ik = matrix[i*n+k];
+                matrix_ik = matrix[beginRow*n+k];
                 matrix_jk = matrix[j*n+k];
                 
-                matrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                matrix[beginRow*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
                 matrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
             }
             
-            synchronize(threadsCount);
-
-            beginCol = n * rank/threadsCount;
-            lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
-            
-            for (k = beginCol; k < lastCol; ++k)
+            for (k = 0; k < n; ++k)
             {
-                matrix_ik = inverseMatrix[i*n+k];
+                matrix_ik = inverseMatrix[beginRow*n+k];
                 matrix_jk = inverseMatrix[j*n+k];
                 
-                inverseMatrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                inverseMatrix[beginRow*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
                 inverseMatrix[j*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
+            }
+        }
+        
+        synchronize(threadsCount);
+
+        if (rank == 0)
+        {
+            for (j = 0; j < threadsCount; ++j)
+            {
+                beginRow = (n - i - 1) * rank;
+                beginRow = beginRow/threadsCount + i + 1;
+            
+                x = matrix[i*n+i];
+                y = matrix[beginRow*n+i];
+                
+                r = sqrt(x*x+y*y);
+                
+                cosPhi = x/r;
+                sinPhi = -y/r;
+                
+                for (k = i; k < n; ++k)
+                {
+                    matrix_ik = matrix[i*n+k];
+                    matrix_jk = matrix[beginRow*n+k];
+                    
+                    matrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                    matrix[beginRow*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;
+                }
+                
+                for (k = 0; k < n; ++k)
+                {
+                    matrix_ik = inverseMatrix[i*n+k];
+                    matrix_jk = inverseMatrix[beginRow*n+k];
+                    
+                    inverseMatrix[i*n+k] = matrix_ik * cosPhi - matrix_jk * sinPhi;
+                    inverseMatrix[beginRow*n+k] = matrix_ik * sinPhi + matrix_jk * cosPhi;//*Tij
+                }
             }
         }
     }
@@ -109,7 +113,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, int rank, int thr
     synchronize(threadsCount);
    
     beginCol = n * rank/threadsCount;
-    lastCol = n * (rank + 1)/threadsCount;//равномерное распределение междлу 0 до n
+    lastCol = n * (rank + 1)/threadsCount;
     
     for (k = beginCol; k < lastCol; ++k)
     {
