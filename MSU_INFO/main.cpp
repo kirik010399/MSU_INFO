@@ -9,7 +9,7 @@ using namespace std;
 
 int main()
 {
-    int n, m;
+    int n;
     double *matrix;
     double *vector;
     FILE* fin = NULL;

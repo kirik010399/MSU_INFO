@@ -18,6 +18,9 @@ void calculateValues(double* matrix, double* vector, double eps, int k, int n)
     double left, right;
     double maxA, maxB;
     
+    for (i = 0; i < n; ++i)
+        vector[i] = 0;
+    
     Rotation(matrix, n);
     
     maxA = matrix[0];
@@ -62,7 +65,6 @@ void calculateValues(double* matrix, double* vector, double eps, int k, int n)
 void values(double *matrix, int n, double *vector, double left, double right, int k, double eps)
 {
     double c;
-    int j;
     
     while(right-left > eps)
     {
@@ -73,9 +75,8 @@ void values(double *matrix, int n, double *vector, double left, double right, in
         else
             right = c;
     }
-    
-    for (j = 0; j < n_(matrix, n, right) - n_(matrix, n, left); ++j)
-        vector[k + j - 1] = (left+right)/2;
+
+    vector[k - 1] = (left+right)/2;
 }
 
 int n_(double* matrix, int n, double lam)
