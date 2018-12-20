@@ -8,7 +8,7 @@
 
 using namespace std;
 
-long double getTime();
+long double get_full_time();
 
 typedef struct
 {
@@ -16,36 +16,29 @@ typedef struct
     double *a;
     double *b;
     double *x;
-    int *var;
-    int rank;
-    int threadsCount;
-    int retFlag;
+    int *index;
+    int *funcFlag;
+    int number;
+    int count;
+    int flag;
 } Args;
 
-void *Inversion(void *Arg)
-{
-    Args *arg = (Args*)Arg;
-    
-    arg->retFlag = solveSystem(arg->a, arg->b, arg->x, arg->var, arg->n, arg->rank, arg->threadsCount);
-    
-    return NULL;
-}
+void *Solve(void *Arg);
 
 int main(int argc, char **argv)
 {
     int i;
     int n, m;
-    double *a;
-    double *b;
-    double *x;
-    int *var;
+    double *a, *b, *x;
+    int *index;
     FILE* fin = NULL;
     long double t;
-    int threadsCount;
+    int count;
     pthread_t *threads;
     Args *args;
-    int inputType;
-    int returnFlag;
+    int funcFlag = 1;
+    
+    int type, flag;
     
     if (argc == 1)
     {
@@ -53,13 +46,13 @@ int main(int argc, char **argv)
         return -2;
     }
     
-    if (sscanf(argv[1], "%d", &inputType) != 1)
+    if (sscanf(argv[1], "%d", &type) != 1)
     {
         cout<<"Data isn't correct"<<endl;
         return -2;
     }
     
-    if (inputType == 1)
+    if (type == 1)
     {
         if (argc != 4)
         {
@@ -83,14 +76,14 @@ int main(int argc, char **argv)
             return -2;
         }
         
-        if (sscanf(argv[2], "%d", &threadsCount) != 1 || threadsCount <= 0)
+        if (sscanf(argv[2], "%d", &count) != 1 || count <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             fclose(fin);
             return -2;
         }
     }
-    else if (inputType == 2)
+    else if (type == 2)
     {
         if (argc != 5)
         {
@@ -104,7 +97,7 @@ int main(int argc, char **argv)
             return -2;
         }
         
-        if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0)
+        if (sscanf(argv[3], "%d", &count) != 1 || count <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
@@ -119,15 +112,15 @@ int main(int argc, char **argv)
     a = new double [n*n];
     b = new double [n];
     x = new double [n];
-    var = new int[n];
-    threads = new pthread_t[threadsCount];
-    args = new Args[threadsCount];
+    index = new int[n];
+    threads = new pthread_t[count];
+    args = new Args[count];
     
-    if (!(a && b && x && threads && var))
+    if (!(a && b && x && threads && index))
     {
         cout<<"No memory, enter a with less dimensions"<<endl;
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
         delete []a;
@@ -135,17 +128,17 @@ int main(int argc, char **argv)
         delete []x;
         delete []threads;
         delete []args;
-        delete []var;
+        delete []index;
         return -2;
     }
     
-    returnFlag = enterData(a, b, n, fin);
+    flag = enterData(a, b, n, fin);
     
-    if (returnFlag == -1)
+    if (flag == -1)
     {
         cout<<"Data isn't correct"<<endl;
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
         delete []a;
@@ -153,18 +146,18 @@ int main(int argc, char **argv)
         delete []x;
         delete []threads;
         delete []args;
-        delete []var;
+        delete []index;
 
         return -2;
     }
     
-    if (inputType == 1)
+    if (type == 1)
     {
         if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)
         {
             cout<<"Data isn't correct"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
             delete []a;
@@ -172,7 +165,7 @@ int main(int argc, char **argv)
             delete []x;
             delete []threads;
             delete []args;
-            delete []var;
+            delete []index;
             
             return -2;
         }
@@ -183,7 +176,7 @@ int main(int argc, char **argv)
         {
             cout<<"Data isn't correct"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
             delete []a;
@@ -191,53 +184,54 @@ int main(int argc, char **argv)
             delete []x;
             delete []threads;
             delete []args;
-            delete []var;
+            delete []index;
             
             return -2;
         }
     }
     
-    for (i = 0; i < threadsCount; i++)
+    for (i = 0; i < count; i++)
     {
         args[i].n = n;
         args[i].a = a;
         args[i].b = b;
         args[i].x = x;
-        args[i].var = var; 
-        args[i].rank = i;
-        args[i].threadsCount = threadsCount;
-        args[i].retFlag = 0;
+        args[i].index = index;
+        args[i].number = i;
+        args[i].funcFlag = &funcFlag;
+        args[i].count = count;
+        args[i].flag = 0;
     }
     
-    t = getTime();
+    t = get_full_time();
     
-    for (i = 0; i < threadsCount; i++)
+    for (i = 0; i < count; i++)
     {
-        if (pthread_create(threads + i, 0, Inversion, args + i))
+        if (pthread_create(threads + i, 0, Solve, args + i))
         {
             printf("Can't create thread %d!\n", i);
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
             delete []a;
             delete []b;
             delete []x;
             delete []threads;
-            delete []var;
+            delete []index;
             delete []args;
             
             return -1;
         }
     }
     
-    for (i = 0; i < threadsCount; i++)
+    for (i = 0; i < count; i++)
     {
         if (pthread_join(threads[i], 0))
         {
             printf("Can't wait thread %d!\n", i);
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
             delete []a;
@@ -245,21 +239,21 @@ int main(int argc, char **argv)
             delete []x;
             delete []threads;
             delete []args;
-            delete []var;
+            delete []index;
             
             return -1;
         }
     }
     
-    t = getTime() - t;
+    t = get_full_time() - t;
     
-    for (i = 0; i < threadsCount; i++)
+    for (i = 0; i < count; i++)
     {
-        if (args[i].retFlag != 0)
+        if (args[i].flag != 0)
         {
             cout<<"Error while solving system"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
             delete []a;
@@ -267,7 +261,7 @@ int main(int argc, char **argv)
             delete []x;
             delete []threads;
             delete []args;
-            delete []var;
+            delete []index;
 
             return -1;
         }
@@ -276,35 +270,44 @@ int main(int argc, char **argv)
     cout<<"x:"<<endl;
     printResult(x, n, m);
     
-    if (inputType == 1)
+    if (type == 1)
     {
         fseek(fin, 0, SEEK_SET);
         fscanf(fin, "%d", &n);
     }
 
-    returnFlag = enterData(a, b, n, fin);
+    flag = enterData(a, b, n, fin);
     
     cout<<"Residual norm: "<<residualNorm(a, b, x, n)<<endl;
     
-    if (inputType == 2)
+    if (type == 2)
         cout<<"Error norm: "<<errorNorm(x, n)<<endl; ;
     
     cout<<"Solving time = "<<t<<" seconds"<<endl;
     
-    if (inputType == 1)
+    if (type == 1)
         fclose(fin);
     
     delete []a;
     delete []b;
     delete []x;
     delete []threads;
-    delete []var;
+    delete []index;
     delete []args;
     
     return 0;
 }
 
-long double getTime()
+void *Solve(void *Arg)
+{
+    Args *arg = (Args*)Arg;
+    
+    arg->flag = solve(arg->a, arg->b, arg->x, arg->index, arg->funcFlag, arg->n, arg->number, arg->count);
+    
+    return NULL;
+}
+
+long double get_full_time()
 {
     struct timeval t;
     gettimeofday(&t, 0);

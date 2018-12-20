@@ -4,81 +4,74 @@
 
 using namespace std;
 
-int returnFlag = 1;
-
-int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int threadsCount)
+int solve(double* a, double* b, double* x, int* index, int* funcFlag, int n, int number, int count)
 {
     int i, j, k;
     double value;
-    int maxStrInd, maxColInd;
-
-    int beginRow, lastRow;
+    int maxstr, maxcol;
+    int begin, last;
     
     double eps = fmax(pow(10, -n*3), 1e-100);
     
-    if (rank == 0)
+    if (number == 0)
     {
         for (i = 0; i < n; ++i)
-            var[i] = i;
+            index[i] = i;
     }
     
     for (i = 0; i < n; i++)
     {
-        synchronize(threadsCount);
+        synchronize(count);
 
-        if (rank == 0)
+        if (number == 0)
         {
-            value = fabs(a[i*n+i]);
-            maxStrInd = i;
-            maxColInd = i;
+            value = fabs(a[i*n+i]); maxstr = i; maxcol = i;
             
             for (j = i; j < n; ++j)
             {
                 for (k = i; k < n; ++k)
                 {
-                    if (fabs(a[j*n+k]) > value)// Search for max in a
+                    if (fabs(a[j*n+k]) > value)
                     {
-                        value = fabs(a[j*n+k]);
-                        maxStrInd = j;
-                        maxColInd = k;
+                        value = fabs(a[j*n+k]); maxstr = j; maxcol = k;
                     }
                 }
             }
             
             if (fabs(value) < eps)
-                returnFlag = 0; //det = 0;
+                *funcFlag = 0;
             else
-                returnFlag = 1;
+                *funcFlag = 1;
             
-            if (returnFlag)
+            if (*funcFlag)
             {
-                if (maxStrInd != i) // Swap strings (i <-> max)
+                if (maxstr != i)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[maxStrInd*n+j], a[i*n+j]);
+                        swap(a[maxstr*n+j], a[i*n+j]);
                     
-                    swap(b[maxStrInd], b[i]);
+                    swap(b[maxstr], b[i]);
                 }
                 
-                swap(var[i], var[maxColInd]);//swap variables
+                swap(index[i], index[maxcol]);
                 
-                if (maxColInd != i) // Swap columns (i <-> max)
+                if (maxcol != i)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[j*n+maxColInd], a[j*n+i]);
+                        swap(a[j*n+maxcol], a[j*n+i]);
                 }
             }
         }
         
-        synchronize(threadsCount);
+        synchronize(count);
         
-        if (!returnFlag)
+        if (!(*funcFlag))
             return -1;
         
-        beginRow = n * rank/threadsCount ;
-        lastRow = n * (rank + 1)/threadsCount;
+        begin = n * number/count ;
+        last = n * (number + 1)/count;
         
-        for (j = beginRow; j < lastRow; ++j)
+        for (j = begin; j < last; ++j)
         {
             if (j != i)
             {
@@ -92,12 +85,12 @@ int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int 
         }
     }
     
-    synchronize(threadsCount);
+    synchronize(count);
     
-    if(rank == 0)
+    if(number == 0)
     {
         for (i = 0; i < n; ++i)
-            x[var[i]] = b[i]/a[i*n+i];
+            x[index[i]] = b[i]/a[i*n+i];
     }
     
     return 0;

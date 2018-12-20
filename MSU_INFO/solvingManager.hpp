@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-int solveSystem(double* a, double* b, double* x, int* var, int n, int rank, int threadsCount);
+int solve(double* a, double* b, double* x, int* index, int *funcFlag, int n, int number, int count);
 void synchronize(int total_threads);
 
 #endif /* solvingManager_hpp */
