@@ -78,7 +78,7 @@ int main(int argc, char **argv)
             return -2;
         }
         
-        if (sscanf(argv[2], "%d", &count) != 1 || count <= 0)
+        if (sscanf(argv[2], "%d", &count) != 1 || count <= 0 || count > n)
         {
             cout<<"Data isn't correct"<<endl;
             fclose(fin);
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
             return -2;
         }
         
-        if (sscanf(argv[3], "%d", &count) != 1 || count <= 0)
+        if (sscanf(argv[3], "%d", &count) != 1 || count <= 0 || count > n)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     {
         if (pthread_create(threads + i, 0, Solve, args + i))
         {
-            printf("Can't create thread %d!\n", i);
+            cout<<"Can't create thread"<<endl;
             
             if (type == 1)
                 fclose(fin);
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
     {
         if (pthread_join(threads[i], 0))
         {
-            printf("Can't wait thread %d!\n", i);
+            cout<<"Can't wait thread"<<endl;
             
             if (type == 1)
                 fclose(fin);
