@@ -10,7 +10,7 @@ typedef struct
     int colIndex; 
 } maxElem;
 
-int solveSystem(double* matrix, double* vector, double* result, int* var, maxElem *max_, int n, int rank, int threadsCount);
+int solveSystem(double* matrix, double* vector, double* result, int* var, maxElem *maxx, int *flag, int n, int rank, int threadsCount);
 void synchronize(int total_threads);
 
 #endif /* solvingManager_hpp */

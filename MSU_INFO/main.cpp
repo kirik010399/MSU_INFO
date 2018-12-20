@@ -12,27 +12,28 @@ long double getTime();
 
 typedef struct
 {
-    int n;
     double *matrix;
     double *vector;
     double *result;
     int *var;
-    maxElem *max_;
+    maxElem *maxx;
+    int n;
     int rank;
     int threadsCount;
     int retFlag;
+    int *flag;
 } Args;
 
-void *Inversion(void *Arg)
+void *Solving(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->max_, arg->n, arg->rank, arg->threadsCount);
+    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->maxx, arg->flag, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
 
-int main()
+int main(int argc, char **argv)
 {
     int i;
     int n, m;
@@ -40,8 +41,8 @@ int main()
     double *vector;
     double *result;
     int *var;
-    maxElem *max_;
-
+    maxElem *maxx;
+    int flag = 1;
     FILE* fin = NULL;
     long double t;
     int threadsCount;
@@ -50,9 +51,13 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
+    if (argc == 1)
+    {
+        cout<<"Incorrect mode"<<endl;
+        return -2;
+    }
     
-    if (scanf("%d", &inputType) != 1)
+    if (sscanf(argv[1],"%d", &inputType) != 1)
     {
         cout<<"Data isn't correct"<<endl;
         return -2;
@@ -60,6 +65,12 @@ int main()
     
     if (inputType == 1)
     {
+        if (argc != 4)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
+        
         fin = fopen("input.txt", "r");
         
         if (!fin)
@@ -75,12 +86,29 @@ int main()
             fclose(fin);
             return -2;
         }
+        
+        if (sscanf(argv[2], "%d", &threadsCount) != 1 || threadsCount <= 0 || threadsCount > n)
+        {
+            cout<<"Data isn't correct"<<endl;
+            fclose(fin);
+            return -2;
+        }
     }
     else if (inputType == 2)
     {
-        cout<<"Enter size: ";
+        if (argc != 5)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
         
-        if (scanf("%d", &n) != 1 || n <= 0)
+        if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            return -2;
+        }
+        
+        if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0 || threadsCount > n)
         {
             cout<<"Data isn't correct"<<endl;
             return -2;
@@ -92,23 +120,15 @@ int main()
         return -2;
     }
     
-    cout<<"Enter treads count: ";
-    
-    if (scanf("%d", &threadsCount) != 1 || threadsCount <= 0)
-    {
-        cout<<"Data isn't correct"<<endl;
-        return -2;
-    }
-    
     matrix = new double [n*n];
     vector = new double [n];
     result = new double [n];
     var = new int[n];
     threads = new pthread_t[threadsCount];
     args = new Args[threadsCount];
-    max_ = new maxElem[threadsCount];
+    maxx = new maxElem[threadsCount];
     
-    if (!(matrix && vector && result && threads && var && max_))
+    if (!(matrix && vector && result && threads && var && maxx))
     {
         cout<<"No memory, enter matrix with less dimensions"<<endl;
         
@@ -121,7 +141,7 @@ int main()
         delete []threads;
         delete []args;
         delete []var;
-        delete []max_;
+        delete []maxx;
         return -2;
     }
     
@@ -140,29 +160,50 @@ int main()
         delete []threads;
         delete []args;
         delete []var;
-        delete []max_;
+        delete []maxx;
 
         return -2;
     }
     
-    cout<<"Enter size of printing vector: ";
-    
-    if (scanf("%d", &m) != 1 || m <= 0)
+    if (inputType == 1)
     {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []vector;
-        delete []result;
-        delete []threads;
-        delete []args;
-        delete []var;
-        delete []max_;
-        
-        return -2;
+        if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []matrix;
+            delete []vector;
+            delete []result;
+            delete []threads;
+            delete []args;
+            delete []var;
+            delete []maxx;
+            
+            return -2;
+        }
+    }
+    else
+    {
+        if (sscanf(argv[4], "%d", &m) != 1 || m <= 0)
+        {
+            cout<<"Data isn't correct"<<endl;
+            
+            if (inputType == 1)
+                fclose(fin);
+            
+            delete []matrix;
+            delete []vector;
+            delete []result;
+            delete []threads;
+            delete []args;
+            delete []var;
+            delete []maxx;
+            
+            return -2;
+        }
     }
     
     for (i = 0; i < threadsCount; i++)
@@ -175,16 +216,17 @@ int main()
         args[i].rank = i;
         args[i].threadsCount = threadsCount;
         args[i].retFlag = 0;
-        args[i].max_ = max_;
+        args[i].flag = &flag;
+        args[i].maxx = maxx;
     }
     
     t = getTime();
     
     for (i = 0; i < threadsCount; i++)
     {
-        if (pthread_create(threads + i, 0, Inversion, args + i))
+        if (pthread_create(threads + i, 0, Solving, args + i))
         {
-            printf("Can't create thread %d!\n", i);
+            cout<<"Can't create thread"<<endl;
             
             if (inputType == 1)
                 fclose(fin);
@@ -195,7 +237,7 @@ int main()
             delete []threads;
             delete []var;
             delete []args;
-            delete []max_;
+            delete []maxx;
             
             return -1;
         }
@@ -205,7 +247,7 @@ int main()
     {
         if (pthread_join(threads[i], 0))
         {
-            printf("Can't wait thread %d!\n", i);
+            cout<<"Can't wait thread"<<endl;
             
             if (inputType == 1)
                 fclose(fin);
@@ -216,7 +258,7 @@ int main()
             delete []threads;
             delete []args;
             delete []var;
-            delete []max_;
+            delete []maxx;
             
             return -1;
         }
@@ -239,13 +281,13 @@ int main()
             delete []threads;
             delete []args;
             delete []var;
-            delete []max_;
+            delete []maxx;
 
             return -1;
         }
     }
     
-    cout<<"result:"<<endl;
+    cout<<"Result:"<<endl;
     printResult(result, n, m);
     
     if (inputType == 1)
@@ -272,7 +314,7 @@ int main()
     delete []threads;
     delete []var;
     delete []args;
-    delete []max_;
+    delete []maxx;
     
     return 0;
 }

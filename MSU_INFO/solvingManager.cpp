@@ -4,9 +4,7 @@
 
 using namespace std;
 
-int returnFlag = 1;
-
-int solveSystem(double* matrix, double* vector, double* result, int* var, maxElem *max_, int n, int rank, int threadsCount)
+int solveSystem(double* matrix, double* vector, double* result, int* var, maxElem *maxx, int *flag, int n, int rank, int threadsCount)
 {
     int i, j, k, maxStrIndex, maxColIndex;
     double a, maxElem;
@@ -29,19 +27,19 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, maxEle
         lastRow = (n - i) * (rank + 1);
         lastRow = lastRow/threadsCount + i;
         
-        max_[rank].elem = fabs(matrix[beginRow*n+i]);
-        max_[rank].rowIndex = beginRow;
-        max_[rank].colIndex = i;
+        maxx[rank].elem = fabs(matrix[beginRow*n+i]);
+        maxx[rank].rowIndex = beginRow;
+        maxx[rank].colIndex = i;
         
         for (j = beginRow; j < lastRow; ++j)
         {
             for (k = i; k < n; ++k)
             {
-                if (fabs(matrix[j*n+k]) > max_[rank].elem)
+                if (fabs(matrix[j*n+k]) > maxx[rank].elem)
                 {
-                    max_[rank].elem = fabs(matrix[j*n+k]);
-                    max_[rank].rowIndex = j;
-                    max_[rank].colIndex = k;
+                    maxx[rank].elem = fabs(matrix[j*n+k]);
+                    maxx[rank].rowIndex = j;
+                    maxx[rank].colIndex = k;
                 }
             }
         }
@@ -50,26 +48,26 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, maxEle
 
         if (rank == 0)
         {
-            maxElem = max_[0].elem;
-            maxStrIndex = max_[0].rowIndex;
-            maxColIndex = max_[0].colIndex;
+            maxElem = maxx[0].elem;
+            maxStrIndex = maxx[0].rowIndex;
+            maxColIndex = maxx[0].colIndex;
             
             for (k = 1; k < threadsCount; ++k)
             {
-                if (maxElem < max_[k].elem)
+                if (maxElem < maxx[k].elem)
                 {
-                    maxElem = max_[k].elem;
-                    maxStrIndex = max_[k].rowIndex;
-                    maxColIndex = max_[k].colIndex;
+                    maxElem = maxx[k].elem;
+                    maxStrIndex = maxx[k].rowIndex;
+                    maxColIndex = maxx[k].colIndex;
                 }
             }
             
             if (fabs(maxElem) < eps)
-                returnFlag = 0; //det = 0;
+                *flag = 0; //det = 0;
             else
-                returnFlag = 1;
+                *flag = 1;
             
-            if (returnFlag)
+            if (*flag)
             {
                 if (maxStrIndex != i) // Swap strings (i <-> max)
                 {
@@ -98,7 +96,7 @@ int solveSystem(double* matrix, double* vector, double* result, int* var, maxEle
         
         synchronize(threadsCount);
         
-        if (!returnFlag)
+        if (!*flag)
             return -1;
         
         beginRow = (n - i - 1) * rank;
