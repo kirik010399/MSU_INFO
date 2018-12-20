@@ -4,14 +4,12 @@
 
 using namespace std;
 
-int solve(double* a, double* b, double* x, int* index, int* funcFlag, int n, int number, int count)
+#define eps 1e-18
+
+int solve(double* a, double* b, double* x, int* index, maxelem* max_, int* retflag, int n, int number, int count)
 {
-    int i, j, k;
+    int i, j, k, maxstr, maxcol, begin, last;
     double value;
-    int maxstr, maxcol;
-    int begin, last;
-    
-    double eps = fmax(pow(10, -n*3), 1e-100);
     
     if (number == 0)
     {
@@ -22,28 +20,53 @@ int solve(double* a, double* b, double* x, int* index, int* funcFlag, int n, int
     for (i = 0; i < n; i++)
     {
         synchronize(count);
-
+       
+        begin = (n - i) * number;
+        begin = begin/count + i;
+        last = (n - i) * (number + 1);
+        last = last/count + i;
+        
+        max_[number].value = fabs(a[begin*n+i]);
+        max_[number].x = begin;
+        max_[number].y = i;
+        
+        for (j = begin; j < last; ++j)
+        {
+            for (k = i; k < n; ++k)
+            {
+                if (fabs(a[j*n+k]) > max_[number].value)
+                {
+                    max_[number].value = fabs(a[j*n+k]);
+                    max_[number].x = j;
+                    max_[number].y = k;
+                }
+            }
+        }
+        
+        synchronize(count);
+        
         if (number == 0)
         {
-            value = fabs(a[i*n+i]); maxstr = i; maxcol = i;
+            value = max_[0].value;
+            maxstr = max_[0].x;
+            maxcol = max_[0].y;
             
-            for (j = i; j < n; ++j)
+            for (k = 1; k < count; ++k)
             {
-                for (k = i; k < n; ++k)
+                if (value < max_[k].value)
                 {
-                    if (fabs(a[j*n+k]) > value)
-                    {
-                        value = fabs(a[j*n+k]); maxstr = j; maxcol = k;
-                    }
+                    value = max_[k].value;
+                    maxstr = max_[k].x;
+                    maxcol = max_[k].y;
                 }
             }
             
             if (fabs(value) < eps)
-                *funcFlag = 0;
+                *retflag = 0;
             else
-                *funcFlag = 1;
+                *retflag = 1;
             
-            if (*funcFlag)
+            if (*retflag)
             {
                 if (maxstr != i)
                 {
@@ -65,10 +88,10 @@ int solve(double* a, double* b, double* x, int* index, int* funcFlag, int n, int
         
         synchronize(count);
         
-        if (!(*funcFlag))
+        if (!(*retflag))
             return -1;
         
-        begin = n * number/count ;
+        begin = n * number/count;
         last = n * (number + 1)/count;
         
         for (j = begin; j < last; ++j)

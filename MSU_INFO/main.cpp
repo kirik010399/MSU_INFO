@@ -17,9 +17,10 @@ typedef struct
     double *b;
     double *x;
     int *index;
-    int *funcFlag;
+    int *retflag;
     int number;
     int count;
+    maxelem *max_;
     int flag;
 } Args;
 
@@ -36,7 +37,8 @@ int main(int argc, char **argv)
     int count;
     pthread_t *threads;
     Args *args;
-    int funcFlag = 1;
+    maxelem *max_;
+    int retflag = 1;
     
     int type, flag;
     
@@ -113,6 +115,7 @@ int main(int argc, char **argv)
     b = new double [n];
     x = new double [n];
     index = new int[n];
+    max_ = new maxelem[count];
     threads = new pthread_t[count];
     args = new Args[count];
     
@@ -129,6 +132,8 @@ int main(int argc, char **argv)
         delete []threads;
         delete []args;
         delete []index;
+        delete []max_;
+
         return -2;
     }
     
@@ -147,6 +152,7 @@ int main(int argc, char **argv)
         delete []threads;
         delete []args;
         delete []index;
+        delete []max_;
 
         return -2;
     }
@@ -166,6 +172,7 @@ int main(int argc, char **argv)
             delete []threads;
             delete []args;
             delete []index;
+            delete []max_;
             
             return -2;
         }
@@ -185,6 +192,7 @@ int main(int argc, char **argv)
             delete []threads;
             delete []args;
             delete []index;
+            delete []max_;
             
             return -2;
         }
@@ -197,8 +205,9 @@ int main(int argc, char **argv)
         args[i].b = b;
         args[i].x = x;
         args[i].index = index;
+        args[i].max_ = max_;
         args[i].number = i;
-        args[i].funcFlag = &funcFlag;
+        args[i].retflag = &retflag;
         args[i].count = count;
         args[i].flag = 0;
     }
@@ -220,6 +229,7 @@ int main(int argc, char **argv)
             delete []threads;
             delete []index;
             delete []args;
+            delete []max_;
             
             return -1;
         }
@@ -240,6 +250,7 @@ int main(int argc, char **argv)
             delete []threads;
             delete []args;
             delete []index;
+            delete []max_;
             
             return -1;
         }
@@ -262,6 +273,7 @@ int main(int argc, char **argv)
             delete []threads;
             delete []args;
             delete []index;
+            delete []max_;
 
             return -1;
         }
@@ -294,6 +306,7 @@ int main(int argc, char **argv)
     delete []threads;
     delete []index;
     delete []args;
+    delete []max_;
     
     return 0;
 }
@@ -301,9 +314,7 @@ int main(int argc, char **argv)
 void *Solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
-    
-    arg->flag = solve(arg->a, arg->b, arg->x, arg->index, arg->funcFlag, arg->n, arg->number, arg->count);
-    
+    arg->flag = solve(arg->a, arg->b, arg->x, arg->index, arg->max_, arg->retflag, arg->n, arg->number, arg->count);
     return NULL;
 }
 

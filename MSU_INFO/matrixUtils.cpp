@@ -7,7 +7,7 @@ using namespace std;
 
 double func(int i, int j, int n)
 {
-    return n - fmax(i,j);
+    return fabs(i-j);
 }
 
 int enterData(double* a, double *b, int n, FILE* fin)
