@@ -59,13 +59,19 @@ void printResult(double* result, int n, int m)
     printf("\n");
 }
 
-double residualNorm(double* matrix, double* vector, double* result, int n)
+double residualNorm(double* matrix, double* vector, double* result, int n, int rank, int threadsCount)
 {
     int i, j;
     double res = 0;
     double val;
+    int beginRow, lastRow;
     
-    for (i = 0; i < n; ++i)
+    beginRow = n * rank;
+    beginRow = beginRow/threadsCount; 
+    lastRow = n * (rank + 1);
+    lastRow = lastRow/threadsCount;
+        
+    for (i = beginRow; i < lastRow; ++i)
     {
         val = 0.0;
         
@@ -73,11 +79,10 @@ double residualNorm(double* matrix, double* vector, double* result, int n)
             val += matrix[i*n+j] * result[j];
         
         val -= vector[i];
-        
         res += val*val;
     }
     
-    return sqrt(res);
+    return res;
 }
 
 double errorNorm(double *result, int n)

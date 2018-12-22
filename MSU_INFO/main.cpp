@@ -22,13 +22,34 @@ typedef struct
     int threadsCount;
     int retFlag;
     int *flag;
+    double norm;
+    FILE *fin;
+    int inputType;
 } Args;
 
 void *Solving(void *Arg)
 {
+    int returnFlag, nn = 0;
     Args *arg = (Args*)Arg;
     
     arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->maxx, arg->flag, arg->n, arg->rank, arg->threadsCount);
+    
+    synchronize(arg->threadsCount);
+
+    if (arg->rank == 0)
+    {
+        if (arg->inputType == 1)
+        {
+            fseek(arg->fin, 0, SEEK_SET);
+            fscanf(arg->fin, "%d", &nn);
+        }
+        
+        returnFlag = enterData(arg->matrix, arg->vector, arg->n, arg->fin);
+    }
+    
+    synchronize(arg->threadsCount);
+    
+    arg->norm =  residualNorm(arg->matrix, arg->vector, arg->result, arg->n, arg->rank, arg->threadsCount);
     
     return NULL;
 }
@@ -49,6 +70,7 @@ int main(int argc, char **argv)
     pthread_t *threads;
     Args *args;
     int inputType;
+    double residualNorm = 0;
     int returnFlag;
     
     if (argc == 1)
@@ -218,6 +240,9 @@ int main(int argc, char **argv)
         args[i].retFlag = 0;
         args[i].flag = &flag;
         args[i].maxx = maxx;
+        args[i].norm = 0;
+        args[i].fin = fin;
+        args[i].inputType = inputType;
     }
     
     t = getTime();
@@ -290,15 +315,10 @@ int main(int argc, char **argv)
     cout<<"Result:"<<endl;
     printResult(result, n, m);
     
-    if (inputType == 1)
-    {
-        fseek(fin, 0, SEEK_SET);
-        fscanf(fin, "%d", &n);
-    }
-
-    returnFlag = enterData(matrix, vector, n, fin);
+    for (i = 0; i < threadsCount; ++i)
+        residualNorm += args[i].norm;
     
-    cout<<"Residual norm: "<<residualNorm(matrix, vector, result, n)<<endl;
+    cout<<"Residual norm: "<<sqrt(residualNorm)<<endl;
     
     if (inputType == 2)
         cout<<"Error norm: "<<errorNorm(result, n)<<endl; ;
