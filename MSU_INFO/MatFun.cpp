@@ -51,12 +51,18 @@ void printResult(double* x, int n, int m) {
     printf("\n");
 }
 
-double residualNorm(double* a, double* b, double* x, int n) {
+double residualNorm(double* a, double* b, double* x, int n, int number, int count){
+    
     int i, j;
     double res = 0;
     double val;
     
-    for (i = 0; i < n; ++i) {
+    int begin, last;
+    
+    begin = n * number/count;
+    last = n * (number + 1)/count;
+    
+    for (i = begin; i < last; ++i) {
         val = 0.0;
         
         for (j = 0; j < n; ++j)
@@ -67,10 +73,11 @@ double residualNorm(double* a, double* b, double* x, int n) {
         res += val*val;
     }
     
-    return sqrt(res);
+    return res;
 }
 
 double errorNorm(double *x, int n) {
+    
     double error = 0;
     int i;
     

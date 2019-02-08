@@ -22,6 +22,9 @@ typedef struct
     int count;
     maxelem *max_;
     int flag;
+    double norm;
+    FILE *fin;
+    int type;
 } Args;
 
 void *Solve(void *Arg);
@@ -38,6 +41,7 @@ int main(int argc, char **argv)  {
     Args *args;
     maxelem *max_;
     int retflag = 1;
+    double residualNorm = 0;
     
     int type, flag;
     
@@ -190,6 +194,10 @@ int main(int argc, char **argv)  {
         args[i].retflag = &retflag;
         args[i].count = count;
         args[i].flag = 0;
+        
+        args[i].norm = 0;
+        args[i].fin = fin;
+        args[i].type = type;
     }
     
     t = get_full_time();
@@ -255,15 +263,11 @@ int main(int argc, char **argv)  {
     
     cout<<"x:"<<endl;
     printResult(x, n, m);
+  
+    for (i = 0; i < count; ++i)
+        residualNorm += args[i].norm;
     
-    if (type == 1)  {
-        fseek(fin, 0, SEEK_SET);
-        fscanf(fin, "%d", &n);
-    }
-    
-    flag = enterData(a, b, n, fin);
-    
-    cout<<"____Остаточная норма: "<<residualNorm(a, b, x, n)<<endl;
+    cout<<"____Остаточная норма: "<<sqrt(residualNorm)<<endl;
     
     if (type == 2)
         cout<<"____Ошибка нормы: "<<errorNorm(x, n)<<endl; ;
@@ -286,8 +290,28 @@ int main(int argc, char **argv)  {
 
 void *Solve(void *Arg) {
     
+    int retFlag, n_ = 0;
+
     Args *arg = (Args*)Arg;
     arg->flag = solve(arg->a, arg->b, arg->x, arg->index, arg->max_, arg->retflag, arg->n, arg->number, arg->count);
+    
+    synchronize(arg->count);
+    
+    if (arg->index == 0)
+    {
+        if (arg->type == 1)
+        {
+            fseek(arg->fin, 0, SEEK_SET);
+            fscanf(arg->fin, "%d", &n_);
+        }
+        
+        retFlag = enterData(arg->a, arg->b, arg->n, arg->fin);
+    }
+    
+    synchronize(arg->count);
+    
+    arg->norm =  residualNorm(arg->a, arg->b, arg->x, arg->n, arg->number, arg->count);
+    
     return NULL;
 }
 
