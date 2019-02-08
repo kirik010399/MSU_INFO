@@ -1,12 +1,14 @@
-#ifndef aFunctions_hpp
-#define aFunctions_hpp
+#ifndef MatFun_hpp
+#define MatFun_hpp
 
 #include <stdio.h>
+#include <algorithm>
+
+using namespace std;
 
 double func(int i, int j, int n);
-int enterData(double* a, double* b, int n, FILE* fin);
-void printResult(double* a, int n, int m);
-double residualNorm(double* a, double* b, double* x, int n);
-double errorNorm(double *x, int n);
+int enterData(double* a, int n, FILE* fin);
+void printResult(double* res, int k);
+pair<double, double> residualNorm(double* a, double* res, int n);
 
-#endif /* aFunctions_hpp */
+#endif /* MatFun_hpp */
