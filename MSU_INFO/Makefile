@@ -1,8 +1,8 @@
-program: main.o matrixUtils.o solvingManager.o
+program: main.o MatFun.o SolvHead.o
 	g++ -lpthread $^ -o program
-main.o: main.cpp matrixUtils.hpp solvingManager.hpp
+main.o: main.cpp MatFun.hpp SolvHead.hpp
 	g++ -c $<
-matrixUtils.o: matrixUtils.cpp matrixUtils.hpp solvingManager.hpp
+MatFun.o: MatFun.cpp MatFun.hpp SolvHead.hpp
 	g++ -c $<
-solvingManager.o: solvingManager.cpp matrixUtils.hpp solvingManager.hpp
+SolvHead.o: SolvHead.cpp MatFun.hpp SolvHead.hpp
 	g++ -c $<

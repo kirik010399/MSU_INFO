@@ -2,345 +2,296 @@
 #include <time.h>
 #include <pthread.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "solvingManager.hpp"
+#include "MatFun.hpp"
+#include "SolvHead.hpp"
 #include <sys/time.h>
 
 using namespace std;
 
-long double getTime();
+long double get_full_time();
 
 typedef struct
 {
-    double *matrix;
-    double *vector;
-    double *result;
-    int *var;
-    maxElem *maxx;
     int n;
-    int rank;
-    int threadsCount;
-    int retFlag;
-    int *flag;
-    double norm;
-    FILE *fin;
-    int inputType;
+    double *a;
+    double *b;
+    double *x;
+    int *index;
+    int *retflag;
+    int number;
+    int count;
+    maxelem *max_;
+    int flag;
 } Args;
 
-void *Solving(void *Arg)
-{
-    int returnFlag, nn = 0;
-    Args *arg = (Args*)Arg;
-    
-    arg->retFlag = solveSystem(arg->matrix, arg->vector, arg->result, arg->var, arg->maxx, arg->flag, arg->n, arg->rank, arg->threadsCount);
-    
-    synchronize(arg->threadsCount);
+void *Solve(void *Arg);
 
-    if (arg->rank == 0)
-    {
-        if (arg->inputType == 1)
-        {
-            fseek(arg->fin, 0, SEEK_SET);
-            fscanf(arg->fin, "%d", &nn);
-        }
-        
-        returnFlag = enterData(arg->matrix, arg->vector, arg->n, arg->fin);
-    }
-    
-    synchronize(arg->threadsCount);
-    
-    arg->norm =  residualNorm(arg->matrix, arg->vector, arg->result, arg->n, arg->rank, arg->threadsCount);
-    
-    return NULL;
-}
-
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv)  {
     int i;
     int n, m;
-    double *matrix;
-    double *vector;
-    double *result;
-    int *var;
-    maxElem *maxx;
-    int flag = 1;
+    double *a, *b, *x;
+    int *index;
     FILE* fin = NULL;
     long double t;
-    int threadsCount;
+    int count;
     pthread_t *threads;
     Args *args;
-    int inputType;
-    double residualNorm = 0;
-    int returnFlag;
+    maxelem *max_;
+    int retflag = 1;
     
-    if (argc == 1)
-    {
-        cout<<"Incorrect mode"<<endl;
+    int type, flag;
+    
+    if (argc == 1)  {
+        cout<<"____Некорректное значение____"<<endl;
         return -2;
     }
     
-    if (sscanf(argv[1],"%d", &inputType) != 1)
-    {
-        cout<<"Data isn't correct"<<endl;
+    if (sscanf(argv[1], "%d", &type) != 1)  {
+        cout<<"____Выбран неверный тип задания матрицы____"<<endl;
         return -2;
     }
     
-    if (inputType == 1)
-    {
-        if (argc != 4)
-        {
-            cout<<"Data isn't correct"<<endl;
+    if (type == 1)  {
+        if (argc != 4)  {
+            cout<<"____Ошибка ввода____"<<endl;
             return -2;
         }
         
         fin = fopen("input.txt", "r");
         
-        if (!fin)
-        {
-            cout<<"File don't exist"<<endl;
+        if (!fin)  {
+            cout<<"____Возникла проблема с файлом____"<<endl;
             fclose(fin);
             return -1;
         }
         
-        if (fscanf(fin, "%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
+        if (fscanf(fin, "%d", &n) != 1 || n <= 0)  {
+            cout<<"____Введено некорректное значение размера матрицы____"<<endl;
             fclose(fin);
             return -2;
         }
         
-        if (sscanf(argv[2], "%d", &threadsCount) != 1 || threadsCount <= 0 || threadsCount > n)
-        {
-            cout<<"Data isn't correct"<<endl;
+        if (sscanf(argv[2], "%d", &count) != 1 || count <= 0 || count > n)  {
+            cout<<"____Введено некорректное значение числа потоков____"<<endl;
             fclose(fin);
             return -2;
         }
     }
-    else if (inputType == 2)
-    {
-        if (argc != 5)
-        {
-            cout<<"Data isn't correct"<<endl;
+    else if (type == 2)  {
+        if (argc != 5)  {
+            cout<<"____Ошибка ввода данных____"<<endl;
             return -2;
         }
         
-        if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
+        if (sscanf(argv[2], "%d", &n) != 1 || n <= 0)  {
+            cout<<"____Введено некорректное значение размера матрицы____"<<endl;
             return -2;
         }
         
-        if (sscanf(argv[3], "%d", &threadsCount) != 1 || threadsCount <= 0 || threadsCount > n)
-        {
-            cout<<"Data isn't correct"<<endl;
+        if (sscanf(argv[3], "%d", &count) != 1 || count <= 0 || count > n)  {
+            cout<<"____Введено некорректное значение числа потоков____"<<endl;
             return -2;
         }
     }
-    else
-    {
-        cout<<"Input type isn't correct"<<endl;
+    else  {
+        cout<<"____Выбран неверный тип задания матрицы____"<<endl;
         return -2;
     }
     
-    matrix = new double [n*n];
-    vector = new double [n];
-    result = new double [n];
-    var = new int[n];
-    threads = new pthread_t[threadsCount];
-    args = new Args[threadsCount];
-    maxx = new maxElem[threadsCount];
+    a = new double [n*n];
+    b = new double [n];
+    x = new double [n];
+    index = new int[n];
+    max_ = new maxelem[count];
+    threads = new pthread_t[count];
+    args = new Args[count];
     
-    if (!(matrix && vector && result && threads && var && maxx))
-    {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
+    if (!(a && b && x && threads && index))  {
+        cout<<"____Маловато памяти, введите матрицу поменьше____"<<endl;
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         delete []threads;
         delete []args;
-        delete []var;
-        delete []maxx;
+        delete []index;
+        delete []max_;
+        
         return -2;
     }
     
-    returnFlag = enterData(matrix, vector, n, fin);
-
-    if (returnFlag == -1)
-    {
-        cout<<"Data isn't correct"<<endl;
+    flag = enterData(a, b, n, fin);
+    
+    if (flag == -1)  {
+        cout<<"____Данные не верны____"<<endl;
         
-        if (inputType == 1)
+        if (type == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []a;
+        delete []b;
+        delete []x;
         delete []threads;
         delete []args;
-        delete []var;
-        delete []maxx;
-
+        delete []index;
+        delete []max_;
+        
         return -2;
     }
     
-    if (inputType == 1)
-    {
-        if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
+    if (type == 1)  {
+        if (sscanf(argv[3], "%d", &m) != 1 || m <= 0)  {
+            cout<<"____Данные не верны____"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
-            delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []a;
+            delete []b;
+            delete []x;
             delete []threads;
             delete []args;
-            delete []var;
-            delete []maxx;
+            delete []index;
+            delete []max_;
             
             return -2;
         }
     }
-    else
-    {
-        if (sscanf(argv[4], "%d", &m) != 1 || m <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
+    else  {
+        if (sscanf(argv[4], "%d", &m) != 1 || m <= 0)  {
+            cout<<"____Данные не верны____"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
-            delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []a;
+            delete []b;
+            delete []x;
             delete []threads;
             delete []args;
-            delete []var;
-            delete []maxx;
+            delete []index;
+            delete []max_;
             
             return -2;
         }
     }
     
-    for (i = 0; i < threadsCount; i++)
-    {
+    for (i = 0; i < count; i++)  {
         args[i].n = n;
-        args[i].matrix = matrix;
-        args[i].vector = vector;
-        args[i].result = result;
-        args[i].var = var; 
-        args[i].rank = i;
-        args[i].threadsCount = threadsCount;
-        args[i].retFlag = 0;
-        args[i].flag = &flag;
-        args[i].maxx = maxx;
-        args[i].norm = 0;
-        args[i].fin = fin;
-        args[i].inputType = inputType;
+        args[i].a = a;
+        args[i].b = b;
+        args[i].x = x;
+        args[i].index = index;
+        args[i].max_ = max_;
+        args[i].number = i;
+        args[i].retflag = &retflag;
+        args[i].count = count;
+        args[i].flag = 0;
     }
     
-    t = getTime();
+    t = get_full_time();
     
-    for (i = 0; i < threadsCount; i++)
-    {
-        if (pthread_create(threads + i, 0, Solving, args + i))
-        {
-            cout<<"Can't create thread"<<endl;
+    for (i = 0; i < count; i++)  {
+        if (pthread_create(threads + i, 0, Solve, args + i))  {
+            cout<<"____Не удалось создать поток____"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
-            delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []a;
+            delete []b;
+            delete []x;
             delete []threads;
-            delete []var;
+            delete []index;
             delete []args;
-            delete []maxx;
+            delete []max_;
             
             return -1;
         }
     }
     
-    for (i = 0; i < threadsCount; i++)
-    {
-        if (pthread_join(threads[i], 0))
-        {
-            cout<<"Can't wait thread"<<endl;
+    for (i = 0; i < count; i++)  {
+        if (pthread_join(threads[i], 0))  {
+            cout<<"____Не дождался потока____"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
-            delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []a;
+            delete []b;
+            delete []x;
             delete []threads;
             delete []args;
-            delete []var;
-            delete []maxx;
+            delete []index;
+            delete []max_;
             
             return -1;
         }
     }
     
-    t = getTime() - t;
+    t = get_full_time() - t;
     
-    for (i = 0; i < threadsCount; i++)
-    {
-        if (args[i].retFlag != 0)
-        {
-            cout<<"Error while solving system"<<endl;
+    for (i = 0; i < count; i++)  {
+        if (args[i].flag != 0)  {
+            cout<<"____Ошибка при решении системы____"<<endl;
             
-            if (inputType == 1)
+            if (type == 1)
                 fclose(fin);
             
-            delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []a;
+            delete []b;
+            delete []x;
             delete []threads;
             delete []args;
-            delete []var;
-            delete []maxx;
-
+            delete []index;
+            delete []max_;
+            
             return -1;
         }
     }
     
-    cout<<"Result:"<<endl;
-    printResult(result, n, m);
+    cout<<"x:"<<endl;
+    printResult(x, n, m);
     
-    for (i = 0; i < threadsCount; ++i)
-        residualNorm += args[i].norm;
+    if (type == 1)  {
+        fseek(fin, 0, SEEK_SET);
+        fscanf(fin, "%d", &n);
+    }
     
-    cout<<"Residual norm: "<<sqrt(residualNorm)<<endl;
+    flag = enterData(a, b, n, fin);
     
-    if (inputType == 2)
-        cout<<"Error norm: "<<errorNorm(result, n)<<endl; ;
+    cout<<"____Остаточная норма: "<<residualNorm(a, b, x, n)<<endl;
     
-    cout<<"Solving time = "<<t<<" seconds"<<endl;
+    if (type == 2)
+        cout<<"____Ошибка нормы: "<<errorNorm(x, n)<<endl; ;
     
-    if (inputType == 1)
+    cout<<"____Время решения  = "<<t<<" секунд"<<endl;
+    
+    if (type == 1)
         fclose(fin);
     
-    delete []matrix;
-    delete []vector;
-    delete []result;
+    delete []a;
+    delete []b;
+    delete []x;
     delete []threads;
-    delete []var;
+    delete []index;
     delete []args;
-    delete []maxx;
+    delete []max_;
     
     return 0;
 }
 
-long double getTime()
-{
+void *Solve(void *Arg) {
+    
+    Args *arg = (Args*)Arg;
+    arg->flag = solve(arg->a, arg->b, arg->x, arg->index, arg->max_, arg->retflag, arg->n, arg->number, arg->count);
+    return NULL;
+}
+
+long double get_full_time()  {
     struct timeval t;
     gettimeofday(&t, 0);
     return t.tv_sec + t.tv_usec/1000000.0;
