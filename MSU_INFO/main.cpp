@@ -267,10 +267,10 @@ int main(int argc, char **argv)  {
     for (i = 0; i < count; ++i)
         residualNorm += args[i].norm;
     
-    cout<<"____Остаточная норма: "<<sqrt(residualNorm)<<endl;
+    cout<<"____Норма погрешности: "<<sqrt(residualNorm)<<endl;
     
     if (type == 2)
-        cout<<"____Ошибка нормы: "<<errorNorm(x, n)<<endl; ;
+        cout<<"____Норма ошибки: "<<errorNorm(x, n)<<endl; ;
     
     cout<<"____Время решения  = "<<t<<" секунд"<<endl;
     
