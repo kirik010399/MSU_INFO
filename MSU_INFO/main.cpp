@@ -270,7 +270,7 @@ int main(int argc, char **argv)  {
     cout<<"____Норма погрешности: "<<sqrt(residualNorm)<<endl;
     
     if (type == 2)
-        cout<<"____Норма ошибки: "<<errorNorm(x, n)<<endl; ;
+        cout<<"____Норма ошибки: "<<errorNorm(x, n)<<endl;
     
     cout<<"____Время решения  = "<<t<<" секунд"<<endl;
     
