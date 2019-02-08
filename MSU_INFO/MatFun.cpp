@@ -11,8 +11,7 @@ double func(int i, int j, int n) {
 }
 
 int enterData(double* a, double *b, int n, FILE* fin) {
-    int i;
-    int j;
+    int i, j;
     
     if (fin) {
         for (i = 0; i < n; ++i) {
