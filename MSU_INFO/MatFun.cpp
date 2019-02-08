@@ -51,7 +51,7 @@ void printResult(double* x, int n, int m) {
     printf("\n");
 }
 
-double inaccuracyNorm(double* a, double* b, double* x, int n) {
+double residualNorm(double* a, double* b, double* x, int n) {
     int i, j;
     double res = 0;
     double val;

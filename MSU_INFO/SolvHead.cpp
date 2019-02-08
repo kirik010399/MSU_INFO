@@ -72,6 +72,13 @@ int solve(double* a, double* b, double* x, int* index, maxelem* max_, int* retfl
                     for (j = 0; j < n; ++j)
                         swap(a[j*n+maxcol], a[j*n+i]);
                 }
+                
+                value = 1.0/a[i*n+i];
+                
+                for (j = i; j < n; ++j)
+                    a[i*n+j] *= value;
+                
+                b[i] *= value;
             }
         }
         
@@ -85,7 +92,7 @@ int solve(double* a, double* b, double* x, int* index, maxelem* max_, int* retfl
         
         for (j = begin; j < last; ++j)  {
             if (j != i)  {
-                value = a[j*n+i]/a[i*n+i];
+                value = a[j*n+i];
                 
                 for(k = i; k < n; ++k)
                     a[j*n+k] -= value*a[i*n+k];
@@ -99,7 +106,7 @@ int solve(double* a, double* b, double* x, int* index, maxelem* max_, int* retfl
     
     if(number == 0)  {
         for (i = 0; i < n; ++i)
-            x[index[i]] = b[i]/a[i*n+i];
+            x[index[i]] = b[i];
     }
     
     return 0;

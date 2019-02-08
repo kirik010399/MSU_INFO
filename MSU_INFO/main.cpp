@@ -263,7 +263,7 @@ int main(int argc, char **argv)  {
     
     flag = enterData(a, b, n, fin);
     
-    cout<<"____Остаточная норма: "<<inaccuracyNorm(a, b, x, n)<<endl;
+    cout<<"____Остаточная норма: "<<residualNorm(a, b, x, n)<<endl;
     
     if (type == 2)
         cout<<"____Ошибка нормы: "<<errorNorm(x, n)<<endl; ;
