@@ -4,11 +4,18 @@
 
 using namespace std;
 
-#define eps 1e-18
+//#define eps 1e-18
 
 int solve(double* a, double* b, double* x, int* index, maxelem* max_, int* retflag, int n, int number, int count)  {
     int i, j, k, maxstr, maxcol, begin, last;
     double value;
+    
+    double eps;
+    
+    if (n < 10)
+        eps = 1e-14;
+    else
+        eps = 1e-18;
     
     if (number == 0)  {
         for (i = 0; i < n; ++i)
