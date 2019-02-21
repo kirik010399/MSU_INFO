@@ -99,7 +99,7 @@ int main(){
     
     cout<<"____Введите точность: ";
     
-    if (scanf("%lf", &eps) != 1 || eps <= 0)  {
+    if (scanf("%lf", &eps) != 1 || eps <= 0 || eps <= 1e-18)  {
         cout<<"____Данные не верны____"<<endl;
         
         if (type == 1)

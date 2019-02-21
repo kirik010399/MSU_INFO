@@ -35,7 +35,7 @@ void calculateValues(double* a, double* res, double eps, int k, int n)
             for (j = 0; j < n; ++j){
                 a[i*n+j]/=alp;
                 
-                if (i!=j && a[i*n+j] < 1e-100)
+                if (i!=j && a[i*n+j] < 1e-18)
                     a[i*n+j] = 0;
             }
         }//97
@@ -43,9 +43,7 @@ void calculateValues(double* a, double* res, double eps, int k, int n)
     
     right = MatrixNorm(a, n) + eps;//95
     left = -right;
-    
-    eps = fmax(eps, 1e-10);
-    
+        
     values(a, n, res, left, right, k, eps);
     
     for (i = 0; i < n; ++i)
@@ -113,10 +111,10 @@ void Rotation(double* a, int n)  {
             x = a[(i+1)*n+i];
             y = a[j*n+i];
             
-            if (fabs(y) < 1e-100)
+            if (fabs(y) < 1e-18)
                 continue;
             r = sqrt(x*x+y*y);
-            if (r < 1e-100)
+            if (r < 1e-18)
                 continue;
             
             cosPhi = x/r;
