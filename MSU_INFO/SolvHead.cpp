@@ -98,41 +98,48 @@ int n_(double* a, int n, double lam)  {
     return m;
 }
 
-void Rotation(double* a, int n)  {
+void Rotation(double* a, int n){
     int i, j, k;
-    double x, y, r, CosPhi, SinPhi;
-    double a_ik, a_jk, a_ki, a_kj;
-    for(i = 0; i < n - 2; ++i){
-        for(j = i + 2; j < n; ++j) {
-            x = a[(i+1)*n + i];
-            y = a[j*n + i];
+    double x, y, r, a_ik, a_jk, CosPhi, SinPhi;
+    double a_ii, a_ij, a_ji, a_jj;
+    
+    for (i = 0; i < n-2; ++i){
+        for (j = i+2; j < n; ++j){
+            x = a[(i+1)*n+i];
+            y = a[j*n+i];
             
-            if( fabs(y) < 1e-18)
+            if (fabs(y) < 1e-18)
                 continue;
-            r = sqrt(x*x + y*y);
-            
-            if(r < 1e-18)
+            r = sqrt(x*x+y*y);
+            if (r < 1e-18)
                 continue;
             
             CosPhi = x/r;
             SinPhi = -y/r;
             
-            for(k = i; k < n; ++k) {
-                a_ik = a[(i+1)*n + k];
-                a_jk = a[j*n + k];
+            for (k = i; k < n; ++k){
+                a_ik = a[(i+1)*n+k];
+                a_jk = a[j*n+k];
                 
-                a[(i+1)*n+k] = CosPhi * a_ik - SinPhi * a_jk;
-                a[j*n+k] = SinPhi * a_ik + CosPhi * a_jk;
+                a[(i+1)*n+k] = a_ik * CosPhi - a_jk * SinPhi;
+                a[j*n+k] = a_ik * SinPhi + a_jk * CosPhi;//*Tij
+                
+                if (k != i+1 && k != j){
+                    a[k*n+i+1] = a[(i+1)*n+k];
+                    a[k*n+j] = a[j*n+k];
+                }
             }
             
-            for(k = i; k < n; ++k) {
-                a_ki = a[k*n + i+1];
-                a_kj = a[k*n + j];
-                
-                a[k*n+i+1] = CosPhi * a_ki - SinPhi * a_kj;
-                a[k*n+j] = SinPhi * a_ki + CosPhi * a_kj;
-            }
-        }
+            a_ii = a[(i+1)*n+i+1];
+            a_ji = a[j*n+i+1];
+            a_ij = a[(i+1)*n+j];
+            a_jj = a[j*n+j];
+            
+            a[(i+1)*n+i+1] = a_ii * CosPhi - a_ij * SinPhi;
+            a[j*n+i+1] = a_ji * CosPhi - a_jj * SinPhi;
+            a[(i+1)*n+j] = a_ii * SinPhi + a_ij * CosPhi;
+            a[j*n+j] = a_ji * SinPhi + a_jj * CosPhi;
+        }//страница   63 *Tij T
     }
 }
 
