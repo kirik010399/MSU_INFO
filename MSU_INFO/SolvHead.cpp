@@ -6,52 +6,63 @@ using namespace std;
 
 void calculateValues(double* a, double* res, double eps, int k, int n)
 {
-    int i, j;
-    double amax, bmax, alp;
-    double right, left;
+    int i, j, alp;
+    double left, right;
+    double maxA, maxB;
     
-    Rotation(a,n);
-    amax = a[0];
-    bmax  = a[1];
+    for (i = 0; i < n; ++i)
+        res[i] = 0;
     
-    for(i = 1; i < n; ++i) {
-        if(amax < fabs(a[i*n+i]))
-            amax = fabs(a[i*+i]);
-        if(i < n-1 )
-            if( bmax < fabs(a[i*n + i+1]))
-                bmax = fabs(a[i*n +i+1]);
-    }
+    Rotation(a, n);
     
-    alp = 4 * fmax(amax, bmax);
+    maxA = a[0];
+    maxB = a[1];
     
-    if(alp > 1e-18){
-        for(i = 0; i < n; ++i){
-            for(j = 0; j < n; ++j) {
-                a[i*n + j] /= alp;
-                if(i!=j && fabs(a[i*n+j]) < 1e-18)
-                    a[i*n+j] = 0;
-            }
+    for (i = 1; i < n; ++i){
+        if (fabs(a[i*n+i]) > maxA)
+            maxA = fabs(a[i*n+i]);
+        
+        if (i<n-1){
+            if (fabs(a[i*n + i+1]) > maxB)
+                maxB = fabs(a[i*n + i+1]);
         }
     }
-    right = MatrixNorm(a, n) + eps;
-    left = -right;
-
-    values(a, n, res, left, right, k, eps);
-
-    for(i = 0; i < n; ++i) {
-        res[i] *= alp;
+    
+    alp = 4*fmax(maxA, maxB);
+    
+    if( fabs(alp) > 1e-18 ){
+        for (i = 0; i < n; ++i){
+            for (j = 0; j < n; ++j){
+                a[i*n+j]/=alp;
+                
+                if (i!=j && a[i*n+j] < 1e-18)
+                    a[i*n+j] = 0;
+            }
+        }//97
     }
+    
+    right = MatrixNorm(a, n) + eps;//95
+    left = -right;
+    
+    values(a, n, res, left, right, k, eps);
+    
+    for (i = 0; i < n; ++i)
+        res[i]*=alp;
 }
 
 void values(double *a, int n, double *res, double left, double right, int k, double eps)  {
     double c;
-    while(right - left > eps){
-        c = (left + right)/2 ;
-        if(n_(a, n ,c) < k)
+    
+    while(right-left > eps)  {
+        c = (left+right)/2;
+        
+        if (n_(a, n, c) < k)
             left = c;
-        else right = c;
+        else
+            right = c;
     }
-    res[k-1] = (left + right)/2;
+    
+    res[k-1] = (left+right)/2;
 }
 
 int n_(double* a, int n, double lam)  {
