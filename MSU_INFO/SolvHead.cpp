@@ -5,11 +5,18 @@
 
 using namespace std;
 
-#define eps 1e-18
+//#define eps 1e-18
 
 int solveSystem(double* a, double* b, double* x, int n, int *index){
     int i, j, k;
     double value;
+    
+    double eps;
+    
+    if (n < 10)
+        eps = 1e-14;
+    else
+        eps = 1e-18;
     
     int maxstr, maxcol;
     
