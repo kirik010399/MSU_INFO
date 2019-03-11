@@ -3,7 +3,7 @@
 
 void calculateValues(double *matrix, double *result, double *cos, double *sin, int n, float eps, int debug)
 {
-    int i, j, k;
+    int i, j, k, ii, jj;
     double acc;
     double shift;
     double tr, det;
@@ -14,14 +14,57 @@ void calculateValues(double *matrix, double *result, double *cos, double *sin, i
     acc = MatrixNorm(matrix, n) * eps;
     
     for (k = n-1; k >= 2; --k){
+        if (debug){
+            printf("\n");
+            printf("%d\n", k);
+            for (ii = 0; ii < n; ++ii){
+                for (jj = 0; jj < n; ++jj){
+                    printf("%f ", matrix[ii*n+jj]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
         while (fabs(matrix[k*n+k-1]) > acc){
             shift = matrix[k*n+k];
             
             for (j = 0; j <= k; ++j)
                 matrix[j*n+j] -= shift;
             
+            if (debug){
+                printf("\n");
+                for (ii = 0; ii < n; ++ii){
+                    for (jj = 0; jj < n; ++jj){
+                        printf("%f ", matrix[ii*n+jj]);
+                    }
+                    printf("\n");
+                }
+            }
+            
             QR(matrix, n, k+1, cos, sin);
+            
+            if (debug){
+                printf("\n");
+                for (ii = 0; ii < n; ++ii){
+                    for (jj = 0; jj < n; ++jj){
+                        printf("%f ", matrix[ii*n+jj]);
+                    }
+                    printf("\n");
+                }
+            }
+           
             RQ(matrix, n, k+1, cos, sin);
+            
+            if (debug){
+                printf("\n");
+                for (ii = 0; ii < n; ++ii){
+                    for (jj = 0; jj < n; ++jj){
+                        printf("%f ", matrix[ii*n+jj]);
+                    }
+                    printf("\n");
+                }
+                printf("\n");
+            }
         
             for (j = 0; j <= k; ++j)
                 matrix[j*n+j] += shift;
@@ -40,17 +83,17 @@ void calculateValues(double *matrix, double *result, double *cos, double *sin, i
     
     D = tr*tr-4*1*det;
 
-    matrix[0*n+0] = (tr + sqrt(D))/2;
-    matrix[1*n+1] = (tr - sqrt(D))/2;
+    matrix[0*n+0] = (tr - sqrt(D))/2;
+    matrix[1*n+1] = (tr + sqrt(D))/2;
     
     for (i = 0; i < n; ++i)
         result[i] = matrix[i*n+i];
 }
 
-void QR(double* matrix, int n, int k, double* cos, double* sin)
-{
+void QR(double* matrix, int n, int k, double* cos, double* sin){
     int i, j;
     double x, y, r;
+    double matrix_ij, matrix_i1j;
     
     for (i = 0; i < k-1; ++i){
         x = matrix[i*n+i];
@@ -68,19 +111,21 @@ void QR(double* matrix, int n, int k, double* cos, double* sin)
         }
         
         for (j = i; j < n; ++j){
-            matrix[i*n+j] = x * cos[i] - y * sin[i];
-            matrix[(i+1)*n+j] = x * sin[i] + y * cos[i];//*Tij
+            matrix_ij = matrix[i*n+j];
+            matrix_i1j = matrix[(i+1)*n+j];
+            
+            matrix[i*n+j] = matrix_ij * cos[i] - matrix_i1j * sin[i];
+            matrix[(i+1)*n+j] = matrix_ij * sin[i] + matrix_i1j * cos[i];//*Tij
         }
     }
 }
 
-void RQ(double* matrix, int n, int k, double* cos, double* sin)
-{
+void RQ(double* matrix, int n, int k, double* cos, double* sin){
     int i, j;
     double x, y;
     
-    for (i = 0; i < k - 1; ++i){
-        for (j = 0; j < i + 2; ++j){
+    for (i = 0; i < k-1; ++i){
+        for (j = 0; j <= i+1; ++j){//начиная с i+2 0
             x = matrix[j*n+i];
             y = matrix[j*n+i+1];
             
