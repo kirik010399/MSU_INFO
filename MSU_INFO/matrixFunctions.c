@@ -146,6 +146,9 @@ void printMatrix(double *matrix, int n, int m, FILE *fout){
 void residualNorm(double* matrix, double* vector, float *inv1, float *inv2, int n){
     int i, j;
     
+    *inv1 = 0.0;
+    *inv2 = 0.0;
+    
     for (i = 0; i < n; ++i){
         *inv1 += vector[i] - matrix[i*n+i];
         *inv2 += vector[i] * vector[i];
