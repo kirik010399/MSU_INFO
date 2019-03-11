@@ -16,7 +16,7 @@ double func2(int i, int j, int n){
     return fabs((i-j)*1.0);
 }
 
-int enterData(double* matrix, double *vector, int n, FILE* fin, int functionNumber){
+int enterData(double* matrix, int n, FILE* fin, int functionNumber){
     int i, j;
     
     if (fin){
@@ -25,15 +25,10 @@ int enterData(double* matrix, double *vector, int n, FILE* fin, int functionNumb
                 if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
                     return -1;
             }
-            
-            if (fscanf(fin, "%lf", &vector[i]) != 1)
-                return -1;
         }
     }
     else{
         for (i = 0; i < n; ++i){
-            vector[i] = 0;
-            
             for (j = 0; j < n; ++j){
                 
                 switch(functionNumber){
@@ -50,9 +45,6 @@ int enterData(double* matrix, double *vector, int n, FILE* fin, int functionNumb
                         break;
                     }
                 }
-                
-                if (j % 2 == 0)
-                    vector[i] += matrix[i*n+j];
             }
         }
     }
@@ -118,8 +110,7 @@ void printMatrix(double *matrix, int n, int m, FILE *fout){
         if (min_ != n)
             fprintf(fout,"%f\n",matrix[(n-1)*n+n-1]);
     }
-    else
-    {
+    else{
         for(i = 0; i < min_; ++i){
             for(j = 0; j < min_; ++j){
                 printf("%f ", matrix[i*n+j]);
@@ -152,36 +143,14 @@ void printMatrix(double *matrix, int n, int m, FILE *fout){
     }
 }
 
-float residualNorm(double* matrix, double* vector, double* result, int n){
+void residualNorm(double* matrix, double* vector, float *inv1, float *inv2, int n){
     int i, j;
-    float res = 0;
-    double a;
     
     for (i = 0; i < n; ++i){
-        a = 0.0;
+        *inv1 += vector[i] - matrix[i*n+i];
+        *inv2 += vector[i] * vector[i];
         
         for (j = 0; j < n; ++j)
-            a += matrix[i*n+j] * result[j];
-        
-        a -= vector[i];
-        
-        res += a*a;
+            *inv2 -= matrix[i*n+j] * matrix[i*n+j];
     }
-    
-    return sqrt(res);
-}
-
-float errorNorm(double *result, int n){
-    float error = 0;
-    int i;
-    
-    for (i = 0; i < n; ++i)
-    {
-        if (i % 2)
-            error += result[i]*result[i];
-        else
-            error += (result[i]-1)*(result[i]-1);
-    }
-    
-    return sqrt(error);
 }

@@ -15,12 +15,10 @@ int main(int argc, char** argv)
     float eps;
     int functionNumber;
     double *matrix;
-    double *vector;
     double *result;
-    int *var;
     FILE* fin = NULL;
     FILE* fout = NULL;
-    float residual, error;
+    float residualFirst, residualSecond;
     
     struct timespec t1, t2;
     double t;
@@ -31,7 +29,7 @@ int main(int argc, char** argv)
     params.fout = NULL;
     params.size = 0;
     params.debug = 0;
-    params.l = 5;
+    params.l = 4;
     params.eps = 1e-18;
     
     functionNumber = 0;
@@ -116,8 +114,7 @@ int main(int argc, char** argv)
         return -2;
     }
     
-    if (inputType == 1)
-    {
+    if (inputType == 1){
         fin = fopen(params.fin, "r");
         
         if (!fin){
@@ -157,11 +154,9 @@ int main(int argc, char** argv)
         fout = fopen(params.fout, "w");
     
     matrix = (double*)malloc(n*n * sizeof(double));
-    vector = (double*)malloc(n * sizeof(double));
     result = (double*)malloc(n * sizeof(double));
-    var = (int*)malloc(n * sizeof(int));
     
-    returnFlag = enterData(matrix, vector, n, fin, functionNumber);
+    returnFlag = enterData(matrix, n, fin, functionNumber);
     
     if (returnFlag == -1){
         printf("Data isn't correct\n");
@@ -173,9 +168,7 @@ int main(int argc, char** argv)
             fclose(fout);
         
         free(matrix);
-        free(vector);
         free(result);
-        free(var);
 
         return -2;
     }
@@ -188,7 +181,7 @@ int main(int argc, char** argv)
     printMatrix(matrix, n, m, fout);
 
     clock_gettime(CLOCK_MONOTONIC, &t1);
-    returnFlag = solveSystem(matrix, vector, result, var, n, eps, params.debug);
+    calculateValues(matrix, result, n, eps, params.debug);
     clock_gettime(CLOCK_MONOTONIC, &t2);
     
     t =(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/(1000000000.);
@@ -206,23 +199,14 @@ int main(int argc, char** argv)
             fscanf(fin, "%d", &n);
         }
         
-        returnFlag = enterData(matrix, vector, n, fin, functionNumber);
+        returnFlag = enterData(matrix, n, fin, functionNumber);
         
-        residual = residualNorm(matrix, vector, result, n);
+        residualNorm(matrix, result, &residualFirst, &residualSecond, n);
         
         if (fout)
-            fprintf(fout, "\nResidual norm: %e\n", residual);
+            fprintf(fout, "\nResidual norm:\nFirst inv: %e\nSecond inv: %e\n", residualFirst, residualSecond);
         else
-            printf("\nResidual norm: %e\n", residual);
-        
-        if (inputType == 2){
-            error = errorNorm(result, n);
-            
-            if (fout)
-                fprintf(fout, "Error norm: %e\n", error);
-            else
-                printf("Error norm: %e\n", error);
-        }
+            printf("\nResidual norm:\nFirst inv: %e\nSecond inv: %e\n", residualFirst, residualSecond);
         
         if (fout)
             fprintf(fout, "Solving time =  %f milliseconds", t);
@@ -239,9 +223,7 @@ int main(int argc, char** argv)
             fclose(fout);
         
         free(matrix);
-        free(vector);
         free(result);
-        free(var);
         
         return -1;
     }
@@ -253,9 +235,7 @@ int main(int argc, char** argv)
         fclose(fout);
     
     free(matrix);
-    free(vector);
     free(result);
-    free(var);
     
     return -2;
     
