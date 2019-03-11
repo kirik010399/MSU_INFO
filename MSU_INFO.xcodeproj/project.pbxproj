@@ -10,6 +10,7 @@
 		ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.c */; };
 		ED568B362153DD980012834A /* matrixFunctions.c in Sources */ = {isa = PBXBuildFile; fileRef = ED568B342153DD980012834A /* matrixFunctions.c */; };
 		ED568B392153DDBC0012834A /* solvingFunctions.c in Sources */ = {isa = PBXBuildFile; fileRef = ED568B372153DDBC0012834A /* solvingFunctions.c */; };
+		ED90A805223688DF005B5B7E /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = ED90A804223688DF005B5B7E /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +34,8 @@
 		ED568B372153DDBC0012834A /* solvingFunctions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = solvingFunctions.c; sourceTree = "<group>"; };
 		ED568B382153DDBC0012834A /* solvingFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = solvingFunctions.h; sourceTree = "<group>"; };
 		ED90A8002236482B005B5B7E /* Params.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Params.h; sourceTree = "<group>"; };
+		ED90A803223688D9005B5B7E /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
+		ED90A804223688DF005B5B7E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,13 +68,15 @@
 		ED0C3B971F82C3EA00D8B1BE /* MSU_INFO */ = {
 			isa = PBXGroup;
 			children = (
-				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED0C3B981F82C3EA00D8B1BE /* main.c */,
-				ED90A8002236482B005B5B7E /* Params.h */,
 				ED568B342153DD980012834A /* matrixFunctions.c */,
 				ED568B352153DD980012834A /* matrixFunctions.h */,
 				ED568B372153DDBC0012834A /* solvingFunctions.c */,
 				ED568B382153DDBC0012834A /* solvingFunctions.h */,
+				ED90A8002236482B005B5B7E /* Params.h */,
+				ED3B84001F82D29000AB9A64 /* input.txt */,
+				ED90A803223688D9005B5B7E /* output.txt */,
+				ED90A804223688DF005B5B7E /* Makefile */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -135,6 +140,7 @@
 			files = (
 				ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */,
 				ED568B362153DD980012834A /* matrixFunctions.c in Sources */,
+				ED90A805223688DF005B5B7E /* Makefile in Sources */,
 				ED568B392153DDBC0012834A /* solvingFunctions.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
