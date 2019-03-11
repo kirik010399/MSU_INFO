@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     int functionNumber;
     double *matrix;
     double *result;
+    double *cos, *sin;
     FILE* fin = NULL;
     FILE* fout = NULL;
     float residualFirst, residualSecond;
@@ -155,6 +156,8 @@ int main(int argc, char** argv)
     
     matrix = (double*)malloc(n*n * sizeof(double));
     result = (double*)malloc(n * sizeof(double));
+    cos = (double*)malloc((n-1) * sizeof(double));
+    sin = (double*)malloc((n-1) * sizeof(double));
     
     returnFlag = enterData(matrix, n, fin, functionNumber);
     
@@ -169,6 +172,8 @@ int main(int argc, char** argv)
         
         free(matrix);
         free(result);
+        free(cos);
+        free(sin);
 
         return -2;
     }
@@ -181,7 +186,7 @@ int main(int argc, char** argv)
     printMatrix(matrix, n, m, fout);
 
     clock_gettime(CLOCK_MONOTONIC, &t1);
-    calculateValues(matrix, result, n, eps, params.debug);
+    calculateValues(matrix, result, cos, sin, n, eps, params.debug);
     clock_gettime(CLOCK_MONOTONIC, &t2);
     
     t =(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/(1000000000.);
@@ -224,6 +229,8 @@ int main(int argc, char** argv)
         
         free(matrix);
         free(result);
+        free(cos);
+        free(sin);
         
         return -1;
     }
@@ -236,6 +243,8 @@ int main(int argc, char** argv)
     
     free(matrix);
     free(result);
+    free(cos);
+    free(sin);
     
     return -2;
     
