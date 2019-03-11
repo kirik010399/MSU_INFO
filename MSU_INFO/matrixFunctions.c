@@ -83,6 +83,75 @@ void printResult(double* result, int n, int m, FILE *fout)
     }
 }
 
+void printMatrix(double *matrix, int n, int m, FILE *fout){
+    int i, j;
+    int min_ = fmin(n,m);
+
+    if(fout){
+        for(i = 0; i < min_; ++i){
+            for(j = 0; j < min_; ++j){
+                fprintf(fout,"%f ", matrix[i*n+j]);
+            }
+            
+            if (min_ < n-1)
+                fprintf(fout,"... ");
+            if (min_ != n)
+                fprintf(fout, "%f ", matrix[i*n+n-1]);
+            
+            fprintf(fout,"\n");
+        }
+        
+        if (min_ < n-1){
+            fprintf(fout, "... ");
+            fprintf(fout, "\n");
+        }
+        
+        if (min_ != n){
+            for(j = 0; j < min_; j++){
+                fprintf(fout, "%f ", matrix[(n-1)*n+j]);
+            }
+        }
+        
+        if (min_ < n-1)
+            fprintf(fout,"... ");
+        
+        if (min_ != n)
+            fprintf(fout,"%f\n",matrix[(n-1)*n+n-1]);
+    }
+    else
+    {
+        for(i = 0; i < min_; ++i){
+            for(j = 0; j < min_; ++j){
+                printf("%f ", matrix[i*n+j]);
+            }
+            
+            if (min_ < n-1)
+                printf("... ");
+            if (min_ != n)
+                printf("%f ", matrix[i*n+n-1]);
+            
+            printf("\n");
+        }
+        
+        if (min_ < n-1){
+            printf("... ");
+            printf("\n");
+        }
+        
+        if (min_ != n){
+            for(j = 0; j < min_; j++){
+                printf("%f ", matrix[(n-1)*n+j]);
+            }
+        }
+        
+        if (min_ < n-1)
+            printf("... ");
+        
+        if (min_ != n)
+            printf("%f\n",matrix[(n-1)*n+n-1]);
+    }
+}
+
 float residualNorm(double* matrix, double* vector, double* result, int n){
     int i, j;
     float res = 0;
