@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp matrixFunctions.cpp solvingFunctions.cpp -o prog
+	gcc main.c matrixFunctions.c solvingFunctions.c -o program
