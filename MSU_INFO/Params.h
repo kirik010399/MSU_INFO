@@ -9,12 +9,11 @@
 
 struct Params;
 
-struct Params
-{
+struct Params{
     int size;
     int l;
     int formula;
-    int verbose;
+    int debug;
     char* fin;
     char* fout;
     float eps;

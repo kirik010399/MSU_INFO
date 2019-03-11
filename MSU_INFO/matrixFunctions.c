@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <math.h>
 
-double func1(int i, int j, int n){
-    return n - fmax(i,j);
+double func0(int i, int j, int n){
+    return i+j == n-1 ?1 :0;
 }
 
-double func2(int i, int j, int n){
+double func1(int i, int j, int n){
     n = n;
     return 1.0/(1.0+i+j);
 }
 
-double func3(int i, int j, int n){
+double func2(int i, int j, int n){
     n = n;
     return fabs((i-j)*1.0);
 }
@@ -37,12 +37,18 @@ int enterData(double* matrix, double *vector, int n, FILE* fin, int functionNumb
             for (j = 0; j < n; ++j){
                 
                 switch(functionNumber){
-                    case 1:
+                    case 0: {
+                        matrix[i*n+j] = func0(i, j, n);
+                        break;
+                    }
+                    case 1: {
                         matrix[i*n+j] = func1(i, j, n);
-                    case 2:
+                        break;
+                    }
+                    case 2: {
                         matrix[i*n+j] = func2(i, j, n);
-                    case 3:
-                        matrix[i*n+j] = func3(i, j, n);
+                        break;
+                    }
                 }
                 
                 if (j % 2 == 0)
@@ -63,7 +69,7 @@ void printResult(double* result, int n, int m, FILE *fout)
         for (i = 0; i < min_; ++i)
             fprintf(fout, "%f ", result[i]);
         if (min_ < n-1)
-            fprintf(fout, "...");
+            fprintf(fout, "... ");
         if (min_ != n)
              fprintf(fout, "%f ", result[n-1]);
     }
@@ -71,15 +77,15 @@ void printResult(double* result, int n, int m, FILE *fout)
         for (i = 0; i < min_; ++i)
             printf("%f ", result[i]);
         if (min_ < n-1)
-            printf("...");
+            printf("... ");
         if (min_ != n)
             printf("%f ", result[n-1]);
     }
 }
 
-double residualNorm(double* matrix, double* vector, double* result, int n){
+float residualNorm(double* matrix, double* vector, double* result, int n){
     int i, j;
-    double res = 0;
+    float res = 0;
     double a;
     
     for (i = 0; i < n; ++i){
@@ -96,8 +102,8 @@ double residualNorm(double* matrix, double* vector, double* result, int n){
     return sqrt(res);
 }
 
-double errorNorm(double *result, int n){
-    double error = 0;
+float errorNorm(double *result, int n){
+    float error = 0;
     int i;
     
     for (i = 0; i < n; ++i)

@@ -20,17 +20,17 @@ int main(int argc, char** argv)
     int *var;
     FILE* fin = NULL;
     FILE* fout = NULL;
-    double residual, error;
+    float residual, error;
     
     struct timespec t1, t2;
     double t;
     struct Params params;
     
-    params.formula = -1;
+    params.formula = 1;
     params.fin = NULL;
     params.fout = NULL;
     params.size = 0;
-    params.verbose = 0;
+    params.debug = 0;
     params.l = 5;
     params.eps = 1e-18;
     
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     int inputType;
     int returnFlag;
     
-    while ((opt = getopt(argc, argv, "n:e:f:l:i:o:v")) != -1){
+    while ((opt = getopt(argc, argv, "n:e:f:l:i:o:d")) != -1){
         switch (opt){
             case 'n': {
                 sscanf(optarg, "%d", &params.size);
@@ -65,8 +65,8 @@ int main(int argc, char** argv)
                 params.fout = optarg;
                 break;
             }
-            case 'v': {
-                params.verbose = 1;
+            case 'd': {
+                params.debug = 1;
                 break;
             }
         }
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
             printf("-l <int>  - size of printing\n");
             printf("-e {float}  - epsilon\n");
             printf("-o {string}  - printing to file\n");
-            printf("-v {int}  - verbose\n");
+            printf("-v {int}  - debug\n");
             return 0;
         }
         else if (inputType == 2){
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
             printf("-l <int>  - size of printing\n");
             printf("-e {float}  - epsilon\n");
             printf("-o {string}  - printing to file\n");
-            printf("-v {int}  - verbose\n");
+            printf("-d <01>  - debug\n");
             return 0;
         }
         else{
@@ -141,8 +141,7 @@ int main(int argc, char** argv)
         n = params.size;
     }
     
-    if (params.l < 1 || params.l > n)
-    {
+    if (params.l < 1 || params.l > n){
         printf("Data isn't correct\n");
         
         if (inputType == 1)
@@ -181,14 +180,18 @@ int main(int argc, char** argv)
         return -2;
     }
     
-    clock_gettime(CLOCK_MONOTONIC,&t1);
-    returnFlag = solveSystem(matrix, vector, result, var, n, eps);
-    clock_gettime(CLOCK_MONOTONIC,&t2);
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+    returnFlag = solveSystem(matrix, vector, result, var, n, eps, params.debug);
+    clock_gettime(CLOCK_MONOTONIC, &t2);
     
     t =(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/(1000000000.);
     
     if (returnFlag != -1){
-        printf("Result:\n");
+        if (fout)
+            fprintf(fout, "Result:\n");
+        else
+            printf("Result:\n");
+
         printResult(result, n, m, fout);
         
         if (inputType == 1){
@@ -201,20 +204,23 @@ int main(int argc, char** argv)
         residual = residualNorm(matrix, vector, result, n);
         
         if (fout)
-            fprintf(fout, "\nResidual norm: %f\n", residual);
+            fprintf(fout, "\nResidual norm: %e\n", residual);
         else
-            printf("\nResidual norm: %f\n", residual);
+            printf("\nResidual norm: %e\n", residual);
         
         if (inputType == 2){
             error = errorNorm(result, n);
             
             if (fout)
-                fprintf(fout, "Error norm: %f\n", error);
+                fprintf(fout, "Error norm: %e\n", error);
             else
-                printf("Error norm: %f\n", error);
+                printf("Error norm: %e\n", error);
         }
         
-        printf("Solving time =  %f milliseconds", t);
+        if (fout)
+            fprintf(fout, "Solving time =  %f milliseconds", t);
+        else
+            printf("Solving time =  %f milliseconds", t);
     }
     else{
         printf("Error while solving system\n");

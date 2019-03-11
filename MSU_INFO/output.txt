@@ -1,0 +1,4 @@
+Result:
+2.000000 3.000000 0.000000 
+Residual norm: 0.000000e+00
+Solving time =  0.000077 milliseconds

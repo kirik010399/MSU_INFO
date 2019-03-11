@@ -2,9 +2,8 @@
 #include <math.h>
 
 
-int solveSystem(double* matrix, double* vector, double* result, int *var, int n, float eps)
-{
-    int i, j, k, maxColIndex;
+int solveSystem(double* matrix, double* vector, double* result, int *var, int n, float eps, int debug){
+    int i, j, k, maxColIndex, ii, jj;
     double a, maxElem;
     int tempVar;
     double temp;
@@ -14,13 +13,22 @@ int solveSystem(double* matrix, double* vector, double* result, int *var, int n,
     
     for (i = 0; i < n; ++i)
     {
+        if (debug){
+            printf("\n");
+            printf("%d\n", i);
+
+            for (ii = 0; ii < n; ++ii){
+                for (jj = 0; jj < n; ++jj){
+                    printf("%f ", matrix[ii*n+jj]);
+                }
+                printf("\n");
+            }
+        }
         maxElem = fabs(matrix[i*n+i]);
         maxColIndex = i;
         
-        for (j = i; j < n; ++j)
-        {
-            if (fabs(matrix[i*n+j]) > maxElem)// Search for max in string
-            {
+        for (j = i; j < n; ++j){
+            if (fabs(matrix[i*n+j]) > maxElem){// Search for max in string
                 maxElem = fabs(matrix[i*n+j]);
                 maxColIndex = j;
             }
@@ -29,20 +37,18 @@ int solveSystem(double* matrix, double* vector, double* result, int *var, int n,
         if (fabs(maxElem) < eps)
             return -1;
         
-        if (maxColIndex != i) // Swap columns (i <-> max)
-        {
+        if (maxColIndex != i){ // Swap columns (i <-> max)
             tempVar = var[i];
             var[i] = var[maxColIndex];
             var[maxColIndex] = tempVar;
             
-            for (j = 0; j < n; ++j)
-            {
+            for (j = 0; j < n; ++j){
                 temp = matrix[j*n+i];
                 matrix[j*n+i] = matrix[j*n+maxColIndex];
                 matrix[j*n+maxColIndex] = temp;
             }
         }
-
+        
         a = 1.0/matrix[i*n+i];
         
         for (j = i; j < n; ++j)
@@ -50,8 +56,7 @@ int solveSystem(double* matrix, double* vector, double* result, int *var, int n,
         
         vector[i] *= a;
         
-        for (j = i+1; j < n; ++j)
-        {
+        for (j = i+1; j < n; ++j){
             a = matrix[j*n+i];
             
             for (k = i; k < n; ++k)
@@ -61,8 +66,7 @@ int solveSystem(double* matrix, double* vector, double* result, int *var, int n,
         }
     }
     
-    for (i = n-1; i >= 0; --i)
-    {
+    for (i = n-1; i >= 0; --i){
         a = vector[i];
         
         for (j = i+1; j < n; ++j)
