@@ -23,7 +23,6 @@ void calculateValues(double *matrix, double *result, double *cos, double *sin, i
                 }
                 printf("\n");
             }
-            printf("\n");
         }
         while (fabs(matrix[k*n+k-1]) > acc){
             shift = matrix[k*n+k];
@@ -31,40 +30,8 @@ void calculateValues(double *matrix, double *result, double *cos, double *sin, i
             for (j = 0; j <= k; ++j)
                 matrix[j*n+j] -= shift;
             
-            if (debug){
-                printf("\n");
-                for (ii = 0; ii < n; ++ii){
-                    for (jj = 0; jj < n; ++jj){
-                        printf("%f ", matrix[ii*n+jj]);
-                    }
-                    printf("\n");
-                }
-            }
-            
             QR(matrix, n, k+1, cos, sin);
-            
-            if (debug){
-                printf("\n");
-                for (ii = 0; ii < n; ++ii){
-                    for (jj = 0; jj < n; ++jj){
-                        printf("%f ", matrix[ii*n+jj]);
-                    }
-                    printf("\n");
-                }
-            }
-           
             RQ(matrix, n, k+1, cos, sin);
-            
-            if (debug){
-                printf("\n");
-                for (ii = 0; ii < n; ++ii){
-                    for (jj = 0; jj < n; ++jj){
-                        printf("%f ", matrix[ii*n+jj]);
-                    }
-                    printf("\n");
-                }
-                printf("\n");
-            }
         
             for (j = 0; j <= k; ++j)
                 matrix[j*n+j] += shift;
@@ -137,7 +104,7 @@ void RQ(double* matrix, int n, int k, double* cos, double* sin){
 
 void Rotation(double* matrix, int n){
     int i, j, k;
-    double x, y, r, matrix_ik, matrix_jk, CosPhi, SinPhi;
+    double x, y, r, matrix_ik, matrix_jk, cos, sin;
     double matrix_ii, matrix_ij, matrix_ji, matrix_jj;
     
     for (i = 0; i < n-2; ++i){
@@ -153,15 +120,15 @@ void Rotation(double* matrix, int n){
             if (r < 1e-18)
                 continue;
             
-            CosPhi = x/r;
-            SinPhi = -y/r;
+            cos = x/r;
+            sin = -y/r;
             
             for (k = i; k < n; ++k){
                 matrix_ik = matrix[(i+1)*n+k];
                 matrix_jk = matrix[j*n+k];
                 
-                matrix[(i+1)*n+k] = matrix_ik * CosPhi - matrix_jk * SinPhi;
-                matrix[j*n+k] = matrix_ik * SinPhi + matrix_jk * CosPhi;//*Tij
+                matrix[(i+1)*n+k] = matrix_ik * cos - matrix_jk * sin;
+                matrix[j*n+k] = matrix_ik * sin + matrix_jk * cos;//*Tij
                 
                 if (k != i+1 && k != j){
                     matrix[k*n+i+1] = matrix[(i+1)*n+k];
@@ -174,11 +141,11 @@ void Rotation(double* matrix, int n){
             matrix_ij = matrix[(i+1)*n+j];
             matrix_jj = matrix[j*n+j];
             
-            matrix[(i+1)*n+i+1] = matrix_ii * CosPhi - matrix_ij * SinPhi;
-            matrix[j*n+i+1] = matrix_ji * CosPhi - matrix_jj * SinPhi;
-            matrix[(i+1)*n+j] = matrix_ii * SinPhi + matrix_ij * CosPhi;
-            matrix[j*n+j] = matrix_ji * SinPhi + matrix_jj * CosPhi;
-        }//страница   63 *Tij T
+            matrix[(i+1)*n+i+1] = matrix_ii * cos - matrix_ij * sin;
+            matrix[j*n+i+1] = matrix_ji * cos - matrix_jj * sin;
+            matrix[(i+1)*n+j] = matrix_ii * sin + matrix_ij * cos;
+            matrix[j*n+j] = matrix_ji * sin + matrix_jj * cos;//страница 63 *Tij T
+        }
     }
 }
 

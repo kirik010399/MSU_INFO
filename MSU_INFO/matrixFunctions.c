@@ -3,7 +3,13 @@
 #include <math.h>
 
 double func0(int i, int j, int n){
-    return i+j == n-1 ?1 :0;
+    if (i == n-1)
+        return j+1;
+    if (j == n-1)
+        return i+1;
+    if (i == j)
+        return 1;
+    return 0;
 }
 
 double func1(int i, int j, int n){
