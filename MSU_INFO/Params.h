@@ -17,6 +17,7 @@ struct Params{
     char* fin;
     char* fout;
     float eps;
+    int threadsCount; 
 };
 
 

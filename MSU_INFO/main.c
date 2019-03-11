@@ -8,9 +8,30 @@
 #include "solvingFunctions.h"
 #include "Params.h"
 
+typedef struct
+{
+    double *matrix;
+    double *vector;
+    double *result;
+    int *var;
+    int n;
+    int rank;
+    int threadsCount;
+    int *flag;
+} Args;
+
+void *Solve(void *Arg)
+{
+    Args *arg = (Args*)Arg;
+    
+    solveSystem(arg->matrix, arg->vector, arg->result, arg->n, arg->rank, arg->threadsCount);
+    
+    return NULL;
+}
+
 int main(int argc, char** argv)
 {
-    int n, m;
+    int n, m, i;
     int opt;
     float eps;
     int functionNumber;
@@ -18,9 +39,14 @@ int main(int argc, char** argv)
     double *vector;
     double *result;
     int *var;
+    int *flag;
     FILE* fin = NULL;
     FILE* fout = NULL;
     float residual, error;
+    
+    int threadsCount;
+    pthread_t *threads;
+    Args *args;
     
     struct timespec t1, t2;
     double t;
@@ -33,13 +59,14 @@ int main(int argc, char** argv)
     params.debug = 0;
     params.l = 5;
     params.eps = 1e-18;
+    params.threadsCount = 1;
     
     functionNumber = 0;
     
     int inputType;
     int returnFlag;
     
-    while ((opt = getopt(argc, argv, "n:e:f:l:i:o:d")) != -1){
+    while ((opt = getopt(argc, argv, "n:e:f:l:i:o:d:t")) != -1){
         switch (opt){
             case 'n': {
                 sscanf(optarg, "%d", &params.size);
@@ -67,6 +94,10 @@ int main(int argc, char** argv)
             }
             case 'd': {
                 params.debug = 1;
+                break;
+            }
+            case 't': {
+                sscanf(optarg, "%d", &params.threadsCount);
                 break;
             }
         }
@@ -153,6 +184,15 @@ int main(int argc, char** argv)
     m = params.l;
     eps = params.eps;
     
+    if (params.threadsCount <= 0 || params.threadsCount >= n){
+        printf("Data isn't correct\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        return -2;
+    }
+    
     if (params.fout)
         fout = fopen(params.fout, "w");
     
@@ -160,6 +200,8 @@ int main(int argc, char** argv)
     vector = (double*)malloc(n * sizeof(double));
     result = (double*)malloc(n * sizeof(double));
     var = (int*)malloc(n * sizeof(int));
+    threads = (pthread_t*)malloc(threadsCount * sizeof(pthread_t));
+    args = (Args*)malloc(threadsCount * sizeof(Args));
     
     returnFlag = enterData(matrix, vector, n, fin, functionNumber);
     
@@ -186,65 +228,59 @@ int main(int argc, char** argv)
         printf("Matrix:\n");
     
     printMatrix(matrix, n, m, fout);
+    
+    for (i = 0; i < threadsCount; ++i)
+    {
+        args[i].n = n;
+        args[i].matrix = matrix;
+        args[i].vector = vector;
+        args[i].result = result;
+        args[i].var = var;
+        args[i].rank = i;
+        args[i].threadsCount = threadsCount;
+        args[i].flag = &flag;
+    }
 
-    clock_gettime(CLOCK_MONOTONIC, &t1);
+//    clock_gettime(CLOCK_MONOTONIC, &t1);
     returnFlag = solveSystem(matrix, vector, result, var, n, eps, params.debug);
-    clock_gettime(CLOCK_MONOTONIC, &t2);
+//    clock_gettime(CLOCK_MONOTONIC, &t2);
     
-    t =(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/(1000000000.);
+//    t =(t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec)/(1000000000.);
     
-    if (returnFlag != -1){
-        if (fout)
-            fprintf(fout, "Result:\n");
-        else
-            printf("Result:\n");
+    if (fout)
+        fprintf(fout, "Result:\n");
+    else
+        printf("Result:\n");
 
-        printResult(result, n, m, fout);
-        
-        if (inputType == 1){
-            fseek(fin, 0, SEEK_SET);
-            fscanf(fin, "%d", &n);
-        }
-        
-        returnFlag = enterData(matrix, vector, n, fin, functionNumber);
-        
-        residual = residualNorm(matrix, vector, result, n);
-        
-        if (fout)
-            fprintf(fout, "\nResidual norm: %e\n", residual);
-        else
-            printf("\nResidual norm: %e\n", residual);
-        
-        if (inputType == 2){
-            error = errorNorm(result, n);
-            
-            if (fout)
-                fprintf(fout, "Error norm: %e\n", error);
-            else
-                printf("Error norm: %e\n", error);
-        }
-        
-        if (fout)
-            fprintf(fout, "Solving time =  %f milliseconds", t);
-        else
-            printf("Solving time =  %f milliseconds", t);
+    printResult(result, n, m, fout);
+    
+    if (inputType == 1){
+        fseek(fin, 0, SEEK_SET);
+        fscanf(fin, "%d", &n);
     }
-    else{
-        printf("Error while solving system\n");
-        
-        if (inputType == 1)
-            fclose(fin);
+    
+    returnFlag = enterData(matrix, vector, n, fin, functionNumber);
+    
+    residual = residualNorm(matrix, vector, result, n);
+    
+    if (fout)
+        fprintf(fout, "\nResidual norm: %e\n", residual);
+    else
+        printf("\nResidual norm: %e\n", residual);
+    
+    if (inputType == 2){
+        error = errorNorm(result, n);
         
         if (fout)
-            fclose(fout);
-        
-        free(matrix);
-        free(vector);
-        free(result);
-        free(var);
-        
-        return -1;
+            fprintf(fout, "Error norm: %e\n", error);
+        else
+            printf("Error norm: %e\n", error);
     }
+    
+    if (fout)
+        fprintf(fout, "Solving time =  %f milliseconds", t);
+    else
+        printf("Solving time =  %f milliseconds", t);
     
     if (inputType == 1)
         fclose(fin);
