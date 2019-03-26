@@ -2,51 +2,105 @@
 #include <math.h>
 #include <stdlib.h>
 
-int k = 0;
+//int k = 0;
 
-int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n, double *x, double *y, double *z)
 {
-    int i;
+    int i, j;
+    double maxA, maxB;
+    double alp;
+    int k;
     
     for (i = 0; i < n; ++i)
         vector[i] = 0;
     
-    eps = fmax(1e-10, eps);
-
-    Otr(matrix, n);
-    values(matrix, n, vector, left, right, eps);
+    Refl(matrix, n, x, y ,z);
+//    
+//    maxA = matrix[0];
+//    maxB = matrix[1];
+//    
+//    for (i = 1; i < n; ++i)
+//    {
+//        if (fabs(matrix[i*n+i]) > maxA)
+//            maxA = fabs(matrix[i*n+i]);
+//        
+//        if (i < n-1)
+//        {
+//            if (fabs(matrix[i*n + i+1]) > maxB)
+//                maxB = fabs(matrix[i*n + i+1]);
+//        }
+//    }
+//    
+//    alp = 4 * fmax(maxA, maxB);
+//    
+//    if(fabs(alp) > 1e-18 )
+//    {
+//        for (i = 0; i < n; ++i)
+//        {
+//            for (j = 0; j < n; ++j)
+//            {
+//                matrix[i*n+j]/=alp;
+//                
+//                if (i!=j && matrix[i*n+j] < 1e-18)
+//                    matrix[i*n+j] = 0;
+//            }
+//        }//97
+//    }
+    
+    k = values(matrix, n, vector, left, right, eps);
+    
+//    for (i = 0; i < n; ++i)
+//        vector[i] *= alp;
     
     return k;
 }
 
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
+int values(double *matrix, int n, double *vector, double left, double right, double eps)
 {
-    int c, j;
+    double c;
+    double a, b;
+    int k;
+    int k1, k2;
     
-    c = n_(matrix, n, right) - n_(matrix, n, left);
-        
-    if (right - left > eps && c != 0)
+    left -= eps;
+    right += eps;
+    
+    printf("%lf %lf\n", left, right);
+    
+    k1 = n_(matrix, n, left);
+    k2 = n_(matrix, n, right);
+    
+    printf("%d %d", k1, k2);
+
+    for (k = k1+1; k <= k2; ++k)
     {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
+        if (k == k1+1)
+            a = left;
+        else
+            a =  vector[k-k1-2];
+        
+        b = right;
+        
+        printf("%lf %lf\n", a, b);
+        
+        while(b - a > eps)
+        {
+            c = (a+b)/2;
+
+            if (n_(matrix, n, c) < k)
+                a = c;
+            else
+                b = c;
+        }
+        vector[k-k1-1] = (a+b)/2;
     }
-    else if (c != 0)
-    {
-        for (j = 0; j < c; ++j)
-            vector[k + j] = (left+right)/2;
-        
-        k += c;
-    }//95
+    
+    return k2-k1;
 }
 
-void Otr(double *matrix, int n)
+void Refl(double *matrix, int n, double *x, double *y, double *z)
 {
     double sk, akk, xk, xy;
-    double *x, *y, *z;
-    
-    x = (double*)malloc(n * sizeof(double));
-    y = (double*)malloc(n * sizeof(double));
-    z = (double*)malloc(n * sizeof(double));
     
     for (int k = 0; k < n-2; k++)
     {
@@ -104,32 +158,41 @@ void Otr(double *matrix, int n)
         
         matrix[n*(k+1)+k] = matrix[n*k+(k+1)] = akk;
     }
-    
-    free(x);
-    free(y);
-    free(z);
 }
 
 int n_(double* matrix, int n, double lam)
 {
-    int i;
-    int res;
-    double elem;
+    int k, m;
+    double x, y, u, v, A, maxx, B, gam;
     
-    elem = matrix[0] - lam;
+    x = matrix[0] - lam;
+    y = 1.0;
     
-    if (elem < 0)
-        res = 1;
+    if (x*y < 0)
+        m = 1;
     else
-        res = 0;
+        m = 0;
     
-    for (i = 1; i < n; ++i)
+    for (k = 1; k < n; ++k)
     {
-        elem = matrix[i*n+i] - lam - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem;
+        A = matrix[k*n+k] - lam;
+        B = matrix[k*n + k-1];
         
-        if (elem < 0)
-            ++res;
+        maxx = fmax(fabs(x), fabs(B*B*y));
+        
+        if(maxx < 1e-18)
+            maxx = 1e-15;
+        
+        gam = (1/1e-18)/maxx;
+        
+        u = gam * (A*x - B*B*y);
+        v = gam * x;
+        
+        if (u*x < 0.0)
+            ++m;
+        x = u;
+        y = v;    //страница 97
     }
     
-    return res;
+    return m;
 }

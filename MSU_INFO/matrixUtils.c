@@ -43,7 +43,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     {
         for (j = 0; j < n; ++j)
         {
-            if (!(fabs(matrix[i*n+j] - matrix[j*n+i]) < 1e-100))
+            if (!(fabs(matrix[i*n+j] - matrix[j*n+i]) < 1e-18))
                 return -1;
         }
     }
