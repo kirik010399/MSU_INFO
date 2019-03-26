@@ -155,6 +155,8 @@ int main()
     retSize = calculateValues(matrix, vector, left, right, eps, n, x, y, z);
     t = clock() - t;
     
+    printf("Founded count: %d\n", retSize); 
+    
     printf("\nValues vector:\n");
     printVector(vector, n, m, retSize);
     

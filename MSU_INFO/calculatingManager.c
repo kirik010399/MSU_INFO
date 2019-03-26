@@ -15,43 +15,50 @@ int calculateValues(double* matrix, double* vector, double left, double right, d
         vector[i] = 0;
     
     Refl(matrix, n, x, y ,z);
-//    
-//    maxA = matrix[0];
-//    maxB = matrix[1];
-//    
-//    for (i = 1; i < n; ++i)
-//    {
-//        if (fabs(matrix[i*n+i]) > maxA)
-//            maxA = fabs(matrix[i*n+i]);
-//        
-//        if (i < n-1)
-//        {
-//            if (fabs(matrix[i*n + i+1]) > maxB)
-//                maxB = fabs(matrix[i*n + i+1]);
-//        }
-//    }
-//    
-//    alp = 4 * fmax(maxA, maxB);
-//    
-//    if(fabs(alp) > 1e-18 )
-//    {
-//        for (i = 0; i < n; ++i)
-//        {
-//            for (j = 0; j < n; ++j)
-//            {
-//                matrix[i*n+j]/=alp;
-//                
-//                if (i!=j && matrix[i*n+j] < 1e-18)
-//                    matrix[i*n+j] = 0;
-//            }
-//        }//97
-//    }
+    
+    maxA = matrix[0];
+    maxB = matrix[1];
+    
+    for (i = 1; i < n; ++i)
+    {
+        if (fabs(matrix[i*n+i]) > maxA)
+            maxA = fabs(matrix[i*n+i]);
+        
+        if (i < n-1)
+        {
+            if (fabs(matrix[i*n + i+1]) > maxB)
+                maxB = fabs(matrix[i*n + i+1]);
+        }
+    }
+    
+    alp = 4 * fmax(maxA, maxB);
+    
+    if(fabs(alp) > 1e-18)
+    {
+        for (i = 0; i < n; ++i)
+        {
+            for (j = 0; j < n; ++j)
+            {
+                matrix[i*n+j] /= alp;
+                
+                if (i!=j && matrix[i*n+j] < 1e-18)
+                    matrix[i*n+j] = 0;
+            }
+        }//97
+        
+        left /= alp;
+        right /= alp;
+        eps /= alp; 
+    }
     
     k = values(matrix, n, vector, left, right, eps);
     
-//    for (i = 0; i < n; ++i)
-//        vector[i] *= alp;
-    
+    if(fabs(alp) > 1e-18)
+    {
+        for (i = 0; i < n; ++i)
+            vector[i] *= alp;
+    }
+
     return k;
 }
 
@@ -62,16 +69,9 @@ int values(double *matrix, int n, double *vector, double left, double right, dou
     int k;
     int k1, k2;
     
-    left -= eps;
-    right += eps;
+    k1 = n_(matrix, n, left-eps);
+    k2 = n_(matrix, n, right+eps);
     
-    printf("%lf %lf\n", left, right);
-    
-    k1 = n_(matrix, n, left);
-    k2 = n_(matrix, n, right);
-    
-    printf("%d %d", k1, k2);
-
     for (k = k1+1; k <= k2; ++k)
     {
         if (k == k1+1)
@@ -81,7 +81,8 @@ int values(double *matrix, int n, double *vector, double left, double right, dou
         
         b = right;
         
-        printf("%lf %lf\n", a, b);
+        a -= eps;
+        b += eps;
         
         while(b - a > eps)
         {
@@ -92,6 +93,7 @@ int values(double *matrix, int n, double *vector, double left, double right, dou
             else
                 b = c;
         }
+        
         vector[k-k1-1] = (a+b)/2;
     }
     
@@ -191,7 +193,7 @@ int n_(double* matrix, int n, double lam)
         if (u*x < 0.0)
             ++m;
         x = u;
-        y = v;    //страница 97
+        y = v;    // 97
     }
     
     return m;
