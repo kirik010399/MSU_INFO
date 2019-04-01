@@ -156,6 +156,16 @@ int main(int argc, char** argv)
     if (params.fout)
         fout = fopen(params.fout, "w");
     
+    if (!((n*n)/n == n))
+    {
+        printf("Enter less size\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        return -2;
+    }
+    
     matrix = (double*)malloc(n*n * sizeof(double));
     vector = (double*)malloc(n * sizeof(double));
     result = (double*)malloc(n * sizeof(double));
