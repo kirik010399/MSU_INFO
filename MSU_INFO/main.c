@@ -24,6 +24,8 @@ typedef struct
     double time;
 } Args;
 
+void *Solve(void *Arg);
+
 void *Solve(void *Arg)
 {
     struct timespec t1, t2;
@@ -55,6 +57,8 @@ int main(int argc, char** argv)
     FILE* fout = NULL;
     float residual, error;
     int threadsCount = 1;
+    int inputType;
+    int returnFlag;
     
     pthread_t *threads;
     Args *args;
@@ -73,9 +77,6 @@ int main(int argc, char** argv)
     params.threadsCount = 1;
     
     functionNumber = 0;
-    
-    int inputType;
-    int returnFlag;
     
     while ((opt = getopt(argc, argv, "n:e:f:t:l:i:o:d")) != -1){
         switch (opt){
@@ -197,7 +198,7 @@ int main(int argc, char** argv)
     m = params.l;
     eps = params.eps;
     
-    if (params.threadsCount <= 0 || params.threadsCount > n){
+    if (params.threadsCount <= 0){
         printf("Data isn't correct\n");
         
         if (inputType == 1)
@@ -205,12 +206,24 @@ int main(int argc, char** argv)
         
         return -2;
     }
-    else{
+    else if (params.threadsCount <= n){
         threadsCount = params.threadsCount;
     }
+    else{
+        threadsCount = 1;
+    }//logic of threads count
     
     if (params.fout)
         fout = fopen(params.fout, "w");
+    
+    if (!((n*n)/n == n)){
+        printf("Enter less size\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        return -2;
+    }
     
     matrix = (double*)malloc(n*n * sizeof(double));
     vector = (double*)malloc(n * sizeof(double));
