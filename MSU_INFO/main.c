@@ -153,8 +153,7 @@ int main(int argc, char** argv)
     if (params.fout)
         fout = fopen(params.fout, "w");
     
-    if (!((n*n)/n == n))
-    {
+    if (!((n*n)/n == n)){
         printf("Enter less size\n");
         
         if (inputType == 1)
