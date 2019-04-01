@@ -21,6 +21,8 @@ int main(int argc, char** argv)
     FILE* fin = NULL;
     FILE* fout = NULL;
     float residual, error;
+    int inputType;
+    int returnFlag;
     
     struct timespec t1, t2;
     double t;
@@ -35,9 +37,6 @@ int main(int argc, char** argv)
     params.eps = 1e-18;
     
     functionNumber = 0;
-    
-    int inputType;
-    int returnFlag;
     
     while ((opt = getopt(argc, argv, "n:e:f:l:i:o:d")) != -1){
         switch (opt){
@@ -156,8 +155,7 @@ int main(int argc, char** argv)
     if (params.fout)
         fout = fopen(params.fout, "w");
     
-    if (!((n*n)/n == n))
-    {
+    if (!((n*n)/n == n)){
         printf("Enter less size\n");
         
         if (inputType == 1)
