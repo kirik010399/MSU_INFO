@@ -20,6 +20,8 @@ int main(int argc, char** argv)
     FILE* fin = NULL;
     FILE* fout = NULL;
     float residualFirst, residualSecond;
+    int inputType;
+    int returnFlag;
     
     struct timespec t1, t2;
     double t;
@@ -34,9 +36,6 @@ int main(int argc, char** argv)
     params.eps = 1e-18;
     
     functionNumber = 0;
-    
-    int inputType;
-    int returnFlag;
     
     while ((opt = getopt(argc, argv, "n:e:f:l:i:o:d")) != -1){
         switch (opt){
