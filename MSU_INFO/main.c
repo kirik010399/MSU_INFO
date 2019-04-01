@@ -85,7 +85,7 @@ int main(int argc, char** argv)
             printf("-l <int>  - size of printing\n");
             printf("-e {float}  - epsilon\n");
             printf("-o {string}  - printing to file\n");
-            printf("-d <01>  - debug\n");
+            printf("-d - debug\n");
             return 0;
         }
         else if (inputType == 2){
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
             printf("-l <int>  - size of printing\n");
             printf("-e {float}  - epsilon\n");
             printf("-o {string}  - printing to file\n");
-            printf("-d <01>  - debug\n");
+            printf("-d - debug\n");
             return 0;
         }
         else{
