@@ -1,2 +1,2 @@
 all:
-	mpicxx main.cpp functions.cpp -O3 -march=native
+	mpicxx main.cpp functions.cpp solution.cpp -O3 -march=native
