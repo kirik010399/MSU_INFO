@@ -21,7 +21,6 @@ int main(int argc, char *argv[])
     if (argc == 3)
         fileName = argv[2];
     
-    double time = get_abs_time();
     errorCode = findSolution(n, fileName, k, p);
     
     if (errorCode == -1)
@@ -29,11 +28,6 @@ int main(int argc, char *argv[])
         MPI_Finalize();
         return 0;
     }
-    
-    time = get_abs_time() - time;
-    
-    if (k == 0)
-        printf("Abs Time: %f\n", time);
     
     MPI_Finalize();
     return 0;
