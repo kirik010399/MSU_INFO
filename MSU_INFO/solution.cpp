@@ -5,7 +5,7 @@ using namespace std;
 
 int findSolution(double *A, double *b, double *buf, double *x, int n, int id, int p)
 {
-    int i, j, k, s, err = 0, globalErr, num, globalNum, len, loc_i, loc_j, loc_max_i, minStr, numOfStr;
+    int i, j, k, q, s, err = 0, globalErr, num, globalNum, len, loc_i, loc_j, loc_max_i, minStr, numOfStr;
     double tmp, maxNorm;
     MPI_Status st;
     
@@ -31,11 +31,14 @@ int findSolution(double *A, double *b, double *buf, double *x, int n, int id, in
         
         for (s = minStr; s < n; s+=p)
         {
-            loc_i = s / p;
-            if (fabs(A[loc_i*n+i]) > maxNorm)
+            for (q = 0; q < n; ++q)
             {
-                maxNorm = fabs(A[loc_i*n+i]);
-                maxStr = s;
+                loc_i = s / p;
+                if (fabs(A[loc_i*n+i]) > maxNorm)
+                {
+                    maxNorm = fabs(A[loc_i*n+i]);
+                    maxStr = s;
+                }
             }
         }
         
