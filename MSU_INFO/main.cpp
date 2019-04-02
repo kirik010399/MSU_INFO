@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
     double *b = new double[numOfStr];
     double *buf = new double[n + numOfStr];
     double *x = new double[n];
-    int *colOrder = new int[n];
     
     if (fileName)
         errorCode = readMatrix(A, b, n, fileName, p, k, MPI_COMM_WORLD, buf);
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     printMatrix(A, b, n, 0, p, k, MPI_COMM_WORLD, buf);
     
     time = get_abs_time();
-    errorCode = findSolution(A, b, buf, x, colOrder, n, k, p);
+    errorCode = findSolution(A, b, buf, x, n, k, p);
     time = get_abs_time() - time;
     
     if (errorCode == 0 && k == 0)
@@ -74,7 +73,6 @@ int main(int argc, char *argv[])
     }
     
     delete[] x;
-    delete[] colOrder;
     delete[] A;
     delete[] b;
     delete[] buf;

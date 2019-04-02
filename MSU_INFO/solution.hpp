@@ -9,6 +9,6 @@ struct NormInd
     int thread;
 };
 
-int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, int n, int id, int p);
+int findSolution(double *A, double *b, double *buf, double *x, int n, int id, int p);
 
 #endif /* solution_hpp */

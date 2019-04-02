@@ -3,22 +3,20 @@
 
 using namespace std; 
 
-int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, int n, int id, int p)
+int findSolution(double *A, double *b, double *buf, double *x, int n, int id, int p)
 {
-    int i, j, k, s, q, err = 0, globalErr, num, globalNum, len, loc_i, loc_j, loc_max_i, minStr, numOfStr;
+    int i, j, k, s, err = 0, globalErr, num, globalNum, len, loc_i, loc_j, loc_max_i, minStr, numOfStr;
     double tmp, maxNorm;
     MPI_Status st;
     
     NormInd normInd, globalNormInd;
-    int maxPos[2];
-    int maxStr, maxCol;
+    int maxStr;
     
     numOfStr = n / p + 1;
     
     for (i = 0; i < n; i++)
     {
         x[i] = 0;
-        colOrder[i] = i;
     }
     
     for (i = 0; i < n; ++i)
@@ -26,25 +24,18 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
         minStr = (i % p <= id) ? i - i % p + id : i + (p - i % p) + id;
         
         maxStr = minStr;
-        maxCol = i;
         maxNorm = 0;
         
         normInd.thread = -1;
         normInd.norm = maxNorm;
-        maxPos[0] = -1;
-        maxPos[1] = -1;
         
         for (s = minStr; s < n; s+=p)
         {
-            for (q = i; q < n; ++q)
+            loc_i = s / p;
+            if (fabs(A[loc_i*n+i]) > maxNorm)
             {
-                loc_i = s / p;
-                if (fabs(A[loc_i*n+q]) > maxNorm)
-                {
-                    maxNorm = fabs(A[loc_i*n+q]);
-                    maxStr = s;
-                    maxCol = q;
-                }
+                maxNorm = fabs(A[loc_i*n+i]);
+                maxStr = s;
             }
         }
         
@@ -57,8 +48,6 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
             num = 1;
             normInd.thread = id;
             normInd.norm = maxNorm;
-            maxPos[0] = maxStr;
-            maxPos[1] = maxCol;
             
             if (fabs(maxNorm) < EPS)
                 err = 1;
@@ -76,22 +65,14 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
         }
         
         MPI_Allreduce(&normInd, &globalNormInd, 1, MPI_DOUBLE_INT, MPI_MAXLOC, MPI_COMM_WORLD);
-        MPI_Bcast(&maxPos, 2, MPI_INT, globalNormInd.thread, MPI_COMM_WORLD);
-        
-        if (maxPos[1] != i)
-        {
-            swap(colOrder[i], colOrder[maxPos[1]]);
-            
-            for (j = 0; j < numOfStr; ++j)
-                swap(A[j*n+maxPos[1]], A[j*n+i]);
-        }
+        MPI_Bcast(&maxStr, 1, MPI_INT, globalNormInd.thread, MPI_COMM_WORLD);
         
         if ((globalNormInd.thread == (i % p)) && (globalNormInd.thread == id))
         {
-            if (maxPos[0] != i)
+            if (maxStr != i)
             {
                 loc_i = i / p;
-                loc_max_i = maxPos[0] / p;
+                loc_max_i = maxStr / p;
                 
                 for (j = 0; j < n; ++j)
                     swap(A[loc_max_i*n+j], A[loc_i*n+j]);
@@ -101,12 +82,12 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
         }
         else if (globalNormInd.thread == id)
         {
-            if (maxPos[0] != i)
+            if (maxStr != i)
             {
                 len = n;
                 memset(buf, 0, (len + 1)*sizeof(double));
                 
-                int loc_i = maxPos[0] / p;
+                int loc_i = maxStr/ p;
                 memcpy(buf, A + loc_i * n, len*sizeof(double));
                 memcpy(buf + len, b + loc_i, sizeof(double));
                 
@@ -118,7 +99,7 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
         }
         else if ((i % p) == id)
         {
-            if (maxPos[0] != i)
+            if (maxStr != i)
             {
                 len = n;
                 memset(buf, 0, (len + 1)*sizeof(double));
@@ -158,35 +139,31 @@ int findSolution(double *A, double *b, double *buf, double *x, int *colOrder, in
         
         MPI_Bcast(buf, len + 1, MPI_DOUBLE, i % p, MPI_COMM_WORLD); // Send i string to all processes
         
-        minStr = ((i + 1) % p <= id) ? i + 1 - (i + 1) % p + id : i + 1 + (p - (i + 1) % p) + id;
-        for (j = minStr; j < n; j+=p)
+        for (j = id; j < n; j+=p)
         {
-            loc_j = j / p;
-            tmp = A[loc_j*n+i];
-            
-            for (k = i; k < n; ++k)
-                A[loc_j*n+k] -= buf[k] * tmp;
-            
-            b[loc_j] -= buf[n] * tmp;
+            if (j != i)
+            {
+                loc_j = j / p;
+                tmp = A[loc_j*n+i];
+                
+                for (k = i; k < n; ++k)
+                    A[loc_j*n+k] -= buf[k] * tmp;
+                
+                b[loc_j] -= buf[n] * tmp;
+            }
         }
     }
     
-    for (i = n-1; i >= 0; --i)
+    for (i = 0; i < n; ++i)
     {
         int loc_i = i / p;
+        buf[i] = 0;
         
         if (id == i % p)
-        {
-            tmp = b[loc_i];
-            
-            for (j = i+1; j < n; ++j)
-                tmp -= A[loc_i * n + j] * x[colOrder[j]];
-            
-            x[colOrder[i]] = tmp;
-        }
-        
-        MPI_Bcast(x + colOrder[i], 1, MPI_DOUBLE, i % p, MPI_COMM_WORLD);
+            buf[i] = b[loc_i];
     }
+    
+    MPI_Allreduce(buf, x, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     
     return 0;
 }
