@@ -167,6 +167,24 @@ int main(int argc, char** argv)
     cos = (double*)malloc((n-1) * sizeof(double));
     sin = (double*)malloc((n-1) * sizeof(double));
     
+    if (!(matrix && result && cos && sin))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(result);
+        free(cos);
+        free(sin);
+        
+        return -2;
+    }
+    
     returnFlag = enterData(matrix, n, fin, functionNumber);
     
     if (returnFlag == -1){
