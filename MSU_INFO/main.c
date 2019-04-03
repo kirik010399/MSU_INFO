@@ -232,6 +232,26 @@ int main(int argc, char** argv)
     threads = (pthread_t*)malloc(threadsCount * sizeof(pthread_t));
     args = (Args*)malloc(threadsCount * sizeof(Args));
     
+    if (!(matrix && vector && result && var && threads && args))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        free(result);
+        free(var);
+        free(threads);
+        free(args);
+        
+        return -2;
+    }
+    
     returnFlag = enterData(matrix, vector, n, fin, functionNumber);
     
     if (returnFlag == -1){
@@ -247,6 +267,8 @@ int main(int argc, char** argv)
         free(vector);
         free(result);
         free(var);
+        free(threads);
+        free(args);
 
         return -2;
     }
@@ -287,6 +309,8 @@ int main(int argc, char** argv)
             free(vector);
             free(result);
             free(var);
+            free(threads);
+            free(args);
             
             return -2;
         }
@@ -306,6 +330,8 @@ int main(int argc, char** argv)
             free(vector);
             free(result);
             free(var);
+            free(threads);
+            free(args);
             
             return -2;
         }
@@ -327,6 +353,8 @@ int main(int argc, char** argv)
         free(vector);
         free(result);
         free(var);
+        free(threads);
+        free(args);
         
         return -1;
     }
@@ -384,6 +412,8 @@ int main(int argc, char** argv)
     free(vector);
     free(result);
     free(var);
+    free(threads);
+    free(args); 
     
     return -2;
     
