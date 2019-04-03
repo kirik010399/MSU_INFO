@@ -169,6 +169,24 @@ int main(int argc, char** argv)
     result = (double*)malloc(n * sizeof(double));
     var = (int*)malloc(n * sizeof(int));
     
+    if (!(matrix && vector && result && var))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        free(result);
+        free(var);
+        
+        return -2;
+    }
+    
     returnFlag = enterData(matrix, vector, n, fin, functionNumber);
     
     if (returnFlag == -1){
