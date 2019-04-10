@@ -163,8 +163,59 @@ int main(int argc, char** argv)
     }
     
     matrix = (double*)malloc(n*n * sizeof(double));
+    
+    if (!(matrix))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        
+        return -2;
+    }
+    
     result = (double*)malloc(n * sizeof(double));
+    
+    if (!(matrix && result))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(result);
+        
+        return -2;
+    }
+    
     cos = (double*)malloc((n-1) * sizeof(double));
+    
+    if (!(matrix && result && cos))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(result);
+        free(cos);
+        
+        return -2;
+    }
+    
     sin = (double*)malloc((n-1) * sizeof(double));
     
     if (!(matrix && result && cos && sin))
