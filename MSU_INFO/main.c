@@ -226,10 +226,100 @@ int main(int argc, char** argv)
     }
     
     matrix = (double*)malloc(n*n * sizeof(double));
+    
+    if (!(matrix))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        
+        return -2;
+    }
+    
     vector = (double*)malloc(n * sizeof(double));
+    
+    if (!(matrix && vector))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        
+        return -2;
+    }
+    
     result = (double*)malloc(n * sizeof(double));
+    
+    if (!(matrix && vector && result))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        free(result);
+        
+        return -2;
+    }
+    
     var = (int*)malloc(n * sizeof(int));
+    
+    if (!(matrix && vector && result && var))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        free(result);
+        free(var);
+        
+        return -2;
+    }
+    
     threads = (pthread_t*)malloc(threadsCount * sizeof(pthread_t));
+    
+    if (!(matrix && vector && result && var && threads))
+    {
+        printf("No memory, enter matrix with less dimensions\n");
+        
+        if (inputType == 1)
+            fclose(fin);
+        
+        if (fout)
+            fclose(fout);
+        
+        free(matrix);
+        free(vector);
+        free(result);
+        free(var);
+        free(threads);
+        
+        return -2;
+    }
+    
     args = (Args*)malloc(threadsCount * sizeof(Args));
     
     if (!(matrix && vector && result && var && threads && args))
