@@ -5,8 +5,8 @@ void sum2(FILE *fin, double *s);
 
 int main(void)
 {
-        double result1;
-    //    double result2;
+    double result1;
+    double result2;
     
     FILE *fin, *fout;
     
@@ -16,8 +16,8 @@ int main(void)
     result1 = sum1(fin);
     fprintf(fout,"%lf\n", result1);
     
-    //    sum2(fin, &result2);
-    //    fprintf(fout,"%lf\n", result2);
+    sum2(fin, &result2);
+    fprintf(fout,"%lf\n", result2);
     
     fclose(fin);
     fclose(fout);
