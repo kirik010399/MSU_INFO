@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
-		ED568B362153DD980012834A /* matrixUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED568B342153DD980012834A /* matrixUtils.cpp */; };
-		ED568B392153DDBC0012834A /* invertingManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED568B372153DDBC0012834A /* invertingManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,10 +27,6 @@
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
-		ED568B342153DD980012834A /* matrixUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrixUtils.cpp; sourceTree = "<group>"; };
-		ED568B352153DD980012834A /* matrixUtils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = matrixUtils.hpp; sourceTree = "<group>"; };
-		ED568B372153DDBC0012834A /* invertingManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = invertingManager.cpp; sourceTree = "<group>"; };
-		ED568B382153DDBC0012834A /* invertingManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = invertingManager.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,10 +61,6 @@
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
-				ED568B342153DD980012834A /* matrixUtils.cpp */,
-				ED568B352153DD980012834A /* matrixUtils.hpp */,
-				ED568B372153DDBC0012834A /* invertingManager.cpp */,
-				ED568B382153DDBC0012834A /* invertingManager.hpp */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 			);
 			path = MSU_INFO;
@@ -134,8 +124,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
-				ED568B362153DD980012834A /* matrixUtils.cpp in Sources */,
-				ED568B392153DDBC0012834A /* invertingManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

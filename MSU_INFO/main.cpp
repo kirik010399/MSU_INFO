@@ -1,76 +1,47 @@
-#include <iostream>
-#include <time.h>
-#include <math.h>
-#include "matrixUtils.hpp"
-#include "invertingManager.hpp"
+#include <stdio.h>
 
-using namespace std;
+double sum1(FILE *fin);
+void sum2(FILE *fin, double *s);
 
-int main()
+int main(void)
 {
-    int n;
-    double *matrix;
-    double *inverseMatrix;
-    FILE* fin = NULL;
-    clock_t t;
-    int inputType;
-    int returnFlag;
+        double result1;
+    //    double result2;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
-    cin>>inputType;
+    FILE *fin, *fout;
     
-    if (inputType == 1)
-    {
-        fin = fopen("input.txt", "r");//TODO
-        
-        if (!fin)
-        {
-            printf("File don't exist");
-            fclose(fin);
-            return -1;
-        }
-        
-        if (fscanf(fin, "%d", &n) != 1)
-        {
-            printf("Data isn't correct");
-            fclose(fin);
-            return -2;
-        }
-    }
-    else
-    {
-        cout<<"Enter size: ";
-        cin>>n; //TODO
-    }
+    fin = fopen("input.txt", "r");
+    fout = fopen("output.txt","w");
     
-    matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
+    result1 = sum1(fin);
+    fprintf(fout,"%lf\n", result1);
     
-    //TODO CHECKING OF MEMORY
-
-    returnFlag = enterMatrix(matrix, n, fin);
+    //    sum2(fin, &result2);
+    //    fprintf(fout,"%lf\n", result2);
     
-    cout<<"Entering matrix:"<<endl;
-    printMatrix(matrix, n);
-    cout<<endl; 
-    
-    t = clock();
-    returnFlag = invertMatrix(matrix, inverseMatrix, n);
-    t = clock() - t;
-    
-    if (returnFlag)
-    {
-        cout<<"Inverse Matrix:"<<endl; 
-        printMatrix(inverseMatrix, n);
-        cout<<"Inversion time =  "<< (double)t/CLOCKS_PER_SEC << " sec"<<endl;
-    }
-    else
-    {
-        cout<<"Error while inverting matrix";
-    }
-    
-    delete []matrix;
-    delete []inverseMatrix;
+    fclose(fin);
+    fclose(fout);
     
     return 0;
 }
+
+double sum1(FILE *fin)
+{
+    double a, s = 0;
+    
+    while (fscanf(fin, "%lf", &a) != EOF)
+        s += a;
+    
+    return s;
+}
+
+void sum2(FILE *fin, double *s)
+{
+    double a;
+    
+    *s = 0;
+    
+    while (fscanf(fin, "%lf", &a) != EOF)
+        *s += a;
+}
+
