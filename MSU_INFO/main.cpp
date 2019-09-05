@@ -2,37 +2,39 @@
 #include <math.h>
 #include <time.h>
 
-double myExp (double x, int n);
+double myExp (double x);
 
 int main(void)
 {
     double x;
-    int n;
     
-    printf("Enter n: ");
-    scanf("%d", &n);
-
     x = 1;
     printf("Correct: %.16f\n", exp(x));
-    printf("Result : %.16f\n", myExp(x, n));
+    printf("Result : %.16f\n", myExp(x));
     
     x = -15;
     printf("Correct: %.16f\n", exp(x));
-    printf("Result : %.16f\n", myExp(x, n));
+    x = 15;
+    printf("Result : %.16f\n", 1.0/myExp(x));
 }
 
-double myExp (double x, int n)
+double myExp (double x)
 {
-    double elem, sum = 0;
+    double elem, sum = 0, sum1;
     int i;
     
-    elem = x;
-    sum = 1 + x;
+    double eps = 1e-16;
     
-    for (i = 2; i <= n; ++i)
+    elem = x;
+    sum1 = 1;
+    sum = 1 + x;
+    i = 2;
+    while(fabs(sum-sum1)/sum > eps)
     {
+        sum1 = sum;
         elem *= x/i;
         sum += elem;
+        ++i;
     }
     
     return sum;
