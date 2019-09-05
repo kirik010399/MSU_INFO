@@ -1,20 +1,39 @@
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
-long double f(double x)
+double myExp (double x, int n);
+
+int main(void)
 {
-    return (x-1000)*(x-0.001);
+    double x;
+    int n;
+    
+    printf("Enter n: ");
+    scanf("%d", &n);
+
+    x = 1;
+    printf("Correct: %.16f\n", exp(x));
+    printf("Result : %.16f\n", myExp(x, n));
+    
+    x = -15;
+    printf("Correct: %.16f\n", exp(x));
+    printf("Result : %.16f\n", myExp(x, n));
 }
 
-int main()
+double myExp (double x, int n)
 {
-    long double a = 1, b = -1000.001, c = 1;
+    double elem, sum = 0;
+    int i;
     
-    long double d = b*b-4*a*c;
-    double x1 = (b*b-d)/(2*a*(-b+sqrt(d)));
-    double x2 = (b*b-d)/(2*a*(-b-sqrt(d)));
+    elem = x;
+    sum = 1 + x;
     
-    printf("%.16lf %.16Lf\n%.16lf %.16Lf\n", x1, f(x1), x2, f(x2));
-    return 0;
+    for (i = 2; i <= n; ++i)
+    {
+        elem *= x/i;
+        sum += elem;
+    }
+    
+    return sum;
 }
-
