@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <math.h>
 
+double f(double x)
+{
+    return (x-10*10*10)*(x-1/10*1/10*1/10)
+}
+
 int main()
 {
-    long double a = 1, b = 10, c = -20;
+    long double a = 1, b = 10*10*10, c = 1;
+    
+    b += 1.0/(10*10*10);
     
     long double d = b*b-4*a*c;
     long double x1 = (-b+sqrt(d))/2;
