@@ -1,47 +1,24 @@
-//#include <stdio.h>
-//
-//double sum1(FILE *fin);
-//void sum2(FILE *fin, double *s);
-//
-//int main(void)
-//{
-//    double result1;
-//    double result2;
-//    
-//    FILE *fin, *fout;
-//    
-//    fin = fopen("input.txt", "r");
-//    fout = fopen("output.txt","w");
-//    
-//    result1 = sum1(fin);
-//    fprintf(fout,"%lf\n", result1);
-//    
-//    sum2(fin, &result2);
-//    fprintf(fout,"%lf\n", result2);
-//    
-//    fclose(fin);
-//    fclose(fout);
-//    
-//    return 0;
-//}
-//
-//double sum1(FILE *fin)
-//{
-//    double a, s = 0;
-//    
-//    while (fscanf(fin, "%lf", &a) != EOF)
-//        s += a;
-//    
-//    return s;
-//}
-//
-//void sum2(FILE *fin, double *s)
-//{
-//    double a;
-//    
-//    *s = 0;
-//    
-//    while (fscanf(fin, "%lf", &a) != EOF)
-//        *s += a;
-//}
-//
+#include <stdio.h>
+
+int main(void)
+{
+    double sum1 = 0;
+    
+    for (int i = 1; i <= 1000; ++i)
+    {
+        int temp = i*i;
+        sum1 += 1.0/temp;
+    }
+    
+    double sum2 = 0;
+    for (int i = 1000; i>=1; --i)
+    {
+        int temp = i*i;
+        sum2 += 1.0/temp;
+    }
+    
+    printf("%.16lf\n%.16lf\n", sum1, sum2);
+    
+    return 0;
+}
+
