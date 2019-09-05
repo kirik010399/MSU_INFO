@@ -1,25 +1,15 @@
 #include <stdio.h>
+#include <math.h>
 
 int main(void)
 {
-    double sum1 = 0;
+    double a = 1, b = 10, c = -20;
     
-    for (int i = 2; i <= 1000; ++i)
-    {
-        int temp = (i-1)*(i+1);
-        sum1 += 1.0/temp;
-    }
+    double d = b*b-4*a*c;
+    double x1 = (-b+sqrt(d))/2;
+    double x2 = (-b-sqrt(d))/2;
     
-    double sum2 = 0;
-    for (int i = 1000; i>=2; --i)
-    {
-        int temp = (i-1)*(i+1);
-        sum2 += 1.0/temp;
-    }
-    
-    double res = 3001*1.0/4004;
-    printf("Correct: %.16lf\nLeft->Right: %.16lf\nRight->left: %.16lf\n", res, sum1, sum2);
-    
+    printf("%.16lf %.16lf\n", x1, x2);
     return 0;
 }
 
