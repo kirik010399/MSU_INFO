@@ -1,52 +1,38 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+double sum(FILE *fin);
 
 int main(void)
 {
+    double result;
+
     FILE *fin, *fout;
-    double a, b;
-    int val;
-    
+
     fin = fopen("input.txt", "r");
     fout = fopen("output.txt","w");
 
-    val = fscanf(fin, "%lf", &a);
-    
-    if (val == -1)
-    {
-        printf("Empty file\n");
-        return -1;
-    }
-    else if (val == 0)
-    {
-        printf("Incorrect first number\n");
-        return -2;
-    }
-    else if (val == 1)
-    {
-        printf("First number is correct\n");
-    }
-    
-    val = fscanf(fin, "%lf", &b);
+    result = sum(fin);
+    fprintf(fout,"%lf\n", result);
 
-    if (val == -1)
-    {
-        printf("There is no second number\n");
-        return -1;
-    }
-    else if (val == 0)
-    {
-        printf("Incorrect second number\n");
-        return -2;
-    }
-    else if (val == 1)
-    {
-        printf("Second number is correct\n");
-    }
-    
-    fprintf(fout, "Sum of numbers is: %f\n", a+b);
-    
     fclose(fin);
     fclose(fout);
-    
+
     return 0;
 }
+
+double sum(FILE *fin)
+{
+    double a, s = 0;
+
+    if (fscanf(fin, "%lf", &a) == EOF)
+        exit(0);
+
+    s = a;
+
+    while (fscanf(fin, "%lf", &a) != EOF)
+        s += a;
+
+    return s;
+}
+

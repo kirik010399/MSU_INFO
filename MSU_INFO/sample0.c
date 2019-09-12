@@ -1,30 +1,36 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+double sum(FILE *fin, double a0);
 
 int main(void)
 {
-    double a;
-    int i;
+    double result, a;
     
-    scanf("%lf", &a);
+    FILE *fin, *fout;
     
-    i = 0;
+    fin = fopen("input.txt", "r");
+    fout = fopen("output.txt","w");
     
-    while (i < 10)
+    if (fscanf(fin, "%lf", &a) != EOF)
     {
-        a += 2;
-        ++i;
+        result = sum(fin, a);
+        fprintf(fout,"%lf\n", result);
     }
     
-    if (i == 10)
-    {
-        i = 3;
-    }
-    else if (i != 5)
-    {
-        i = 5;
-    }
-    
-    printf("%lf %d\n", a, i);
+    fclose(fin);
+    fclose(fout);
     
     return 0;
 }
+
+double sum(FILE *fin, double a0)
+{
+    double a, s = a0;
+    
+    while (fscanf(fin, "%lf", &a) != EOF)
+        s += a;
+    
+    return s;
+}
+
