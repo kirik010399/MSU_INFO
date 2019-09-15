@@ -29,6 +29,7 @@
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
+		EDA0BBF8232A6C18001D0ED3 /* input1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input1.txt; sourceTree = "<group>"; };
 		EDEEDDF2232125BC0006EBAD /* sample1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample1.c; sourceTree = "<group>"; };
 		EDEEDDF4232126390006EBAD /* sample2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample2.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
+				EDA0BBF8232A6C18001D0ED3 /* input1.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 				EDEEDDF2232125BC0006EBAD /* sample1.c */,
