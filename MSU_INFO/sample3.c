@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int sum(FILE *fin, double *s);
+int sum_pr(FILE *fin, double *s, double *p);
 
 int main(void)
 {
-    double s;
+    double s, p;
     int eofFlag;
     
     FILE *fin, *fout;
@@ -13,10 +13,10 @@ int main(void)
     fin = fopen("input.txt", "r");
     fout = fopen("output.txt","w");
     
-    eofFlag = sum(fin, &s);
+    eofFlag = sum_pr(fin, &s, &p);
     
     if (eofFlag != -1)
-        fprintf(fout,"Sum: %lf\n", s);
+        fprintf(fout,"Sum: %lf, Prod: %lf\n", s, p);
     
     fclose(fin);
     fclose(fout);
@@ -24,7 +24,7 @@ int main(void)
     return 0;
 }
 
-int sum(FILE *fin, double *s)
+int sum_pr(FILE *fin, double *s, double *p)
 {
     double a;
     
@@ -32,9 +32,13 @@ int sum(FILE *fin, double *s)
         return -1;
     
     *s = a;
+    *p = a;
     
     while (fscanf(fin, "%lf", &a) != EOF)
+    {
         *s += a;
+        *p *= a;
+    }
     
     return 0;
 }

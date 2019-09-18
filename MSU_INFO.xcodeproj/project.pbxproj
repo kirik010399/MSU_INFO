@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.c */; };
+		ED6FF2A823329CA600714233 /* sample3.c in Sources */ = {isa = PBXBuildFile; fileRef = ED6FF2A723329CA600714233 /* sample3.c */; };
 		EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* sample1.c */; };
 		EDEEDDF5232126390006EBAD /* sample2.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF4232126390006EBAD /* sample2.c */; };
 		EDEEDDF723224CF90006EBAD /* sample0.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF623224CF90006EBAD /* sample0.c */; };
@@ -30,6 +31,7 @@
 		ED0C3B981F82C3EA00D8B1BE /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
+		ED6FF2A723329CA600714233 /* sample3.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample3.c; sourceTree = "<group>"; };
 		EDEEDDF2232125BC0006EBAD /* sample1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample1.c; sourceTree = "<group>"; };
 		EDEEDDF4232126390006EBAD /* sample2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample2.c; sourceTree = "<group>"; };
 		EDEEDDF623224CF90006EBAD /* sample0.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample0.c; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				EDEEDDF623224CF90006EBAD /* sample0.c */,
 				EDEEDDF2232125BC0006EBAD /* sample1.c */,
 				EDEEDDF4232126390006EBAD /* sample2.c */,
+				ED6FF2A723329CA600714233 /* sample3.c */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -133,6 +136,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDEEDDF723224CF90006EBAD /* sample0.c in Sources */,
+				ED6FF2A823329CA600714233 /* sample3.c in Sources */,
 				ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */,
 				EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */,
 				EDEEDDF5232126390006EBAD /* sample2.c in Sources */,
