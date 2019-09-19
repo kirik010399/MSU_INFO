@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
-		EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* sample1.c */; };
-		EDEEDDF5232126390006EBAD /* sample2.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF4232126390006EBAD /* sample2.c */; };
+		EDEEDDF3232125BC0006EBAD /* sample1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* sample1.cpp */; };
+		EDEEDDF5232126390006EBAD /* sample2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF4232126390006EBAD /* sample2.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,8 +30,8 @@
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		EDA0BBF8232A6C18001D0ED3 /* input1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input1.txt; sourceTree = "<group>"; };
-		EDEEDDF2232125BC0006EBAD /* sample1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample1.c; sourceTree = "<group>"; };
-		EDEEDDF4232126390006EBAD /* sample2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample2.c; sourceTree = "<group>"; };
+		EDEEDDF2232125BC0006EBAD /* sample1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample1.cpp; sourceTree = "<group>"; };
+		EDEEDDF4232126390006EBAD /* sample2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample2.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,8 +68,8 @@
 				EDA0BBF8232A6C18001D0ED3 /* input1.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
-				EDEEDDF2232125BC0006EBAD /* sample1.c */,
-				EDEEDDF4232126390006EBAD /* sample2.c */,
+				EDEEDDF2232125BC0006EBAD /* sample1.cpp */,
+				EDEEDDF4232126390006EBAD /* sample2.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -132,8 +132,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
-				EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */,
-				EDEEDDF5232126390006EBAD /* sample2.c in Sources */,
+				EDEEDDF3232125BC0006EBAD /* sample1.cpp in Sources */,
+				EDEEDDF5232126390006EBAD /* sample2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,102 +7,94 @@
 
 using namespace std;
 
-double f (double x);
-
-void generatePoints(FILE *fin, double a, double b, int n)
+vector <double> f2c(vector <double> y, int n)
 {
-    double dt = fabs(b-a)/(n-1);
+    double h = 1.0/n;
+    vector <double> c;
     
-    for (double i = a; i <= b; i+=dt)
-    {
-        fprintf(fin, "%f %f\n", i, f(i));
-    }
-}
-
-void generateChPoints(FILE *fin, double a, double b, int n)
-{
-    for (double i = 1; i <= n; i+=1)
-    {
-        double x = (a+b)/2 + (b-a) * 0.5 * cos(M_PI*(2*i-1)/(2*n));
-        fprintf(fin, "%f %f\n", x, f(x));
-    }
-}
-
-double lagrange(vector <double> x,  vector <double> y, double x0, int n)
-{
-    double res = 0;
+    c.push_back(0);
     
-    for (int i = 0; i < n; ++i)
+    for (int k = 1; k <= n-1; ++k)
     {
-        double temp = y[i];
-
-        for (int j = 0; j < n; ++j)
-        {
-            if (i == j)
-                continue;
-            
-            temp *= (x0 - x[j])/(x[i]-x[j]);
-        }
+        double sum = 0;
         
-        res += temp;
+        for (int i = 1; i <= n-1; ++i)
+            sum += y[i] * sin(M_PI*k*i*h) * h;
+        
+        double sum1 = 0;
+        
+        for (int i = 1; i <= n-1; ++i)
+            sum1 += sin(M_PI*k*i*h) * sin(M_PI*k*i*h) * h;
+        
+        c.push_back(sum/sum1);
     }
     
-    return res;
+    c.push_back(0);
+    
+    return c;
 }
 
-double f (double x)
+vector <double> c2f(vector <double> c, int n)
 {
-    return 1.0/(25 * x * x + 1);
-}
-
-int main(void)
-{
-    FILE *fin1, *fin, *fout;
-    int n;
-    double a, b;
-    double tempX, tempY;
-    vector <double> x;
+    double h = 1.0/n;
     vector <double> y;
     
-    fin1 = fopen("input.txt", "r");
-    fin = fopen("input1.txt", "w");
+    y.push_back(0);
+    
+    for (int i = 1; i <= n-1; ++i)
+    {
+        double sum = 0;
+        
+        for (int m = 0; m <= n-1; ++m)
+        {
+            sum += c[m] * sin(M_PI*m*i*h);
+        }
+        
+        y.push_back(sum);
+    }
+    
+    y.push_back(0);
+    
+    return y;
+}
+
+int main()
+{
+    FILE *fin, *fin1, *fout;
+    int n;
+    double a;
+    vector <double> c, y, y1;
+    
+    fin = fopen("input.txt", "r");
+    fin1 = fopen("input1.txt", "r");
     fout = fopen("output.txt", "w");
     
-    fscanf(fin1, "%d%lf%lf", &n, &a, &b);
+    fscanf(fin, "%d", &n);
     
-//    generatePoints(fin, a, b, n);
-    generateChPoints(fin, a, b, n);
-    
-    fclose(fin);
-    fclose(fin1);
-    
-    fin = fopen("input1.txt", "r");
-    
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < n + 1; ++i)
     {
-        fscanf(fin, "%lf%lf", &tempX, &tempY);
-        x.push_back(tempX);
-        y.push_back(tempY);
+        fscanf(fin1, "%lf", &a);
+        y.push_back(a);
     }
     
-    double l ;
-    for (int i = 0; i < n-1; ++i)
+    c = f2c(y, n);
+    
+    for (int i = 0; i < n + 1; ++i)
     {
-        l = lagrange(x, y, x[i], n);
-        fprintf(fout, "%f %f %f %f\n", x[i], f(x[i]), l, f(x[i]) - l);
-        
-        tempX = x[i] + (x[i + 1] - x[i])/2;
-        l = lagrange(x, y, tempX, n);
-        
-        fprintf(fout, "%f %f %f %f\n", tempX, f(tempX), l, f(tempX) - l);
+        fprintf(fout, "%f ", c[i]);
     }
     
-    l = lagrange(x, y, x[n-1], n);
-
-    fprintf(fout, "%f %f %f %f\n", x[n-1], f(x[n-1]), l, f(x[n-1]) - l);
+    fprintf(fout, "\n");
+    
+    y1 = c2f(c, n);
+    
+    for (int i = 0; i < n + 1; ++i)
+    {
+        fprintf(fout, "%f ", y1[i]);
+    }
     
     fclose(fin);
-    fclose(fout); 
+    fclose(fout);
 }
 
 
