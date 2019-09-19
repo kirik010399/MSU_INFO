@@ -52,13 +52,13 @@ double lagrange(vector <double> x,  vector <double> y, double x0, int n)
 
 double f (double x)
 {
-    return 1.0/(25*x*x); 
+    return 1.0/(25 * x * x + 1);
 }
 
 int main(void)
 {
     FILE *fin1, *fin, *fout;
-    int n, m;
+    int n;
     double a, b;
     double tempX, tempY;
     vector <double> x;
@@ -68,10 +68,10 @@ int main(void)
     fin = fopen("input1.txt", "w");
     fout = fopen("output.txt", "w");
     
-    fscanf(fin1, "%d%d%lf%lf", &n, &m, &a, &b);
+    fscanf(fin1, "%d%lf%lf", &n, &a, &b);
     
-    generatePoints(fin, a, b, n);
-//    generateChPoints(fin, a, b, n);
+//    generatePoints(fin, a, b, n);
+    generateChPoints(fin, a, b, n);
     
     fclose(fin);
     fclose(fin1);
@@ -85,29 +85,21 @@ int main(void)
         y.push_back(tempY);
     }
     
-//    double l ;
-//    for (int i = 0; i < n-1; ++i)
-//    {
-//        l = lagrange(x, y, x[i], n);
-//        fprintf(fout, "%f %f %f %f\n", x[i], f(x[i]), l, f(x[i]) - l);
-//
-//        tempX = x[i] + (x[i + 1] - x[i])/2;
-//        l = lagrange(x, y, tempX, n);
-//
-//        fprintf(fout, "%f %f %f %f\n", tempX, f(tempX), l, f(tempX) - l);
-//    }
-//
-//    l = lagrange(x, y, x[n-1], n);
-//
-//    fprintf(fout, "%f %f %f %f\n", x[n-1], f(x[n-1]), l, f(x[n-1]) - l);
-
-    double dt = fabs(b-a)/(m-1);
-
-    for (double i = a; i <= b; i += dt)
+    double l ;
+    for (int i = 0; i < n-1; ++i)
     {
-        double l = lagrange(x, y, i, n);
-        fprintf(fout, "%lf %lf %lf %lf\n", i, f(i), l, f(i) - l);
+        l = lagrange(x, y, x[i], n);
+        fprintf(fout, "%f %f %f %f\n", x[i], f(x[i]), l, f(x[i]) - l);
+        
+        tempX = x[i] + (x[i + 1] - x[i])/2;
+        l = lagrange(x, y, tempX, n);
+        
+        fprintf(fout, "%f %f %f %f\n", tempX, f(tempX), l, f(tempX) - l);
     }
+    
+    l = lagrange(x, y, x[n-1], n);
+
+    fprintf(fout, "%f %f %f %f\n", x[n-1], f(x[n-1]), l, f(x[n-1]) - l);
     
     fclose(fin);
     fclose(fout); 
