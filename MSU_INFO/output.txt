@@ -1,1 +1,1 @@
-Sum: 15.000000
+Sum of numbers is: 3.000000
