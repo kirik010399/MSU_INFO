@@ -58,6 +58,67 @@ vector <double> c2f(vector <double> c, int n)
     return y;
 }
 
+vector <double> f2cWithShift(vector <double> y, int n)
+{
+    double h = 1.0/(n-1);
+    
+    vector <double> c;
+    
+    c.push_back(0);
+    
+//    double tempSum = 0;
+//
+//    for (int i = 1; i <= n-1; ++i)
+//        tempSum += sin(M_PI*(i*h-h/2)*(2*1-1)*0.5) * sin(M_PI*(i*h-h/2)*(2*2-1)*0.5);
+//
+//    printf("%lf\n", tempSum);
+    
+    for (int k = 1; k <= n-1; ++k)
+    {
+        double sum = 0;
+        
+        for (int i = 1; i <= n-1; ++i)
+            sum += y[i] * sin(M_PI*(i*h-h/2)*(2*k-1)*0.5) * h;
+        
+        double sum1 = 0;
+        
+        for (int i = 1; i <= n-1; ++i)
+            sum1 += sin(M_PI*(i*h-h/2)*(2*k-1)*0.5) * sin(M_PI*(i*h-h/2)*(2*k-1)*0.5) * h;
+                
+        c.push_back(sum/sum1);
+    }
+    
+    c.push_back(0);
+    
+    return c;
+}
+
+vector <double> c2fWithShift(vector <double> c, int n)
+{
+    double h = 1.0/(n-1);
+    vector <double> y;
+        
+    for (int i = 1; i <= n-1; ++i)
+    {
+        double sum = 0;
+        
+        for (int m = 0; m <= n-1; ++m)
+        {
+            sum += c[m] * sin(M_PI*(i*h-h/2)*(2*m-1)*0.5);
+        }
+        
+        if (i == 1)
+            y.push_back(-sum);
+        
+        y.push_back(sum);
+
+        if (i == n-1)
+            y.push_back(sum);
+    }
+        
+    return y;
+}
+
 int main()
 {
     FILE *fin, *fin1, *fout;
@@ -77,7 +138,7 @@ int main()
         y.push_back(a);
     }
     
-    c = f2c(y, n);
+    c = f2cWithShift(y, n);
     
     for (int i = 0; i < n + 1; ++i)
     {
@@ -86,7 +147,7 @@ int main()
     
     fprintf(fout, "\n");
     
-    y1 = c2f(c, n);
+    y1 = c2fWithShift(c, n);
     
     for (int i = 0; i < n + 1; ++i)
     {
