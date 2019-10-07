@@ -137,7 +137,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     maxNorm = 0;//инициализурем максимум, на нулевом векторе и норма Ay и lam равны 0
     maxNormIndex = 0;//на данный момент максимум будет на 0 векторе
     
-    printf("%lf ", maxNorm);
+    printf("%.16lf ", maxNorm);
     
     for (m = 1; m <= n; ++m)//запускаем цикл по остальным векторам, внутри него делаем то же самое
     {
@@ -145,7 +145,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
         norm = calculateNorm(a, m, n);
         
         temp = subNorm/norm;
-        printf("%lf ", temp);
+        printf("%.16lf ", temp);
         if (temp > maxNorm)//если новое частное больше максимального, то обновляем максимальный и индекс на котором он достигается
         {
             maxNorm = temp;
