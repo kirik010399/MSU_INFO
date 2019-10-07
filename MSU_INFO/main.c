@@ -42,7 +42,6 @@ int main(void)
     fclose(fout);
 }
 
-
 void printScalarMatrix(FILE *fout, int n)
 {
     double maxSc = 0;//переменная для максимального скалярного произведения
@@ -134,12 +133,9 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     double temp;//частное этих норм
     double maxNorm;//максимальная норма
     int maxNormIndex;//номер вектора, на котором она достигается
-    //далее выносим из цикла подсчет для нулевого вектора, чтобы присвоить изначальное значение максимум
-    subNorm = calculateSubNorm(a, 0, n);//считаем норму Ay-lam*y
-    norm = calculateNorm(a, 0, n);//считаем нормм Ay
-    
-    maxNorm = subNorm/norm;//инициализурем максимум их частным
-    maxNormIndex = 0;//на данный момент максимум будет как раз на 0 вектора
+        
+    maxNorm = 0;//инициализурем максимум, на нулевом векторе и норма Ay и lam равны 0
+    maxNormIndex = 0;//на данный момент максимум будет на 0 векторе
     
     printf("%lf ", maxNorm);
     
@@ -158,7 +154,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     }
     printf("\n");
     
-    fprintf(fout, "Max norm: %lf, index of vector: %d\n", maxNorm, maxNormIndex);
+    fprintf(fout, "Max norm: %.16lf, index of vector: %d\n", maxNorm, maxNormIndex);
 }
 
 double calculateSubNorm(double *a, int m, int n)
@@ -177,12 +173,12 @@ double calculateSubNorm(double *a, int m, int n)
     {
         sum = 0.0;
         
-        y_i = getScalarComponent(i, m, n);//m - номер вектора, i - номер компоненты
+        y_i = cos(M_PI*i*m*h);//m - номер вектора, i - номер компоненты
         
         //считаем Ay
         for (j = 0; j <= n; ++j)
         {
-            y_j = getScalarComponent(j, m, n);//m - номер вектора, j - номер компоненты
+            y_j = cos(M_PI*j*m*h);//m - номер вектора, j - номер компоненты
             
             sum += a[i*n1+j] * y_j;//поэлементно умножаем строку A на y
         }
@@ -208,7 +204,7 @@ double calculateNorm(double *a, int m, int n)
         //считаем Ay
         for (j = 0; j <= n; ++j)
         {
-            y_j = getScalarComponent(j, m, n);//m - номер вектора, j - номер компоненты
+            y_j = cos(M_PI*j*m/n);//m - номер вектора, j - номер компоненты
 
             sum += a[i*n1+j] * y_j;//поэлементно умножаем строку A на y
         }

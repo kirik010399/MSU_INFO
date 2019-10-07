@@ -6,4 +6,4 @@
 0.000000 0.000000 -0.000000 0.000000 -0.000000 1.000000 
 
 Max scalar product: 1.000000, index of first vector: 0, index of second vector: 0
-Max norm: 1.000000, index of vector: 0
+Max norm: 0.0000000000000004, index of vector: 1
