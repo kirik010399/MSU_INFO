@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.cpp */; };
-		EDEEDDF3232125BC0006EBAD /* sample1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* sample1.cpp */; };
+		ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* main.c */; };
+		EDEEDDF3232125BC0006EBAD /* generatePoints.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* generatePoints.c */; };
 		EDEEDDF5232126390006EBAD /* sample2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF4232126390006EBAD /* sample2.cpp */; };
 /* End PBXBuildFile section */
 
@@ -26,11 +26,11 @@
 
 /* Begin PBXFileReference section */
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		ED0C3B981F82C3EA00D8B1BE /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
-		EDA0BBF8232A6C18001D0ED3 /* input1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input1.txt; sourceTree = "<group>"; };
-		EDEEDDF2232125BC0006EBAD /* sample1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample1.cpp; sourceTree = "<group>"; };
+		EDA0BBF8232A6C18001D0ED3 /* initial_data.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = initial_data.txt; sourceTree = "<group>"; };
+		EDEEDDF2232125BC0006EBAD /* generatePoints.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = generatePoints.c; sourceTree = "<group>"; };
 		EDEEDDF4232126390006EBAD /* sample2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample2.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -65,10 +65,10 @@
 			isa = PBXGroup;
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
-				EDA0BBF8232A6C18001D0ED3 /* input1.txt */,
+				EDA0BBF8232A6C18001D0ED3 /* initial_data.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
-				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
-				EDEEDDF2232125BC0006EBAD /* sample1.cpp */,
+				ED0C3B981F82C3EA00D8B1BE /* main.c */,
+				EDEEDDF2232125BC0006EBAD /* generatePoints.c */,
 				EDEEDDF4232126390006EBAD /* sample2.cpp */,
 			);
 			path = MSU_INFO;
@@ -100,7 +100,7 @@
 		ED0C3B8D1F82C3EA00D8B1BE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = "Кирилл Мащенко";
 				TargetAttributes = {
 					ED0C3B941F82C3EA00D8B1BE = {
@@ -115,6 +115,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = ED0C3B8C1F82C3EA00D8B1BE;
 			productRefGroup = ED0C3B961F82C3EA00D8B1BE /* Products */;
@@ -131,8 +132,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED0C3B991F82C3EA00D8B1BE /* main.cpp in Sources */,
-				EDEEDDF3232125BC0006EBAD /* sample1.cpp in Sources */,
+				ED0C3B991F82C3EA00D8B1BE /* main.c in Sources */,
+				EDEEDDF3232125BC0006EBAD /* generatePoints.c in Sources */,
 				EDEEDDF5232126390006EBAD /* sample2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,6 +251,7 @@
 		ED0C3B9D1F82C3EA00D8B1BE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92HN6W64J3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -259,6 +261,7 @@
 		ED0C3B9E1F82C3EA00D8B1BE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92HN6W64J3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
