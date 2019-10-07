@@ -3,36 +3,68 @@
 #include <time.h>
 #include <stdlib.h>
 
+double getScalarComponent(double k, double m, int n);
+void printScalarMatrix(FILE *fout, int n);
+void generateMatrix(double *a, int n);
+double calculateSubNorm(double *a, int m, int n);
+double calculateNorm(double *a, int m, int n);
+void calculateMaxResidual(double *a, FILE *fout, int n);
+
+double getScalarComponent(double k, double m, int n)
+{
+    double h = 1.0/n;
+    
+    if (k == 0 || k == n)
+        return cos(M_PI*k*m*h)*sqrt(h/2);
+    else
+        return cos(M_PI*k*m*h)*sqrt(h);//модифицированное скалярное произведение
+}
+
+int main(void)
+{
+    FILE *fin, *fout;//создали переменные для файлов, fin - количество точек, fout - файл, куда мы все будем выводить
+    int n;//переменная для количества точек
+    double *a;//матрица из условий
+        
+    fin = fopen("input.txt", "r");
+    fout = fopen("output.txt", "w");//открыли файлы
+    
+    fscanf(fin, "%d", &n);//прочитали количество точек
+    
+    a = (double*)malloc((n+1)*(n+1) * sizeof(double));//выделили память под матрицу условий
+
+    printScalarMatrix(fout, n);//вызвали функцию печати матрицы
+    generateMatrix(a, n);//запускаем функцию генерирования матрицы из условия
+    calculateMaxResidual(a, fout, n);//запускаем функцию подсчета максимальной нормы
+        
+    free(a);
+    fclose(fin);
+    fclose(fout);
+}
+
+
 void printScalarMatrix(FILE *fout, int n)
 {
-    double h = 1.0/n;//заводим переменную h, 1.0 важно, чтобы не было целочисленного деления
     double maxSc = 0;//переменная для максимального скалярного произведения
     int maxScX, maxScY;//переменные для номеров векторов, на которых оно достигается
     double sum = 0;//переменная для хранения временной суммы из скалярного произведения
-        
-    sum += cos(M_PI*0*0*h) * cos(M_PI*0*0*h) * h/2;
+    int k, i, j;
     
-    for (int k = 1; k <= n-1; ++k)
-        sum += cos(M_PI*k*0*h) * cos(M_PI*k*0*h) * h;
-    
-    sum += cos(M_PI*n*0*h) * cos(M_PI*n*0*h) * h/2;//блок подсчета скалярного произведения для 0 и 0 вектора, вынесено из цикла, чтобы присвоить изначальное значение максимуму
+    for (k = 0; k <= n; ++k)
+        sum += getScalarComponent(k, 0, n) * getScalarComponent(k, 0, n);//блок подсчета скалярного произведения для 0 и 0 вектора, вынесено из цикла, чтобы присвоить изначальное значение максимуму
     
     maxSc = sum;//присваиваем изначально значение максимуму
     maxScX = 0;//присваиваем изначальное значение номеру первого вектора, на котором достигнут максимум
     maxScY = 0;//присваиваем изначальное значение номеру второго вектора, на котором достигнут максимум
         
-    for (int i = 0; i <= n; ++i)//бежим по всем векторам из условия
+    for (i = 0; i <= n; ++i)//бежим по всем векторам из условия
     {
-        for (int j = 0; j <= n; ++j)//бежим по всем векторам из условия, итого бежим по всем парам вектором
+        for (j = 0; j <= n; ++j)//бежим по всем векторам из условия, итого бежим по всем парам вектором
         {
             sum = 0;
             
-            sum += cos(M_PI*0*i*h) * cos(M_PI*0*j*h) * h/2;
-            
-             for (int k = 1; k <= n-1; ++k)
-                   sum += cos(M_PI*k*i*h) * cos(M_PI*k*j*h) * h;//k - номер компоненты вектора, i и j - номера векторов
-            
-            sum += cos(M_PI*n*i*h) * cos(M_PI*n*j*h) * h/2;//блок подсчета скалярного произведения
+             for (k = 0; k <= n; ++k)
+                   sum += getScalarComponent(k, i, n) * getScalarComponent(k, j, n);//k - номер компоненты вектора, i и j - номера векторов, блок подсчета скалярного произведения
         
             if (sum > maxSc)//если нашли скалярное произведение больше максимума - обновляем максимум и номера векторов, на котором он достигнут
             {
@@ -47,45 +79,45 @@ void printScalarMatrix(FILE *fout, int n)
     }
     //итого в файле получаем диагональную матрицу => вектора ортогональны
     
-    fprintf(fout, "\n%lf %d %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
+    fprintf(fout, "\nMax scalar product: %lf, index of first vector: %d, index of second vector: %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
 }
 
 void generateMatrix(double *a, int n)
 {
     int i, j;
     double h = 1.0/n;
-    double h2 = h*h;
-    int n1 = n+1;
+    double h2 = h*h;//хранит h^2
+    int n1 = n+1;//хранит n+1 для удобной работы с матрицами
     
-    for (i = 0; i <= n; ++i)
+    for (i = 0; i <= n; ++i)//бежим по строкам матрицы, i - номер строки
     {
-        for (j = 0; j <= n; ++j)
+        for (j = 0; j <= n; ++j)//бежим по столбцам матрицы, j - номер столбца
         {
-            if (i == 0)
+            if (i == 0)//заполняем отдельно первую строку
             {
-                if (j == 0)
+                if (j == 0)//заполняем ее первый элемент
                     a[i*n1+j] = -2.0/h2;
-                else if (j == 1)
+                else if (j == 1)//заполняем ее второй элемент
                     a[i*n1+j] = 2.0/h2;
-                else
+                else//заполняем остальные элементы
                     a[i*n1+j] = 0.0;
             }
-            else if (i == n)
+            else if (i == n)//заполняем отдельно последнюю строку
             {
-                if (j == n)
+                if (j == n)//заполянем последний элемент
                     a[i*n1+j] = -2.0/h2;
-                else if (j == n-1)
+                else if (j == n-1)//заполняем предпоследний элемент
                     a[i*n1+j] = 2.0/h2;
-                else
+                else//заполняем остальные элементы
                     a[i*n1+j] = 0.0;
             }
             else
             {
-                if (j == i)
+                if (j == i)//заполняем диагональный элемент
                     a[i*n1+j] = -2.0/h2;
-                else if (j == i-1 || j == i+1)
+                else if (j == i-1 || j == i+1)//заполняем элемент левее диагонального и правее диагонального
                     a[i*n1+j] = 1.0/h2;
-                else
+                else//заполняем остальные элементы
                     a[i*n1+j] = 0.0;
             }
             printf("%lf ", a[i*n1+j]);
@@ -93,6 +125,40 @@ void generateMatrix(double *a, int n)
         printf("\n");
     }
     printf("\n");
+}
+
+void calculateMaxResidual(double *a, FILE *fout, int n)
+{
+    int m;
+    double subNorm, norm;//norm - норма матрицы Ay, subNorm - норма матрицы Ay-lam*y
+    double temp;//частное этих норм
+    double maxNorm;//максимальная норма
+    int maxNormIndex;//номер вектора, на котором она достигается
+    //далее выносим из цикла подсчет для нулевого вектора, чтобы присвоить изначальное значение максимум
+    subNorm = calculateSubNorm(a, 0, n);//считаем норму Ay-lam*y
+    norm = calculateNorm(a, 0, n);//считаем нормм Ay
+    
+    maxNorm = subNorm/norm;//инициализурем максимум их частным
+    maxNormIndex = 0;//на данный момент максимум будет как раз на 0 вектора
+    
+    printf("%lf ", maxNorm);
+    
+    for (m = 1; m <= n; ++m)//запускаем цикл по остальным векторам, внутри него делаем то же самое
+    {
+        subNorm = calculateSubNorm(a, m, n);
+        norm = calculateNorm(a, m, n);
+        
+        temp = subNorm/norm;
+        printf("%lf ", temp);
+        if (temp > maxNorm)//если новое частное больше максимального, то обновляем максимальный и индекс на котором он достигается
+        {
+            maxNorm = temp;
+            maxNormIndex = m;
+        }
+    }
+    printf("\n");
+    
+    fprintf(fout, "Max norm: %lf, index of vector: %d\n", maxNorm, maxNormIndex);
 }
 
 double calculateSubNorm(double *a, int m, int n)
@@ -105,30 +171,27 @@ double calculateSubNorm(double *a, int m, int n)
     double h2 = h*h;
     int n1 = n+1;
     
-    double lam = 4*sin(M_PI*m*h/2)*sin(M_PI*m*h/2)/h2;
+    double lam = 4 * sin(M_PI*m*h/2) * sin(M_PI*m*h/2)/h2;//заполнили lam
 
-    for (i = 0; i <= n; ++i)
+    for (i = 0; i <= n; ++i)//бежим по всем строкам матрицы
     {
         sum = 0.0;
         
-        y_i = cos(M_PI*i*m*h);//m - номер вектора, i - номер компоненты
+        y_i = getScalarComponent(i, m, n);//m - номер вектора, i - номер компоненты
         
+        //считаем Ay
         for (j = 0; j <= n; ++j)
         {
-            y_j = cos(M_PI*j*m*h);//m - номер вектора, j - номер компоненты
-
-            sum += a[i*n1+j] * y_j;
+            y_j = getScalarComponent(j, m, n);//m - номер вектора, j - номер компоненты
+            
+            sum += a[i*n1+j] * y_j;//поэлементно умножаем строку A на y
         }
         
-        sum -= lam * y_i;
-        
-        printf("%lf ", sum);
-        
-        res += sum * sum;
+        sum += lam * y_i;//прибавляем lam*y
+        res += sum * sum;//берем квадрат полученной компоненты итогового вектора
     }
-    printf("\n"); 
     
-    return sqrt(res);
+    return sqrt(res);//возвращаем корень из суммы квадратов
 }
 
 double calculateNorm(double *a, int m, int n)
@@ -137,77 +200,21 @@ double calculateNorm(double *a, int m, int n)
     double res = 0;
     double sum;
     double y_j;
-    double h = 1.0/n;
     int n1 = n+1;
     
-    for (i = 0; i <= n; ++i)
+    for (i = 0; i <= n; ++i)//бежим по строкам матрицы
     {
         sum = 0.0;
-            
+        //считаем Ay
         for (j = 0; j <= n; ++j)
         {
-            y_j = cos(M_PI*j*m*h);//m - номер вектора, j - номер компоненты
+            y_j = getScalarComponent(j, m, n);//m - номер вектора, j - номер компоненты
 
-            sum += a[i*n1+j] * y_j;
+            sum += a[i*n1+j] * y_j;//поэлементно умножаем строку A на y
         }
                         
-        res += sum * sum;
+        res += sum * sum;//берем квадрат полученной компоненты итогового вектора
     }
     
-    return sqrt(res);
+    return sqrt(res);//возвращаем корень из суммы квадратов
 }
-
-void calculateMaxResidual(double *a, FILE *fout, int n)
-{
-    int m;
-    double subNorm, norm;
-    double res;
-    double maxNorm;
-    int maxNormIndex;
-    
-    subNorm = calculateSubNorm(a, 0, n);
-    norm = calculateNorm(a, 0, n);
-    
-    maxNorm = subNorm/norm;
-    maxNormIndex = 0;
-    
-    for (m = 1; m <= n; ++m)
-    {
-        subNorm = calculateSubNorm(a, m, n);
-        norm = calculateNorm(a, m, n);
-        
-        res = subNorm/norm;
-        
-        if (res > maxNorm)
-        {
-            maxNorm = res;
-            maxNormIndex = m;
-        }
-    }
-    
-    fprintf(fout, "%lf %d\n", maxNorm, maxNormIndex);
-}
-
-int main(void)
-{
-    FILE *fin, *fout;//создали переменные для файлов, fin - количество точек, fout - файл, куда мы все будем выводить
-    int n;//переменная для количества точек
-    double *a;//матрица из условий
-        
-    fin = fopen("input.txt", "r");
-    fout = fopen("output.txt", "w");//открыли файлы
-    
-    fscanf(fin, "%d", &n);//прочитали количество точек
-    
-    a = (double*)malloc((n+1)*(n+1) * sizeof(int));
-
-    printScalarMatrix(fout, n);//вызвали функцию печати матрицы
-    generateMatrix(a, n);//запускаем функцию генерирования матрицы из условия
-    calculateMaxResidual(a, fout, n);
-        
-    free(a);
-    fclose(fin);
-    fclose(fout);
-}
-
-
