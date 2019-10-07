@@ -72,13 +72,13 @@ void printScalarMatrix(FILE *fout, int n)
                 maxScY = j;
             }
             
-            fprintf(fout, "%lf ", sum);//вывели очередное скалярное произведения
+            fprintf(fout, "%f ", sum);//вывели очередное скалярное произведения
         }
         fprintf(fout, "\n");//перевели строку
     }
     //итого в файле получаем диагональную матрицу => вектора ортогональны
     
-    fprintf(fout, "\nMax scalar product: %lf, index of first vector: %d, index of second vector: %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
+    fprintf(fout, "\nMax scalar product: %f, index of first vector: %d, index of second vector: %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
 }
 
 void generateMatrix(double *a, int n)
@@ -119,7 +119,7 @@ void generateMatrix(double *a, int n)
                 else//заполняем остальные элементы
                     a[i*n1+j] = 0.0;
             }
-            printf("%lf ", a[i*n1+j]);
+            printf("%f ", a[i*n1+j]);
         }
         printf("\n");
     }
@@ -137,7 +137,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     maxNorm = 0;//инициализурем максимум, на нулевом векторе и норма Ay и lam равны 0
     maxNormIndex = 0;//на данный момент максимум будет на 0 векторе
     
-    printf("%.16lf ", maxNorm);
+    printf("%.16f ", maxNorm);
     
     for (m = 1; m <= n; ++m)//запускаем цикл по остальным векторам, внутри него делаем то же самое
     {
@@ -145,7 +145,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
         norm = calculateNorm(a, m, n);
         
         temp = subNorm/norm;
-        printf("%.16lf ", temp);
+        printf("%.16f ", temp);
         if (temp > maxNorm)//если новое частное больше максимального, то обновляем максимальный и индекс на котором он достигается
         {
             maxNorm = temp;
@@ -154,7 +154,7 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     }
     printf("\n");
     
-    fprintf(fout, "Max norm: %.16lf, index of vector: %d\n", maxNorm, maxNormIndex);
+    fprintf(fout, "Max norm: %.16f, index of vector: %d\n", maxNorm, maxNormIndex);
 }
 
 double calculateSubNorm(double *a, int m, int n)
