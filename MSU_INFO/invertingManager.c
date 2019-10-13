@@ -1,28 +1,14 @@
-//
-//  invertingManager.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
-#include "invertingManager.hpp"
+#include "invertingManager.h"
 #include <math.h>
-#include <iostream>
-//#define eps 1e-100
+#include <stdio.h>
 
-using namespace std; 
-
-int invertMatrix(double* matrix, double* inverseMatrix, int n)
+int invertMatrix(double* matrix, double* inverseMatrix, double *d, int n)
 {
     int i, j, k;
     double a, b;
-    double *d;
 
-    double eps = fmax(pow(10, -n*3), 1e-100);
-    
-    d = new double [n];
-    
+    double eps = fmax(pow(10, -n*3), 1e-100);//strange thing for strange matrix
+        
     for (i = 0; i < n; ++i)
     {
         d[i] = 0;
@@ -45,10 +31,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
         b = sqrt(a + matrix[i*n+i] * matrix[i*n+i]);//(13)
 
         if (b < eps)
-        {
-            delete[]d;
-            return 0;
-        }//det = 0;
+            return 0; //det = 0;
 
         d[i] = matrix[i*n+i] - b;
         
@@ -69,7 +52,7 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
             for (j = i; j < n; ++j)
                 a += d[j] * matrix[j*n+k];
 
-            a*=2.0;//from formula
+            a *= 2.0;//from formula
             for (j = i; j < n; ++j)
                 matrix[j*n+k] -= a * d[j];
         }
@@ -80,15 +63,13 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
             for (j = i; j < n; ++j)
                 a += d[j] * inverseMatrix[j*n+k];
 
-            a*=2.0;//from formula
+            a *= 2.0;//from formula
             for (j = i; j < n; ++j)
                 inverseMatrix[j*n+k] -= a * d[j];
         }
 
-        matrix[i*n+i] = b;//on diag R
+        matrix[i*n+i] = b;
     }
-    
-    //R in up triangle, Q in down triangle and in d
 
     for (k = 0; k < n; ++k)
     {
@@ -103,6 +84,5 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n)
         }
     }//Reverse Gauss
     
-    delete []d;
     return 1;
 }

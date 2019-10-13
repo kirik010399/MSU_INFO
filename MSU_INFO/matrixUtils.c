@@ -1,21 +1,10 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
-#include "matrixUtils.hpp"
+#include "matrixUtils.h"
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
-using namespace std;
-
-double func(int i, int j)
+double func(int i, int j, int n)
 {
-    return i+j==999?1:0;
+    return i+j== n-1 ?1:0;
 }
 
 int enterMatrix(double* matrix, int n, FILE* fin)
@@ -39,7 +28,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j);
+                matrix[i*n+j] = func(i, j, n);
             }
         }
     }
@@ -56,9 +45,9 @@ void printMatrix(double* matrix, int n, int m)
     {
         for (j = 0; j < min_; ++j)
         {
-            cout<<matrix[i*n+j]<<' ';
+            printf("%f ", matrix[i*n+j]);
         }
-        cout<<endl;
+        printf("\n");
     }
 }
 

@@ -1,26 +1,26 @@
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "invertingManager.hpp"
+#include "matrixUtils.h"
+#include "invertingManager.h"
 
-using namespace std;
-
-int main()
+int main(void)
 {
     int n, m;
     double *matrix;
     double *inverseMatrix;
+    double *d;
     FILE* fin = NULL;
     clock_t t;
     int inputType;
     int returnFlag;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    printf("Choose type of entering data: 1 - from file, 2 - from formula\n");
     
     if (scanf("%d", &inputType) != 1)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         return -2;
     }
          
@@ -30,46 +30,48 @@ int main()
         
         if (!fin)
         {
-            cout<<"File don't exist"<<endl;
+            printf("File don't exist\n");
             fclose(fin);
             return -1;
         }
         
         if (fscanf(fin, "%d", &n) != 1 || n <= 0)
         {
-            cout<<"Data isn't correct"<<endl;
+            printf("Data isn't correct\n");
             fclose(fin);
             return -2;
         }
     }
     else if (inputType == 2)
     {
-        cout<<"Enter size: ";
+        printf("Enter size: ");
     
         if (scanf("%d", &n) != 1 || n <= 0)
         {
-            cout<<"Data isn't correct"<<endl;
+            printf("Data isn't correct\n");
             return -2;
         }
     }
     else
     {
-        cout<<"Input type isn't correct"<<endl;
+        printf("Input type isn't correct\n");
         return -2;
     }
     
-    matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
+    matrix = (double*)malloc((n*n) * sizeof(double));
+    inverseMatrix = (double*)malloc((n*n) * sizeof(double));
+    d = (double*)malloc((n) * sizeof(double));
     
-    if (!(matrix && inverseMatrix))
+    if (!(matrix && inverseMatrix && d))
     {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
+        printf("No memory, enter matrix with less dimensions\n");
         
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []inverseMatrix;
+        free(matrix);
+        free(inverseMatrix);
+        free(d);
         
         return -2;
     }
@@ -78,59 +80,64 @@ int main()
     
     if (returnFlag == -1)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []inverseMatrix;
+        free(matrix);
+        free(inverseMatrix);
+        free(d);
         
         return -2;
     }
     
-    cout<<"Enter size of printing matrix: ";
+    printf("Enter size of printing matrix: ");
     
     if (scanf("%d", &m) != 1 || m <= 0)
     {
-        cout<<"Data isn't correct"<<endl;
+        printf("Data isn't correct\n");
         
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []inverseMatrix;
+        free(matrix);
+        free(inverseMatrix);
+        free(d);
         
         return -2;
     }
     
     t = clock();
-    returnFlag = invertMatrix(matrix, inverseMatrix, n);
+    returnFlag = invertMatrix(matrix, inverseMatrix, d, n);
     t = clock() - t;
     
     if (returnFlag)
     {
-        cout<<endl<<"Inverse Matrix:"<<endl;
+        printf("\nInverse Matrix:\n");
         printMatrix(inverseMatrix, n, m);
         
         if (inputType == 1)
-            fseek(fin, 1, SEEK_SET);
+        {
+            fseek(fin, 0, SEEK_SET);
+            fscanf(fin, "%d", &n);
+        }
         
         returnFlag = enterMatrix(matrix, n, fin);
         
-        cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
-        
-        cout<<"Inversion time =  "<< t << " milliseconds"<<endl;
+        printf("\nThe norm of residual: %f\n", residualNorm(matrix, inverseMatrix, n));
+        printf("Inversion time = %f \n", t*1.0/CLOCKS_PER_SEC);
     }
     else
     {
-        cout<<"Error while inverting matrix"<<endl;
+        printf("Error while inverting matrix\n");
         
         if (inputType == 1)
             fclose(fin);
         
-        delete []matrix;
-        delete []inverseMatrix;
+        free(matrix);
+        free(inverseMatrix);
+        free(d);
         
         return -1;
     }
@@ -138,8 +145,9 @@ int main()
     if (inputType == 1)
         fclose(fin);
     
-    delete []matrix;
-    delete []inverseMatrix;
+    free(matrix);
+    free(inverseMatrix);
+    free(d);
     
     return 0;
 }
