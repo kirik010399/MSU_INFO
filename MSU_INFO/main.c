@@ -3,14 +3,14 @@
 #include <time.h>
 #include <stdlib.h>
 
-double getScalarComponent(double k, double m, int n);
+double getScalarComponent(int k, int m, int n);
 void printScalarMatrix(FILE *fout, int n);
 void generateMatrix(double *a, int n);
 double calculateSubNorm(double *a, int m, int n);
 double calculateNorm(double *a, int m, int n);
 void calculateMaxResidual(double *a, FILE *fout, int n);
 
-double getScalarComponent(double k, double m, int n)
+double getScalarComponent(int k, int m, int n)
 {
     double h = 1.0/n;
     
@@ -49,12 +49,24 @@ void printScalarMatrix(FILE *fout, int n)
     double sum = 0;//переменная для хранения временной суммы из скалярного произведения
     int k, i, j;
     
+    double maxNotOrt;
+    int maxNotX;
+    int maxNotY;
+    
     for (k = 0; k <= n; ++k)
         sum += getScalarComponent(k, 0, n) * getScalarComponent(k, 0, n);//блок подсчета скалярного произведения для 0 и 0 вектора, вынесено из цикла, чтобы присвоить изначальное значение максимуму
     
     maxSc = sum;//присваиваем изначально значение максимуму
     maxScX = 0;//присваиваем изначальное значение номеру первого вектора, на котором достигнут максимум
     maxScY = 0;//присваиваем изначальное значение номеру второго вектора, на котором достигнут максимум
+    
+    sum = 0;
+    for (k = 0; k <= n; ++k)
+        sum += getScalarComponent(k, 0, n) * getScalarComponent(k, 1, n);//блок подсчета скалярного произведения для 0 и 1 вектора, вынесено из цикла, чтобы присвоить изначальное значение максимуму
+    
+    maxNotOrt = sum;
+    maxNotX = 0;
+    maxNotY = 1;
         
     for (i = 0; i <= n; ++i)//бежим по всем векторам из условия
     {
@@ -72,13 +84,21 @@ void printScalarMatrix(FILE *fout, int n)
                 maxScY = j;
             }
             
-            fprintf(fout, "%f ", sum);//вывели очередное скалярное произведения
+            if (i != j && sum > maxNotOrt)
+            {
+                maxNotOrt = sum;
+                maxNotX = i;
+                maxNotY = j;
+            }
+            
+            fprintf(fout, "%.16f ", sum);//вывели очередное скалярное произведения
         }
         fprintf(fout, "\n");//перевели строку
     }
     //итого в файле получаем диагональную матрицу => вектора ортогональны
     
-    fprintf(fout, "\nMax scalar product: %f, index of first vector: %d, index of second vector: %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
+    fprintf(fout, "\nMax scalar product: %.16f, index of first vector: %d, index of second vector: %d\n", maxSc, maxScX, maxScY);//вывели максимальное скалярное проивезедения и вектора, на которых оно достигнуто
+    fprintf(fout, "Max not ort: %.16f, index of first vector: %d, index of second vector: %d\n", maxNotOrt, maxNotX, maxNotY);
 }
 
 void generateMatrix(double *a, int n)
@@ -133,9 +153,14 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
     double temp;//частное этих норм
     double maxNorm;//максимальная норма
     int maxNormIndex;//номер вектора, на котором она достигается
+    double maxSubNorm;
+    int maxSubIndex;
         
     maxNorm = 0;//инициализурем максимум, на нулевом векторе и норма Ay и lam равны 0
     maxNormIndex = 0;//на данный момент максимум будет на 0 векторе
+    
+    maxSubNorm = 0;
+    maxSubIndex = 0;
     
     printf("%.16f ", maxNorm);
     
@@ -151,10 +176,17 @@ void calculateMaxResidual(double *a, FILE *fout, int n)
             maxNorm = temp;
             maxNormIndex = m;
         }
+        
+        if (subNorm > maxSubNorm)
+        {
+            maxSubNorm = subNorm;
+            maxSubIndex = m;
+        }
     }
     printf("\n");
     
     fprintf(fout, "Max norm: %.16f, index of vector: %d\n", maxNorm, maxNormIndex);
+    fprintf(fout, "Max sub norm: %.16f, index of vector: %d\n", maxSubNorm, maxSubIndex);
 }
 
 double calculateSubNorm(double *a, int m, int n)
