@@ -17,7 +17,7 @@ int main()
     double eps;
     struct myPair p;
     
-    printf("Choosy type of data:\n1 - from file, \n2 - from formula\n");
+    printf("Choose type of data:\n1 - from file, \n2 - from formula\n");
 
     if (scanf("%d", &inputType) != 1)
     {
