@@ -64,7 +64,7 @@ void c2fFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
             
             for (int k = 0; k < n1; ++k)
             {
-                for (int p = 1; p < n1; ++p)
+                for (int p = 0; p < n1; ++p)
                 {
                     sum += c[k][p] * sin(M_PI*i*k*h) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5);
                 }
