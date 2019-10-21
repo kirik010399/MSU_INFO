@@ -9,7 +9,7 @@ using namespace std;
 
 double f (double x, double y)
 {
-//    return sin(M_PI*x) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5);
+    return sin(M_PI*y) * sin(M_PI*(x)*0.5);
 }
 
 void generatePointsFinal(FILE *fout, int n)
