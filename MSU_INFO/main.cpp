@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
+void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector <vector <double> > &d, int n)
 {
     double h = 1.0/n;
     double h1 = 1.0/(n-1);
@@ -26,23 +26,29 @@ void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
         for (int j = 1; j <= n-1; ++j)
         {
             double sum = 0;
-            
+            double sum1 = 0;
+
             for (int k = 1; k <= n-1; ++k)
             {
-                for (int p = 1; p <= n-1; ++p)
-                {
-                    sum += y[k][p] * sin(M_PI*i*k*h) * h * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
-                }
+                sum += y[k][j] * sin(M_PI*i*k*h) * h;
+                sum1 += sin(M_PI*i*k*h) * sin(M_PI*i*k*h) * h;
             }
             
+            d[i][j] = sum/sum1;
+        }
+    }
+    
+    for (int i = 1; i <= n-1; ++i)
+    {
+        for (int j = 1; j <= n-1; ++j)
+        {
+            double sum = 0;
             double sum1 = 0;
-            
-            for (int k = 1; k <= n-1; ++k)
+
+            for (int p = 1; p <= n-1; ++p)
             {
-                for (int p = 1; p <= n-1; ++p)
-                {
-                    sum1 += sin(M_PI*i*k*h) * sin(M_PI*i*k*h) * h * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
-                }
+                sum += d[i][p] * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
+                sum1 += sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
             }
             
             c[i][j] = sum/sum1;
@@ -89,12 +95,14 @@ int main()
     vector <vector <double> > c;
     vector <vector <double> > y;
     vector <vector <double> > y1;
+    vector <vector <double> > d;
     
     for (int i = 0; i < n + 1; ++i)
     {
         vector<double> tempC;
         vector<double> tempY;
         vector<double> tempY1;
+        vector<double> tempD;
 
         for (int j = 0; j < n + 1; ++j)
         {
@@ -103,14 +111,16 @@ int main()
             tempY.push_back(a);
             tempC.push_back(0);
             tempY1.push_back(0);
+            tempD.push_back(0);
         }
         
         y.push_back(tempY);
         c.push_back(tempC);
         y1.push_back(tempY1);
+        d.push_back(tempD);
     }
     
-    f2cFinal(c, y, n);
+    f2cFinal(c, y, d, n);
     
     for (int i = 0; i < n + 1; ++i)
     {
