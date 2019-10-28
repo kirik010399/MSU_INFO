@@ -81,16 +81,46 @@ void c2fFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
     }
 }
 
+double f (double x, double y)
+{
+    return sin(M_PI*y) * sin(M_PI*(x)*0.5);
+}
+
+void generatePointsFinal(FILE *fout, int n)
+{
+    double a = 0, b = 1;
+    
+    double dt = fabs(b-a)/(n);
+    double newDt = (1.0 + dt)/n;
+    
+    for (double j = a; j <= b; j+=dt)
+    {
+        fprintf(fout, "%f ", -f(-dt/2 + newDt, j));
+        
+        for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt; i+=newDt)
+        {
+            fprintf(fout, "%f ", f(i, j));
+        }
+        
+        fprintf(fout, "%f\n", f(1+dt/2-newDt, j));
+    }
+}
+
 int main()
 {
     FILE *fin, *fin1, *fout;
     int n;
     
     fin = fopen("input.txt", "r");
-    fin1 = fopen("input1.txt", "r");
+    fin1 = fopen("input1.txt", "w");
     fout = fopen("output.txt", "w");
     
     fscanf(fin, "%d", &n);
+    
+    generatePointsFinal(fin1, n);
+    
+    fclose(fin1);
+    fin1 = fopen("input1.txt", "r");
     
     vector <vector <double> > c;
     vector <vector <double> > y;
@@ -145,6 +175,17 @@ int main()
     }
        
     fprintf(fout, "\n");
+    
+    for (int i = 0; i < n + 1; ++i)
+       {
+           for (int j = 0; j < n + 1; ++j)
+           {
+               fprintf(fout, "%f ", y[i][j]);
+           }
+           fprintf(fout, "\n");
+       }
+          
+       fprintf(fout, "\n");
     
     fclose(fin);
     fclose(fout);
