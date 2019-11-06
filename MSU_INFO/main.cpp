@@ -7,6 +7,11 @@
 
 using namespace std;
 
+double f (double x, double y)
+{
+    return y*(y-1)*(2*x*x*x - 3*x*x);
+}
+
 void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector <vector <double> > &d, int n)
 {
     double h = 1.0/n;
@@ -81,9 +86,40 @@ void c2fFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
     }
 }
 
-double f (double x, double y)
+void residual(vector <vector <double> > c, int n)
 {
-    return sin(M_PI*y) * sin(M_PI*(x)*0.5);
+    double a = 0, b = 1;
+    
+    double dt = fabs(b-a)/(n);
+    double newDt = (1.0 + dt)/n;
+    int n1 = n + 1;
+    
+    double maxRes = 0;
+    
+    for (double i = a; i <= b; i+=dt)
+    {
+       for (double j = -dt/2 + newDt; j <= 1+dt/2-newDt; j+=newDt)
+        {
+            double tempValue = 0;
+                    
+            for (int k = 0; k < n1; ++k)
+            {
+                for (int p = 0; p < n1; ++p)
+                {
+                    tempValue += c[k][p] * sin(M_PI*i*k) * sin(M_PI*(j)*(2*p-1)*0.5);
+                }
+            }
+            
+            double tempRes = fabs(f(j, i) - tempValue);
+            
+            printf("%.16lf %.16lf %.16lf\n", i, j, tempRes);
+            
+            if(tempRes > maxRes)
+                maxRes = tempRes;
+        }
+    }
+    
+    printf("\n%.16lf\n", maxRes);
 }
 
 void generatePointsFinal(FILE *fout, int n)
@@ -93,17 +129,32 @@ void generatePointsFinal(FILE *fout, int n)
     double dt = fabs(b-a)/(n);
     double newDt = (1.0 + dt)/n;
     
+    int k1 = 0, k2 = 0;
+    
     for (double j = a; j <= b; j+=dt)
     {
-        fprintf(fout, "%f ", -f(-dt/2 + newDt, j));
+        k1++;
+        fprintf(fout, "%.16f ", -f(-dt/2 + newDt, j));
         
-        for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt; i+=newDt)
+        k2 = 0;
+        for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-15; i+=newDt)
         {
-            fprintf(fout, "%f ", f(i, j));
+            k2++;
+            fprintf(fout, "%.16f ", f(i, j));
         }
         
-        fprintf(fout, "%f\n", f(1+dt/2-newDt, j));
+        fprintf(fout, "%.16f\n", f(1+dt/2-newDt, j));
+
+        //        if (k2 != n-1)
+        //        {
+        //            for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-15; i+=newDt)
+        //                printf("%lf ", i);
+        //            printf("\n%d\n", k2);
+        //        }
     }
+
+    if (k1 != n+1)
+        printf("!!!!!!");
 }
 
 int main()
@@ -156,7 +207,7 @@ int main()
     {
         for (int j = 0; j < n + 1; ++j)
         {
-            fprintf(fout, "%f ", c[i][j]);
+            fprintf(fout, "%.16f ", c[i][j]);
         }
         fprintf(fout, "\n");
     }
@@ -165,11 +216,13 @@ int main()
     
     c2fFinal(c, y1, n);
     
+    residual(c, n);
+    
     for (int i = 0; i < n + 1; ++i)
     {
         for (int j = 0; j < n + 1; ++j)
         {
-            fprintf(fout, "%f ", y1[i][j]);
+            fprintf(fout, "%.16f ", y1[i][j]);
         }
         fprintf(fout, "\n");
     }
@@ -177,16 +230,16 @@ int main()
     fprintf(fout, "\n");
     
     for (int i = 0; i < n + 1; ++i)
-       {
-           for (int j = 0; j < n + 1; ++j)
-           {
-               fprintf(fout, "%f ", y[i][j]);
-           }
-           fprintf(fout, "\n");
-       }
-          
-       fprintf(fout, "\n");
-    
+    {
+        for (int j = 0; j < n + 1; ++j)
+        {
+            fprintf(fout, "%.16f ", y[i][j]);
+        }
+        fprintf(fout, "\n");
+    }
+      
+    fprintf(fout, "\n");
+
     fclose(fin);
     fclose(fout);
 }
