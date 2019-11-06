@@ -96,9 +96,9 @@ void residual(vector <vector <double> > c, int n)
     
     double maxRes = 0;
     
-    for (double i = a; i <= b; i+=dt)
+    for (double i = a; i <= b + 1e-10; i+=dt)
     {
-       for (double j = -dt/2 + newDt; j <= 1+dt/2-newDt; j+=newDt)
+       for (double j = -dt/2 + newDt; j <= 1+dt/2-newDt + 1e-10; j+=newDt)
         {
             double tempValue = 0;
                     
@@ -112,14 +112,14 @@ void residual(vector <vector <double> > c, int n)
             
             double tempRes = fabs(f(j, i) - tempValue);
             
-            printf("%.16lf %.16lf %.16lf\n", i, j, tempRes);
+//            printf("%.16lf %.16lf %.16lf\n", i, j, tempRes);
             
             if(tempRes > maxRes)
                 maxRes = tempRes;
         }
     }
     
-    printf("\n%.16lf\n", maxRes);
+    printf("%d %.16lf\n", n, maxRes);
 }
 
 void generatePointsFinal(FILE *fout, int n)
@@ -131,13 +131,13 @@ void generatePointsFinal(FILE *fout, int n)
     
     int k1 = 0, k2 = 0;
     
-    for (double j = a; j <= b; j+=dt)
+    for (double j = a; j <= b + 1e-10; j+=dt)
     {
         k1++;
         fprintf(fout, "%.16f ", -f(-dt/2 + newDt, j));
         
         k2 = 0;
-        for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-15; i+=newDt)
+        for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-10; i+=newDt)
         {
             k2++;
             fprintf(fout, "%.16f ", f(i, j));
@@ -160,88 +160,91 @@ void generatePointsFinal(FILE *fout, int n)
 int main()
 {
     FILE *fin, *fin1, *fout;
-    int n;
+//    int n;
     
-    fin = fopen("input.txt", "r");
-    fin1 = fopen("input1.txt", "w");
-    fout = fopen("output.txt", "w");
-    
-    fscanf(fin, "%d", &n);
-    
-    generatePointsFinal(fin1, n);
-    
-    fclose(fin1);
-    fin1 = fopen("input1.txt", "r");
-    
-    vector <vector <double> > c;
-    vector <vector <double> > y;
-    vector <vector <double> > y1;
-    vector <vector <double> > d;
-    
-    for (int i = 0; i < n + 1; ++i)
+    for (int n = 5; n <= 100; n += 5)
     {
-        vector<double> tempC;
-        vector<double> tempY;
-        vector<double> tempY1;
-        vector<double> tempD;
-
-        for (int j = 0; j < n + 1; ++j)
+        fin = fopen("input.txt", "r");
+        fin1 = fopen("input1.txt", "w");
+        fout = fopen("output.txt", "w");
+        
+    //    fscanf(fin, "%d", &n);
+        
+        generatePointsFinal(fin1, n);
+        
+        fclose(fin1);
+        fin1 = fopen("input1.txt", "r");
+        
+        vector <vector <double> > c;
+        vector <vector <double> > y;
+        vector <vector <double> > y1;
+        vector <vector <double> > d;
+        
+        for (int i = 0; i < n + 1; ++i)
         {
-            double a;
-            fscanf(fin1, "%lf", &a);
-            tempY.push_back(a);
-            tempC.push_back(0);
-            tempY1.push_back(0);
-            tempD.push_back(0);
+            vector<double> tempC;
+            vector<double> tempY;
+            vector<double> tempY1;
+            vector<double> tempD;
+
+            for (int j = 0; j < n + 1; ++j)
+            {
+                double a;
+                fscanf(fin1, "%lf", &a);
+                tempY.push_back(a);
+                tempC.push_back(0);
+                tempY1.push_back(0);
+                tempD.push_back(0);
+            }
+            
+            y.push_back(tempY);
+            c.push_back(tempC);
+            y1.push_back(tempY1);
+            d.push_back(tempD);
         }
         
-        y.push_back(tempY);
-        c.push_back(tempC);
-        y1.push_back(tempY1);
-        d.push_back(tempD);
-    }
-    
-    f2cFinal(c, y, d, n);
-    
-    for (int i = 0; i < n + 1; ++i)
-    {
-        for (int j = 0; j < n + 1; ++j)
+        f2cFinal(c, y, d, n);
+        
+        for (int i = 0; i < n + 1; ++i)
         {
-            fprintf(fout, "%.16f ", c[i][j]);
+            for (int j = 0; j < n + 1; ++j)
+            {
+                fprintf(fout, "%.16f ", c[i][j]);
+            }
+            fprintf(fout, "\n");
         }
+        
         fprintf(fout, "\n");
-    }
-    
-    fprintf(fout, "\n");
-    
-    c2fFinal(c, y1, n);
-    
-    residual(c, n);
-    
-    for (int i = 0; i < n + 1; ++i)
-    {
-        for (int j = 0; j < n + 1; ++j)
+        
+        c2fFinal(c, y1, n);
+        
+        residual(c, n);
+        
+        for (int i = 0; i < n + 1; ++i)
         {
-            fprintf(fout, "%.16f ", y1[i][j]);
+            for (int j = 0; j < n + 1; ++j)
+            {
+                fprintf(fout, "%.16f ", y1[i][j]);
+            }
+            fprintf(fout, "\n");
         }
+           
         fprintf(fout, "\n");
-    }
-       
-    fprintf(fout, "\n");
-    
-    for (int i = 0; i < n + 1; ++i)
-    {
-        for (int j = 0; j < n + 1; ++j)
+        
+        for (int i = 0; i < n + 1; ++i)
         {
-            fprintf(fout, "%.16f ", y[i][j]);
+            for (int j = 0; j < n + 1; ++j)
+            {
+                fprintf(fout, "%.16f ", y[i][j]);
+            }
+            fprintf(fout, "\n");
         }
+          
         fprintf(fout, "\n");
-    }
-      
-    fprintf(fout, "\n");
 
-    fclose(fin);
-    fclose(fout);
+        fclose(fin);
+        fclose(fout);
+    }
 }
 
 
