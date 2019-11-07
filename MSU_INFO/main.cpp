@@ -96,9 +96,9 @@ void residual(vector <vector <double> > c, int n)
     
     double maxRes = 0;
     
-    for (double i = a; i <= b + 1e-10; i+=dt)
+    for (double i = a; i <= b + 1e-10; i+=dt/3)
     {
-       for (double j = -dt/2 + newDt; j <= 1+dt/2-newDt + 1e-10; j+=newDt)
+       for (double j = -dt/2 + newDt; j <= 1+dt/2-newDt + 1e-10; j+=newDt/3)
         {
             double tempValue = 0;
                     
@@ -119,7 +119,7 @@ void residual(vector <vector <double> > c, int n)
         }
     }
     
-    printf("%d %.16lf\n", n, maxRes);
+    printf("%.16lf\n", maxRes);
 }
 
 void generatePointsFinal(FILE *fout, int n)
@@ -128,33 +128,18 @@ void generatePointsFinal(FILE *fout, int n)
     
     double dt = fabs(b-a)/(n);
     double newDt = (1.0 + dt)/n;
-    
-    int k1 = 0, k2 = 0;
-    
+        
     for (double j = a; j <= b + 1e-10; j+=dt)
     {
-        k1++;
         fprintf(fout, "%.16f ", -f(-dt/2 + newDt, j));
         
-        k2 = 0;
         for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-10; i+=newDt)
         {
-            k2++;
             fprintf(fout, "%.16f ", f(i, j));
         }
         
         fprintf(fout, "%.16f\n", f(1+dt/2-newDt, j));
-
-        //        if (k2 != n-1)
-        //        {
-        //            for (double i = -dt/2 + newDt; i <= 1+dt/2-newDt + 1e-15; i+=newDt)
-        //                printf("%lf ", i);
-        //            printf("\n%d\n", k2);
-        //        }
     }
-
-    if (k1 != n+1)
-        printf("!!!!!!");
 }
 
 int main()
@@ -162,7 +147,7 @@ int main()
     FILE *fin, *fin1, *fout;
 //    int n;
     
-    for (int n = 5; n <= 100; n += 5)
+    for (int n = 3; n <= 100; n += 1)
     {
         fin = fopen("input.txt", "r");
         fin1 = fopen("input1.txt", "w");
