@@ -114,15 +114,14 @@ void residual(vector <vector <double> > c, int n)
 {
     FILE *fout;
     fout = fopen("output1.txt", "w");
-    double a = 0, b = 1;
     
-    double dt = fabs(b-a)/(n);
+    double dt = 1.0/n;
     double newDt = 1.0/(n-1);
     int n1 = n + 1;
     
     double maxRes = 0;
     
-    for (double k = a; k <= b + 1e-10; k+=dt/2)
+    for (double k = 0; k <= 1 + 1e-10; k+=dt/2)
     {
        for (double p = newDt/2; p <= 1-newDt/2 + 1e-10; p+=newDt/2)
         {
@@ -139,7 +138,6 @@ void residual(vector <vector <double> > c, int n)
             double tempRes = fabs(f(p, k) - tempValue);
             
             fprintf(fout, "%f ", tempRes);
-//            printf("%.16lf %.16lf %.16lf\n", k, p, tempRes);
             
             if(tempRes > maxRes)
                 maxRes = tempRes;
@@ -152,14 +150,12 @@ void residual(vector <vector <double> > c, int n)
 
 void generatePointsFinal(FILE *fout, int n)
 {
-    double a = 0, b = 1;
-    
-    double dt = fabs(b-a)/(n);
+    double dt = 1.0/n;
     double newDt = 1.0/(n-1);
         
     int k1 = 0, k2 = 0;
     
-    for (double j = a; j <= b + 1e-10; j+=dt)
+    for (double j = 0; j <= 1 + 1e-10; j+=dt)
     {
         k1 = 0;
         
@@ -185,15 +181,17 @@ void generatePointsFinal(FILE *fout, int n)
 int main()
 {
     FILE *fin, *fin1, *fout;
-//    int n;
+    int begin, end;
     
-    for (int n = 5; n <= 5; n += 1)
+    fin = fopen("input.txt", "r");
+    
+    fscanf(fin, "%d", &begin);
+    fscanf(fin, "%d", &end);
+
+    for (int n = begin; n <= end; n += 1)
     {
-        fin = fopen("input.txt", "r");
         fin1 = fopen("input1.txt", "w");
         fout = fopen("output.txt", "w");
-        
-    //    fscanf(fin, "%d", &n);
         
         generatePointsFinal(fin1, n);
         
@@ -230,6 +228,8 @@ int main()
         
         f2cFinal(c, y, d, n);
         
+        fprintf(fout, "C coeff:\n");
+        
         for (int i = 0; i < n + 1; ++i)
         {
             for (int j = 0; j < n + 1; ++j)
@@ -245,6 +245,8 @@ int main()
         
         residual(c, n);
         
+        fprintf(fout, "Y result:\n");
+
         for (int i = 0; i < n + 1; ++i)
         {
             for (int j = 0; j < n + 1; ++j)
@@ -256,6 +258,8 @@ int main()
            
         fprintf(fout, "\n");
         
+        fprintf(fout, "Y begin:\n");
+
         for (int i = 0; i < n + 1; ++i)
         {
             for (int j = 0; j < n + 1; ++j)
