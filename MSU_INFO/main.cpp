@@ -12,24 +12,24 @@ double f (double x, double y)
     return y*(y-1)*(2*x*x*x - 3*x*x);
 }
 
-double getCompY(int i, int k, int n)
+double getCompY(int i, int k, int n)//i - number of vector, k - number of component
 {
     double h = 1.0/n;
     return sin(M_PI*i*k*h);
 }
 
-double getCompX(int j, int p, int n)
+double getCompX(int j, int p, int n)//j - number of vector, p - number of component
 {
     double h1 = 1.0/(n-1);
     return sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5);
 }
 
-double getBasisY(double k, int i)
+double getBasisY(int i, double k)//i - number of vector, k - double y
 {
-    return sin(M_PI*k*i);
+    return sin(M_PI*i*k);
 }
 
-double getBasisX(double p, int j)
+double getBasisX(int j, double p)//j - number of vector, p - double x
 {
     return sin(M_PI*p*(2*j-1)*0.5);
 }
@@ -132,7 +132,7 @@ void residual(vector <vector <double> > c, int n)
             {
                 for (int j = 0; j < n1; ++j)
                 {
-                    tempValue += c[i][j] * getBasisY(k, i) * getBasisX(p, j);
+                    tempValue += c[i][j] * getBasisY(i, k) * getBasisX(j, p);
                 }
             }
             
