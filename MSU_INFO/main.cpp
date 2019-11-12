@@ -12,6 +12,28 @@ double f (double x, double y)
     return y*(y-1)*(2*x*x*x - 3*x*x);
 }
 
+double getCompY(int i, int k, int n)
+{
+    double h = 1.0/n;
+    return sin(M_PI*i*k*h);
+}
+
+double getCompX(int j, int p, int n)
+{
+    double h1 = 1.0/(n-1);
+    return sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5);
+}
+
+double getBasisY(double k, int i)
+{
+    return sin(M_PI*k*i);
+}
+
+double getBasisX(double p, int j)
+{
+    return sin(M_PI*p*(2*j-1)*0.5);
+}
+
 void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector <vector <double> > &d, int n)
 {
     double h = 1.0/n;
@@ -35,8 +57,10 @@ void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector
 
             for (int k = 1; k <= n-1; ++k)
             {
-                sum += y[k][j] * sin(M_PI*i*k*h) * h;
-                sum1 += sin(M_PI*i*k*h) * sin(M_PI*i*k*h) * h;
+                double compY = getCompY(i, k, n);
+                
+                sum += y[k][j] * compY * h;
+                sum1 += compY * compY * h;
             }
             
             d[i][j] = sum/sum1;
@@ -52,8 +76,10 @@ void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector
 
             for (int p = 1; p <= n-1; ++p)
             {
-                sum += d[i][p] * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
-                sum1 += sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5) * h1;
+                double compX = getCompX(j, p, n);
+                
+                sum += d[i][p] * compX * h1;
+                sum1 += compX * compX * h1;
             }
             
             c[i][j] = sum/sum1;
@@ -63,8 +89,6 @@ void f2cFinal(vector <vector <double> > &c, vector <vector <double> > &y, vector
 
 void c2fFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
 {
-    double h = 1.0/n;
-    double h1 = 1.0/(n-1);
     int n1 = n + 1;
 
     for (int i = 0; i < n1; ++i)
@@ -77,7 +101,7 @@ void c2fFinal(vector <vector <double> > &c, vector <vector <double> > &y, int n)
             {
                 for (int p = 0; p < n1; ++p)
                 {
-                    sum += c[k][p] * sin(M_PI*i*k*h) * sin(M_PI*(p*h1-h1/2)*(2*j-1)*0.5);
+                    sum += c[k][p] * getCompY(i, k, n) * getCompX(j, p, n);
                 }
             }
             
@@ -98,24 +122,24 @@ void residual(vector <vector <double> > c, int n)
     
     double maxRes = 0;
     
-    for (double i = a; i <= b + 1e-10; i+=dt/2)
+    for (double k = a; k <= b + 1e-10; k+=dt/2)
     {
-       for (double j = newDt/2; j <= 1-newDt/2 + 1e-10; j+=newDt/2)
+       for (double p = newDt/2; p <= 1-newDt/2 + 1e-10; p+=newDt/2)
         {
             double tempValue = 0;
                     
-            for (int k = 0; k < n1; ++k)
+            for (int i = 0; i < n1; ++i)
             {
-                for (int p = 0; p < n1; ++p)
+                for (int j = 0; j < n1; ++j)
                 {
-                    tempValue += c[k][p] * sin(M_PI*i*k) * sin(M_PI*(j)*(2*p-1)*0.5);
+                    tempValue += c[i][j] * getBasisY(k, i) * getBasisX(p, j);
                 }
             }
             
-            double tempRes = fabs(f(j, i) - tempValue);
+            double tempRes = fabs(f(p, k) - tempValue);
             
             fprintf(fout, "%f ", tempRes);
-//            printf("%.16lf %.16lf %.16lf\n", i, j, tempRes);
+//            printf("%.16lf %.16lf %.16lf\n", k, p, tempRes);
             
             if(tempRes > maxRes)
                 maxRes = tempRes;
@@ -138,6 +162,7 @@ void generatePointsFinal(FILE *fout, int n)
     for (double j = a; j <= b + 1e-10; j+=dt)
     {
         k1 = 0;
+        
         fprintf(fout, "%.16f ", -f(newDt/2, j));
         
         for (double i = newDt/2; i <= 1-newDt/2 + 1e-10; i += newDt)
@@ -147,12 +172,14 @@ void generatePointsFinal(FILE *fout, int n)
         }
         
         fprintf(fout, "%.16f\n", f(1-newDt/2, j));
+        
         if (k1 != n-1)
-            printf("1");
+            printf("X error");
         k2++;
     }
+    
     if (k2 != n+1)
-        printf("2");
+        printf("Y error");
 }
 
 int main()
