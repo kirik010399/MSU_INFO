@@ -6,7 +6,7 @@
 
 using namespace std;
 
-struct tree* add_to_tree(struct tree *root, double new_value);
+struct tree* addToTree(struct tree *root, double newValue);
 void printTree(struct tree *p, ofstream &fout);
 
 struct tree
@@ -27,7 +27,7 @@ int main()
     while (!fin.eof())
     {
         if (fin>>value)
-            root = add_to_tree(root, value);
+            root = addToTree(root, value);
     }
     
     printTree(root, fout);
@@ -35,13 +35,13 @@ int main()
     return 0;
 }
 
-struct tree* add_to_tree(struct tree *root, double new_value)
+struct tree* addToTree(struct tree *root, double newValue)
 {
     if (root == NULL)
     {
         root = (struct tree*)malloc(sizeof(struct tree));
         
-        root->value = new_value;
+        root->value = newValue;
         
         root->left = NULL;
         root->right = NULL;
@@ -49,12 +49,12 @@ struct tree* add_to_tree(struct tree *root, double new_value)
         return root;
     }
     
-    double cur_value = root->value;
+    double curValue = root->value;
     
-    if (cur_value < new_value)
-        root->right = add_to_tree(root->right, new_value);
-    else if (cur_value > new_value)
-        root->left = add_to_tree(root->left, new_value);
+    if (curValue < newValue)
+        root->right = addToTree(root->right, newValue);
+    else if (curValue > newValue)
+        root->left = addToTree(root->left, newValue);
     else
         ++root->count;
     
