@@ -6,12 +6,12 @@
 
 using namespace std;
 
-struct tree* add_to_tree(struct tree *root, string new_value);
+struct tree* add_to_tree(struct tree *root, string new_value);// change here
 void printTree(struct tree *p, ofstream &fout);
 
 struct tree
 {
-    string value;
+    string value;// change here
     struct tree *left;
     struct tree *right;
     int count;
@@ -19,7 +19,7 @@ struct tree
 
 int main()
 {
-    string value;
+    string value;// change here
     struct tree *root = NULL;
     ifstream fin("input.txt");
     ofstream fout("output.txt");
@@ -35,7 +35,7 @@ int main()
     return 0;
 }
 
-struct tree* add_to_tree(struct tree *root, string new_value)
+struct tree* add_to_tree(struct tree *root, string new_value)// change here
 {
     if (root == NULL)
     {
@@ -49,11 +49,11 @@ struct tree* add_to_tree(struct tree *root, string new_value)
         return root;
     }
     
-    string cur_value = root->value;
+    string cur_value = root->value;// change here
     
-    if (cur_value.compare(new_value) < 0)
+    if (cur_value.compare(new_value) < 0)// change here
         root->right = add_to_tree(root->right, new_value);
-    else if (cur_value.compare(new_value) > 0)
+    else if (cur_value.compare(new_value) > 0)// change here
         root->left = add_to_tree(root->left, new_value);
     else
         ++root->count;

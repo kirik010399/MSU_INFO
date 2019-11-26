@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ED58D550238D889100C27CB7 /* sample0.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D54F238D889100C27CB7 /* sample0.cpp */; };
+		ED58D550238D889100C27CB7 /* sample2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D54F238D889100C27CB7 /* sample2.cpp */; };
 		ED6FF2A823329CA600714233 /* sample1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6FF2A723329CA600714233 /* sample1.cpp */; };
 /* End PBXBuildFile section */
 
@@ -27,7 +27,7 @@
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
-		ED58D54F238D889100C27CB7 /* sample0.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample0.cpp; sourceTree = "<group>"; };
+		ED58D54F238D889100C27CB7 /* sample2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample2.cpp; sourceTree = "<group>"; };
 		ED6FF2A723329CA600714233 /* sample1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample1.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -63,8 +63,8 @@
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
-				ED58D54F238D889100C27CB7 /* sample0.cpp */,
 				ED6FF2A723329CA600714233 /* sample1.cpp */,
+				ED58D54F238D889100C27CB7 /* sample2.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -126,7 +126,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED58D550238D889100C27CB7 /* sample0.cpp in Sources */,
+				ED58D550238D889100C27CB7 /* sample2.cpp in Sources */,
 				ED6FF2A823329CA600714233 /* sample1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
