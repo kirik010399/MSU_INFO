@@ -19,15 +19,15 @@ struct tree
 
 int main()
 {
-    string word;
+    string value;
     struct tree *root = NULL;
     ifstream fin("input.txt");
     ofstream fout("output.txt");
             
     while (!fin.eof())
     {
-        if (fin>>word)
-            root = add_to_tree(root, word);
+        if (fin>>value)
+            root = add_to_tree(root, value);
     }
     
     printTree(root, fout);
@@ -66,7 +66,10 @@ void printTree(struct tree *p, ofstream &fout)
     if(p != NULL)
     {
         printTree(p->left, fout);
-        fout<<"count: "<<p->count<<", word: "<<p->value<<"\n";
+        
+        for (int i = 0; i < p->count; ++i)
+            fout<<p->value<<" ";
+        
         printTree(p->right, fout);
     }
 }

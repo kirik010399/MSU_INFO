@@ -1,9 +1,1 @@
-count: 3, word: a
-count: 2, word: abc
-count: 2, word: abcd
-count: 1, word: b
-count: 1, word: kir
-count: 2, word: kirill
-count: 1, word: vasya
-count: 1, word: vasyaa
-count: 1, word: zxy
+a a a abc abc abcd abcd b kir kirill kirill vasya vasyaa zxy 
