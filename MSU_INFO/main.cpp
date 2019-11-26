@@ -22,7 +22,7 @@ int main()
 {
     string word;
     struct tree *root = NULL;
-    ifstream fin ("input.txt");
+    ifstream fin("input.txt");
     ofstream fout("output.txt");
             
     while (!fin.eof())
