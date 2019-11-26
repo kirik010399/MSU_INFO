@@ -6,7 +6,6 @@
 
 using namespace std;
 
-int stringCompare(string s1, string s2);
 struct tree* add_to_tree(struct tree *root, string new_value);
 void printTree(struct tree *p, ofstream &fout);
 
