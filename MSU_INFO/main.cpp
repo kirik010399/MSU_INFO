@@ -12,7 +12,7 @@ void printTree(struct tree *p, ofstream &fout);
 
 struct tree
 {
-    string a;
+    string value;
     struct tree *left;
     struct tree *right;
     int count;
@@ -42,7 +42,7 @@ struct tree* add_to_tree(struct tree *root, string new_value)
     {
         root = (struct tree*)malloc(sizeof(struct tree));
         
-        root->a = new_value;
+        root->value = new_value;
         
         root->left = NULL;
         root->right = NULL;
@@ -50,7 +50,7 @@ struct tree* add_to_tree(struct tree *root, string new_value)
         return root;
     }
     
-    string cur_value = root->a;
+    string cur_value = root->value;
     
     if (cur_value.compare(new_value) < 0)
         root->right = add_to_tree(root->right, new_value);
@@ -67,7 +67,7 @@ void printTree(struct tree *p, ofstream &fout)
     if(p != NULL)
     {
         printTree(p->left, fout);
-        fout<<"count: "<<p->count<<", word: "<<p->a<<"\n";
+        fout<<"count: "<<p->count<<", word: "<<p->value<<"\n";
         printTree(p->right, fout);
     }
 }
