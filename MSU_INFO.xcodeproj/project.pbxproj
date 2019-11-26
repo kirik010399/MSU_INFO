@@ -68,8 +68,8 @@
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
 				ED6FF2A723329CA600714233 /* sample1.cpp */,
-				ED58D54F238D889100C27CB7 /* sample2.cpp */,
 				ED58D551238D8B0A00C27CB7 /* sample1_1.cpp */,
+				ED58D54F238D889100C27CB7 /* sample2.cpp */,
 				ED58D553238D90DF00C27CB7 /* sample2_1.cpp */,
 			);
 			path = MSU_INFO;
