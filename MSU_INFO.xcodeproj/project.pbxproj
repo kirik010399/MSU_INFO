@@ -7,13 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ED0C3B991F82C3EA00D8B1BE /* Pointer.c in Sources */ = {isa = PBXBuildFile; fileRef = ED0C3B981F82C3EA00D8B1BE /* Pointer.c */; };
-		ED6FF2A823329CA600714233 /* sample3.c in Sources */ = {isa = PBXBuildFile; fileRef = ED6FF2A723329CA600714233 /* sample3.c */; };
-		ED9D1D0A233B80260030871E /* ReadWriteFiles.c in Sources */ = {isa = PBXBuildFile; fileRef = ED9D1D08233B80260030871E /* ReadWriteFiles.c */; };
-		ED9D1D0B233B80260030871E /* MainConstructions.c in Sources */ = {isa = PBXBuildFile; fileRef = ED9D1D09233B80260030871E /* MainConstructions.c */; };
-		EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF2232125BC0006EBAD /* sample1.c */; };
-		EDEEDDF5232126390006EBAD /* sample2.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF4232126390006EBAD /* sample2.c */; };
-		EDEEDDF723224CF90006EBAD /* sample0.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEDDF623224CF90006EBAD /* sample0.c */; };
+		ED6FF2A823329CA600714233 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6FF2A723329CA600714233 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,15 +24,9 @@
 
 /* Begin PBXFileReference section */
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED0C3B981F82C3EA00D8B1BE /* Pointer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Pointer.c; sourceTree = "<group>"; };
 		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
-		ED6FF2A723329CA600714233 /* sample3.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample3.c; sourceTree = "<group>"; };
-		ED9D1D08233B80260030871E /* ReadWriteFiles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReadWriteFiles.c; sourceTree = "<group>"; };
-		ED9D1D09233B80260030871E /* MainConstructions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MainConstructions.c; sourceTree = "<group>"; };
-		EDEEDDF2232125BC0006EBAD /* sample1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample1.c; sourceTree = "<group>"; };
-		EDEEDDF4232126390006EBAD /* sample2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample2.c; sourceTree = "<group>"; };
-		EDEEDDF623224CF90006EBAD /* sample0.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sample0.c; sourceTree = "<group>"; };
+		ED6FF2A723329CA600714233 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,13 +61,7 @@
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
 				ED3B83FF1F82D29000AB9A64 /* output.txt */,
-				ED0C3B981F82C3EA00D8B1BE /* Pointer.c */,
-				EDEEDDF623224CF90006EBAD /* sample0.c */,
-				EDEEDDF2232125BC0006EBAD /* sample1.c */,
-				ED9D1D09233B80260030871E /* MainConstructions.c */,
-				ED9D1D08233B80260030871E /* ReadWriteFiles.c */,
-				EDEEDDF4232126390006EBAD /* sample2.c */,
-				ED6FF2A723329CA600714233 /* sample3.c */,
+				ED6FF2A723329CA600714233 /* main.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -141,13 +123,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED9D1D0B233B80260030871E /* MainConstructions.c in Sources */,
-				EDEEDDF723224CF90006EBAD /* sample0.c in Sources */,
-				ED6FF2A823329CA600714233 /* sample3.c in Sources */,
-				ED0C3B991F82C3EA00D8B1BE /* Pointer.c in Sources */,
-				EDEEDDF3232125BC0006EBAD /* sample1.c in Sources */,
-				EDEEDDF5232126390006EBAD /* sample2.c in Sources */,
-				ED9D1D0A233B80260030871E /* ReadWriteFiles.c in Sources */,
+				ED6FF2A823329CA600714233 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

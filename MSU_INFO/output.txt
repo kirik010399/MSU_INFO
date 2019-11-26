@@ -1,2 +1,9 @@
-Количество элементов: 4
-Максимальный подъем: 0
+count: 3, word: a
+count: 2, word: abc
+count: 2, word: abcd
+count: 1, word: b
+count: 1, word: kir
+count: 2, word: kirill
+count: 1, word: vasya
+count: 1, word: vasyaa
+count: 1, word: zxy
