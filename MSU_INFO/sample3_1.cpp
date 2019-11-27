@@ -6,26 +6,41 @@
 
 using namespace std;
 
-struct tree
+template <class T>
+class tree
 {
-    double value;
-    struct tree *left;
-    struct tree *right;
+public:
+    tree(){}
+    tree(T value)
+    {
+        this->value = value;
+    }
+    ~tree();
+
+    T value;
+    tree *left;
+    tree *right;
     int count;
 };
 
-struct tree* addToTree(struct tree *root, double newValue);
-void printTree(struct tree *p);
-bool findValue(struct tree *p, double x);
+template <class T>
+tree <T>* addToTree(tree <T> *root, T newValue);
+
+template <class T>
+void printTree(tree <T> *p);
+
+template <class T>
+bool findValue(tree <T> *p, T x);
 
 int main()
 {
-    double value;
-    struct tree *root = NULL;
+    double value;// change here
     ifstream fin("input.txt");
     ofstream fout("output.txt");
-
-    double x;
+            
+    tree <double> *root = NULL;// change here
+    
+    double x;//change here
     fin>>x;
 
     while (!fin.eof())
@@ -33,16 +48,17 @@ int main()
         if (fin>>value)
             root = addToTree(root, value);
     }
-
+    
     printTree(root);
-
+    
     bool retFlag = findValue(root, x);
     fout<<retFlag<<endl;
-
+    
     return 0;
 }
 
-bool findValue(struct tree *p, double x)
+template <class T>
+bool findValue(tree <T> *p, T x)
 {
     if (!p->left && !p->right)
         return x == p->value;
@@ -67,33 +83,33 @@ bool findValue(struct tree *p, double x)
     }
 }
 
-struct tree* addToTree(struct tree *root, double newValue)
+template <class T>
+tree <T>* addToTree(tree <T> *root, T newValue)
 {
     if (root == NULL)
     {
-        root = (struct tree*)malloc(sizeof(struct tree));
-
-        root->value = newValue;
-
-        root->left = NULL;
-        root->right = NULL;
-        root->count = 1;
-        return root;
+        tree <T> *newRoot = new tree <T> (newValue);
+                
+        newRoot->left = NULL;
+        newRoot->right = NULL;
+        newRoot->count = 1;
+        return newRoot;
     }
-
-    double curValue = root->value;
-
+    
+    T curValue = root->value;
+    
     if (curValue < newValue)
         root->right = addToTree(root->right, newValue);
     else if (curValue > newValue)
         root->left = addToTree(root->left, newValue);
     else
         ++root->count;
-
+    
     return root;
 }
 
-void printTree(struct tree *p)
+template <class T>
+void printTree(tree <T> *p)
 {
     if(p != NULL)
     {

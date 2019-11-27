@@ -6,24 +6,37 @@
 
 using namespace std;
 
-struct tree
+template <class T>
+class tree
 {
-    string value;// change here
-    struct tree *left;
-    struct tree *right;
+public:
+    tree(){}
+    tree(T value)
+    {
+        this->value = value;
+    }
+    ~tree();
+
+    T value;
+    tree *left;
+    tree *right;
     int count;
 };
 
-struct tree* addToTree(struct tree *root, string newValue);// change here
-void printTree(struct tree *p, ofstream &fout);
+template <class T>
+tree <T>* addToTree(tree <T> *root, T newValue);
+
+template <class T>
+void printTree(tree <T> *p, ofstream &fout);
 
 int main()
 {
-    string value;// change here
-    struct tree *root = NULL;
+    int value;// change here
     ifstream fin("input.txt");
     ofstream fout("output.txt");
             
+    tree <int> *root = NULL;// change here
+
     while (!fin.eof())
     {
         if (fin>>value)
@@ -35,21 +48,20 @@ int main()
     return 0;
 }
 
-struct tree* addToTree(struct tree *root, string newValue)// change here
+template <class T>
+tree <T>* addToTree(tree <T> *root, T newValue)
 {
     if (root == NULL)
     {
-        root = (struct tree*)malloc(sizeof(struct tree));
-        
-        root->value = newValue;
-        
-        root->left = NULL;
-        root->right = NULL;
-        root->count = 1;
-        return root;
+        tree <T> *newRoot = new tree <T> (newValue);
+                
+        newRoot->left = NULL;
+        newRoot->right = NULL;
+        newRoot->count = 1;
+        return newRoot;
     }
     
-    string curValue = root->value;// change here
+    T curValue = root->value;
     
     if (curValue < newValue)
         root->right = addToTree(root->right, newValue);
@@ -61,15 +73,16 @@ struct tree* addToTree(struct tree *root, string newValue)// change here
     return root;
 }
 
-void printTree(struct tree *p, ofstream &fout)
+template <class T>
+void printTree(tree <T> *p, ofstream &fout)
 {
     if(p != NULL)
     {
         printTree(p->left, fout);
-        
+
         for (int i = 0; i < p->count; ++i)
             fout<<p->value<<" ";
-        
+
         printTree(p->right, fout);
     }
 }

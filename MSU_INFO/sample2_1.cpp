@@ -6,10 +6,6 @@
 
 using namespace std;
 
-struct tree* addToTree(struct tree *root, string newValue);// change here
-void printTree(struct tree *p);
-bool findValue(struct tree *p, string x);//change here
-
 struct tree
 {
     string value;// change here
@@ -17,6 +13,10 @@ struct tree
     struct tree *right;
     int count;
 };
+
+struct tree* addToTree(struct tree *root, string newValue);// change here
+void printTree(struct tree *p);
+bool findValue(struct tree *p, string x);//change here
 
 int main()
 {
@@ -45,16 +45,16 @@ int main()
 bool findValue(struct tree *p, string x)// change here
 {
     if (!p->left && !p->right)
-        return x.compare(p->value) == 0;// change here
+        return x == p->value;
     
-    if (x.compare(p->value) < 0)// change here
+    if (x < p->value)
     {
         if (p->left)
             return findValue(p->left, x);
         else
             return false;
     }
-    if (x.compare(p->value) > 0)// change here
+    if (x > p->value)
     {
         if (p->right)
             return findValue(p->right, x);
@@ -83,9 +83,9 @@ struct tree* addToTree(struct tree *root, string newValue)// change here
     
     string curValue = root->value;// change here
     
-    if (curValue.compare(newValue) < 0)// change here
+    if (curValue < newValue)// change here
         root->right = addToTree(root->right, newValue);
-    else if (curValue.compare(newValue) > 0)// change here
+    else if (curValue > newValue)// change here
         root->left = addToTree(root->left, newValue);
     else
         ++root->count;

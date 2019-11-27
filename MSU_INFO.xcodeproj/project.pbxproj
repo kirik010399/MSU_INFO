@@ -10,6 +10,8 @@
 		ED58D550238D889100C27CB7 /* sample2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D54F238D889100C27CB7 /* sample2.cpp */; };
 		ED58D552238D8B0A00C27CB7 /* sample1_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D551238D8B0A00C27CB7 /* sample1_1.cpp */; };
 		ED58D554238D90DF00C27CB7 /* sample2_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D553238D90DF00C27CB7 /* sample2_1.cpp */; };
+		ED58D556238E9DC700C27CB7 /* sample3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D555238E9DC700C27CB7 /* sample3.cpp */; };
+		ED58D55A238EF7DD00C27CB7 /* sample3_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED58D559238EF7DD00C27CB7 /* sample3_1.cpp */; };
 		ED6FF2A823329CA600714233 /* sample1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6FF2A723329CA600714233 /* sample1.cpp */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +34,8 @@
 		ED58D54F238D889100C27CB7 /* sample2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample2.cpp; sourceTree = "<group>"; };
 		ED58D551238D8B0A00C27CB7 /* sample1_1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample1_1.cpp; sourceTree = "<group>"; };
 		ED58D553238D90DF00C27CB7 /* sample2_1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample2_1.cpp; sourceTree = "<group>"; };
+		ED58D555238E9DC700C27CB7 /* sample3.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample3.cpp; sourceTree = "<group>"; };
+		ED58D559238EF7DD00C27CB7 /* sample3_1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample3_1.cpp; sourceTree = "<group>"; };
 		ED6FF2A723329CA600714233 /* sample1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample1.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -71,6 +75,8 @@
 				ED58D551238D8B0A00C27CB7 /* sample1_1.cpp */,
 				ED58D54F238D889100C27CB7 /* sample2.cpp */,
 				ED58D553238D90DF00C27CB7 /* sample2_1.cpp */,
+				ED58D555238E9DC700C27CB7 /* sample3.cpp */,
+				ED58D559238EF7DD00C27CB7 /* sample3_1.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -132,6 +138,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED58D556238E9DC700C27CB7 /* sample3.cpp in Sources */,
+				ED58D55A238EF7DD00C27CB7 /* sample3_1.cpp in Sources */,
 				ED58D550238D889100C27CB7 /* sample2.cpp in Sources */,
 				ED58D552238D8B0A00C27CB7 /* sample1_1.cpp in Sources */,
 				ED58D554238D90DF00C27CB7 /* sample2_1.cpp in Sources */,

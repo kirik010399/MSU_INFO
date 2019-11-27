@@ -6,9 +6,6 @@
 
 using namespace std;
 
-struct tree* addToTree(struct tree *root, double newValue);
-void printTree(struct tree *p, ofstream &fout);
-
 struct tree
 {
     double value;
@@ -16,6 +13,9 @@ struct tree
     struct tree *right;
     int count;
 };
+
+struct tree* addToTree(struct tree *root, double newValue);
+void printTree(struct tree *p, ofstream &fout);
 
 int main()
 {
