@@ -34,13 +34,13 @@ bool findValue(tree <T> *p, T x);
 
 int main()
 {
-    double value;// change here
+    string value;// change here
     ifstream fin("input.txt");
     ofstream fout("output.txt");
             
-    tree <double> *root = NULL;// change here
+    tree <string> *root = NULL;// change here
     
-    double x;//change here
+    string x;//change here
     fin>>x;
 
     while (!fin.eof())
