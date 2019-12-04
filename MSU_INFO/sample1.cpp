@@ -47,7 +47,7 @@ public:
             }
 
             i = parent;
-            parent = (i-1)/2;//if even - then right child and will return parent too
+            parent = (i-1)/2;//if even - then right child and will return parent too because of int division
         }
         
         ++heapSize;
@@ -80,17 +80,17 @@ public:
     
     void buildHeap(int *a, int n)
     {
-        heapSize = n;
-        for (int i = 0; i < heapSize; ++i)
+        heapSize = 0;
+        for (int i = 0; i < n; ++i)
             addElement(a[i]);
     }
     
     void buildHeapOptimal(int *a, int n)
     {
-        heapSize = n;
-        
-        for(int i = 0; i < heapSize; ++i)
+        for(int i = 0; i < n; ++i)
             list[i] = a[i];
+        
+        heapSize = n;
 
         for (int i = heapSize/2; i >= 0; i--)
             heapify(i);
@@ -106,7 +106,9 @@ public:
     
     void heapSort(int *a, int n)
     {
+//        buildHeap(a, n);
         buildHeapOptimal(a, n);
+
         for (int i = n-1; i >= 0; --i)
         {
             a[i] = popMax();
@@ -122,15 +124,15 @@ public:
         {
             while((i < k) && (i < heapSize))
             {
-                cout << list[i] << " ";
+                cout<<list[i]<<" ";
                 i++;
             }
             cout << endl;
-            k = k * 2 + 1;
+            k = k*2+1;
         }
     }
     
-    void out()
+    void outArray()
     {
         for (int i = 0; i < heapSize; ++i)
         {
@@ -142,24 +144,25 @@ public:
 
 int main()
 {
-    int value;// change here
+    int n;
     ifstream fin("input.txt");
     ofstream fout("output.txt");
-        
-    Heap heap(10);
+            
+    int *a;
+    fin>>n;
     
-    while (!fin.eof())
-    {
-        if (fin>>value)
-        {
-            heap.addElement(value);
-        }
-    }
+    a = new int[n];
     
-    heap.outHeap();
-    cout<<endl;
-    heap.out();
-
+    for (int i = 0; i < n; ++i)
+        fin>>a[i];
+    
+    Heap heap(n);
+    heap.heapSort(a, n);
+    
+    for (int i = 0; i < n; ++i)
+        fout<<a[i]<<" ";
+    
+    delete []a;
     return 0;
 }
 
