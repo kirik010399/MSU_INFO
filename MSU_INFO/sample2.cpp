@@ -23,7 +23,7 @@ public:
     
     Heap(int size)
     {
-        list = new int[size];//current - i, left child - 2*i+1, right child - 2*i+2
+        list = new int[size];//parent - i, left child - 2*i+1, right child - 2*i+2
         heapMaxSize = size;
         heapSize = 0;
     }
@@ -35,22 +35,22 @@ public:
     
     void addElement(int value)
     {
-        list[heapSize] = value;
-        int i = heapSize;
+        ++heapSize;
+
+        list[heapSize-1] = value;
+        int i = heapSize-1;
         int parent = (i-1)/2;
         
         while(parent >= 0 && i > 0)
         {
             if(list[i] > list[parent])
-            {
-              swap(list[i], list[parent]);
-            }
+                swap(list[i], list[parent]);
+            else
+                break;
 
             i = parent;
             parent = (i-1)/2;//if even - then right child and will return parent too because of int division
         }
-        
-        ++heapSize;
     }
     
     void buildHeap(int *a, int n)
@@ -106,8 +106,8 @@ public:
     
     void heapSort(int *a, int n)
     {
-//        buildHeap(a, n);
-        buildHeapOptimal(a, n);
+        buildHeap(a, n);
+//        buildHeapOptimal(a, n);
 
         for (int i = n-1; i >= 0; --i)
         {
@@ -127,7 +127,7 @@ public:
                 cout<<list[i]<<" ";
                 i++;
             }
-            cout << endl;
+            cout<<endl;
             k = k*2+1;
         }
     }
