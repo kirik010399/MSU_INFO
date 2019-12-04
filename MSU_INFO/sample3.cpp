@@ -33,33 +33,6 @@ public:
         delete []list;
     }
     
-    void addElement(int value)
-    {
-        ++heapSize;
-
-        list[heapSize-1] = value;
-        int i = heapSize-1;
-        int parent = (i-1)/2;//if even - then right child and will return parent too because of int division
-        
-        while(parent >= 0 && i > 0)
-        {
-            if(list[i] > list[parent])
-                swap(list[i], list[parent]);
-            else
-                break;
-
-            i = parent;
-            parent = (i-1)/2;
-        }
-    }
-    
-    void buildHeap(int *a, int n)
-    {
-        heapSize = 0;
-        for (int i = 0; i < n; ++i)
-            addElement(a[i]);
-    }
-    
     void heapify(int i)
     {
         int left, right;
@@ -106,39 +79,13 @@ public:
     
     void heapSort(int *a, int n)
     {
-        buildHeap(a, n);
-//        buildHeapOptimal(a, n);
+        buildHeapOptimal(a, n);
 
         for (int i = n-1; i >= 0; --i)
         {
             a[i] = popMax();
             heapify(0);
         }
-    }
-    
-    void outHeap()
-    {
-        int i = 0;
-        int k = 1;
-        while(i < heapSize)
-        {
-            while((i < k) && (i < heapSize))
-            {
-                cout<<list[i]<<" ";
-                i++;
-            }
-            cout<<endl;
-            k = k*2+1;
-        }
-    }
-    
-    void outArray()
-    {
-        for (int i = 0; i < heapSize; ++i)
-        {
-            cout<<list[i]<<" ";
-        }
-        cout<<endl;
     }
 };
 
