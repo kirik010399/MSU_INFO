@@ -85,17 +85,6 @@ public:
         }
     }
     
-    void buildHeapOptimal(int *a, int n)
-    {
-        for(int i = 0; i < n; ++i)
-            list[i] = a[i];
-        
-        heapSize = n;
-
-        for (int i = heapSize/2; i >= 0; i--)
-            heapify(i);
-    }
-    
     int popMax()
     {
         int max = list[0];
@@ -107,38 +96,12 @@ public:
     void heapSort(int *a, int n)
     {
         buildHeap(a, n);
-//        buildHeapOptimal(a, n);
 
         for (int i = n-1; i >= 0; --i)
         {
             a[i] = popMax();
             heapify(0);
         }
-    }
-    
-    void outHeap()
-    {
-        int i = 0;
-        int k = 1;
-        while(i < heapSize)
-        {
-            while((i < k) && (i < heapSize))
-            {
-                cout<<list[i]<<" ";
-                i++;
-            }
-            cout<<endl;
-            k = k*2+1;
-        }
-    }
-    
-    void outArray()
-    {
-        for (int i = 0; i < heapSize; ++i)
-        {
-            cout<<list[i]<<" ";
-        }
-        cout<<endl;
     }
 };
 

@@ -69,13 +69,12 @@ public:
         }
     }
     
-    void outArray()
+    void outArray(ofstream &fout)
     {
         for (int i = 0; i < heapSize; ++i)
         {
-            cout<<list[i]<<" ";
+            fout<<list[i]<<" ";
         }
-        cout<<endl;
     }
 };
 
@@ -97,7 +96,7 @@ int main()
     }
     
     heap.outHeap();
-    heap.outArray();
+    heap.outArray(fout);
     
     return 0;
 }
