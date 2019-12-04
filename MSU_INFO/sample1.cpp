@@ -39,7 +39,7 @@ public:
 
         list[heapSize-1] = value;
         int i = heapSize-1;
-        int parent = (i-1)/2;
+        int parent = (i-1)/2;//if even - then right child and will return parent too because of int division
         
         while(parent >= 0 && i > 0)
         {
@@ -49,7 +49,7 @@ public:
                 break;
             
             i = parent;
-            parent = (i-1)/2;//if even - then right child and will return parent too because of int division
+            parent = (i-1)/2;
         }
     }
     
