@@ -53,12 +53,19 @@ public:
         ++heapSize;
     }
     
+    void buildHeap(int *a, int n)
+    {
+        heapSize = 0;
+        for (int i = 0; i < n; ++i)
+            addElement(a[i]);
+    }
+    
     void heapify(int i)
     {
         int left, right;
         left = 2*i+1;
         right = 2*i+2;
-        
+
         if(left < heapSize)
         {
             if(list[i] < list[left])
@@ -67,7 +74,7 @@ public:
                 heapify(left);
             }
         }
-        
+
         if(right < heapSize)
         {
             if(list[i] < list[right])
@@ -76,13 +83,6 @@ public:
                 heapify(right);
             }
         }
-    }
-    
-    void buildHeap(int *a, int n)
-    {
-        heapSize = 0;
-        for (int i = 0; i < n; ++i)
-            addElement(a[i]);
     }
     
     void buildHeapOptimal(int *a, int n)
