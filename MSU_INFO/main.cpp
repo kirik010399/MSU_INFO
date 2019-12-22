@@ -17,7 +17,7 @@ int main()
     int inputType;
     int returnFlag;
     
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
+    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
     cin>>inputType;
     
     if (inputType == 1)
@@ -102,7 +102,7 @@ int main()
         printResult(result, n, m);
         
         if (inputType == 1)
-            fseek(fin, 1, SEEK_SET);
+            fscanf(fin, "%d", &n);
         
         returnFlag = enterData(matrix, vector, n, fin);
         

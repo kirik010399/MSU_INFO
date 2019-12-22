@@ -100,7 +100,7 @@
 		ED0C3B8D1F82C3EA00D8B1BE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Кирилл Мащенко";
 				TargetAttributes = {
 					ED0C3B941F82C3EA00D8B1BE = {
@@ -250,6 +250,7 @@
 		ED0C3B9D1F82C3EA00D8B1BE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92HN6W64J3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -259,6 +260,7 @@
 		ED0C3B9E1F82C3EA00D8B1BE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92HN6W64J3;
 				PRODUCT_NAME = "$(TARGET_NAME)";

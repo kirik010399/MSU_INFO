@@ -15,7 +15,7 @@ using namespace std;
 
 double func(int i, int j)
 {
-    return i+j==999 ?1 :0;
+    return fabs(i-j);
 }
 
 int enterData(double* matrix, double *vector, int n, FILE* fin)
