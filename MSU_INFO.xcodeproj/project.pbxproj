@@ -25,10 +25,9 @@
 /* Begin PBXFileReference section */
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		ED3B83FF1F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
+		ED3B83FF1F82D29000AB9A64 /* outputNewton.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = outputNewton.txt; sourceTree = "<group>"; };
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
-		EDA0BBF8232A6C18001D0ED3 /* input1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input1.txt; sourceTree = "<group>"; };
-		EDBB1F4B23744C16003C18FB /* output1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output1.txt; sourceTree = "<group>"; };
+		EDBB1F4B23744C16003C18FB /* outputGauss.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = outputGauss.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,9 +61,8 @@
 			isa = PBXGroup;
 			children = (
 				ED3B84001F82D29000AB9A64 /* input.txt */,
-				EDA0BBF8232A6C18001D0ED3 /* input1.txt */,
-				ED3B83FF1F82D29000AB9A64 /* output.txt */,
-				EDBB1F4B23744C16003C18FB /* output1.txt */,
+				ED3B83FF1F82D29000AB9A64 /* outputNewton.txt */,
+				EDBB1F4B23744C16003C18FB /* outputGauss.txt */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 			);
 			path = MSU_INFO;
