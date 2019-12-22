@@ -7,12 +7,12 @@
 
 double func(double x)
 {
-    return x*x;
+    return x * sin(x);
 }
 
 double integrateFunc(double x)
 {
-    return x*x*x/3;
+    return sin(x) - x*cos(x);
 }
 
 double integrateNewton(double a, double b, int n)
@@ -37,7 +37,7 @@ double integrateNewton(double a, double b, int n)
         double c2 = 3*(b0-a0)/8;
         double c3 = (b0-a0)/8;
                 
-        sum += c0*func(tempX0) + c1*func(tempX1) + c2*func(tempX2) + c3*func(tempX3);
+        sum += c0 * func(tempX0) + c1 * func(tempX1) + c2 * func(tempX2) + c3 * func(tempX3);
     }
     
     return sum;
@@ -94,8 +94,8 @@ int main()
     
     for (int i = 1; i <= 100; ++i)
     {
-        fprintf(foutNewton, "%.16lf ", realResult - integrateNewton(a, b, i));
-        fprintf(foutGauss, "%.16lf ", realResult - integrateGauss(a, b, i));
+        fprintf(foutNewton, "%.16lf, ", realResult - integrateNewton(a, b, i));
+        fprintf(foutGauss, "%.16lf, ", realResult - integrateGauss(a, b, i));
     }
     
     return 0;
