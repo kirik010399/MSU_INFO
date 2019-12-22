@@ -94,9 +94,13 @@ int main()
     
     for (int i = 1; i <= 100; ++i)
     {
-        fprintf(foutNewton, "%.16lf, ", realResult - integrateNewton(a, b, i));
-        fprintf(foutGauss, "%.16lf, ", realResult - integrateGauss(a, b, i));
+        fprintf(foutNewton, "%.16lf, ", fabs(realResult - integrateNewton(a, b, i)));
+        fprintf(foutGauss, "%.16lf, ", fabs(realResult - integrateGauss(a, b, i)));
     }
     
+    fclose(fin);
+    fclose(foutNewton);
+    fclose(foutGauss);
+
     return 0;
 }
