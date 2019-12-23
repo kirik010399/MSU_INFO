@@ -7,7 +7,7 @@ using namespace std;
 
 double func(int i, int j, int n)
 {
-    double h = 1.0/(n+1);
+    double h = 1.0/(n-1);
     
     if (i == j)
         return 2.0/(h*h);

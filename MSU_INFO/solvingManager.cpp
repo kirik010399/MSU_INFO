@@ -9,42 +9,36 @@ void fillTau(double *tau, int n, double m, double M, int N)
 {
     int tauIndexes[N];
     
-    for (int i = 0; i < N; ++i)
-        tauIndexes[i] = n-i;
+    int k1 = 0, k2 = N-1;
     
     for (int i = 0; i < N; ++i)
     {
-        tau[i] = 1.0/((M+m)/2 + (M-m)/2 * cos(M_PI*(2*tauIndexes[i]-1)/(2*N)));
-    }
-}
-
-void matrixVectorProduct(double* matrix, double* vector, double *resultVector, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        resultVector[i] = 0;
-        for (int j = 0; j < n; ++j)
+        if (i % 2 == 0)
         {
-            resultVector[i] += matrix[i*n+j] * vector[j];
+            tauIndexes[i] = k1;
+            ++k1;
+        }
+        else
+        {
+            tauIndexes[i] = k2;
+            --k2;
         }
     }
-}
-
-void makeIteration(double* matrix, double* resultMatrix, double tau, int n)
-{
-    for (int i = 0; i < n; ++i)
+    
+//    for (int i = 0; i < N; ++i)
+//    {
+//        tauIndexes[i] = N-i-1;
+//    }
+//
+//    for (int i = 0; i < N; ++i)
+//    {
+//        tauIndexes[i] = i;
+//    }
+    
+    for (int i = 0; i < N; ++i)
     {
-        for (int j = 0; j < n; ++j)
-        {
-            resultMatrix[i*n+j] = int(i == j) - tau * matrix[i*n+j];
-        }
+        tau[i] = 1.0/((M+m)/2 + (M-m)/2 * cos(M_PI*(2*tauIndexes[i]+1)/(2*N)));
     }
-}
-
-void sumVectors(double* vector1, double* vector2, double k, int n)
-{
-    for (int i = 0; i < n; ++i)
-        vector1[i] += k * vector2[i];
 }
 
 double errorFunction(double *x, int n)
@@ -54,7 +48,7 @@ double errorFunction(double *x, int n)
     
     for (i = 0; i < n; i++)
     {
-        if (i % 2)
+        if (i % 2 == 1)
             error = fabs(x[i]);
         else
             error = fabs(x[i]-1);
@@ -68,7 +62,7 @@ double errorFunction(double *x, int n)
 
 void solveSystem(double* matrix, double* vector, double* result, int n)
 {
-    double h = 1.0/(n+1);
+    double h = 1.0/(n-1);
     double m = 4.0, M = 4.0/(h*h);
     int N = 64;
     
@@ -87,7 +81,12 @@ void solveSystem(double* matrix, double* vector, double* result, int n)
     fillTau(tau, n, m, M, N);
     
     for (int i = 0; i < n; ++i)
+    {
+        result[i] = 0.0;
         tempResult[i] = 1.0;
+        tempVector1[i] = 0;
+        tempVector2[i] = 0;
+    }
     
     for (int iteration = 0; iteration <= 2500; ++iteration)
     {
