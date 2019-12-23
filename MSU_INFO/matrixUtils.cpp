@@ -1,11 +1,3 @@
-//
-//  matrixUtils.cpp
-//  MSU_INFO
-//
-//  Created by Кирилл Мащенко on 20.09.2018.
-//  Copyright © 2018 Кирилл Мащенко. All rights reserved.
-//
-
 #include "matrixUtils.hpp"
 #include <stdio.h>
 #include <math.h>
@@ -13,47 +5,32 @@
 
 using namespace std;
 
-double func(int i, int j)
+double func(int i, int j, int n)
 {
-    return fabs(i-j);
+    double h = 1.0/(n+1);
+    
+    if (i == j)
+        return 2.0/(h*h);
+    else if (i == j+1 || i == j-1)
+        return -1.0/(h*h);
+    else
+        return 0;
 }
 
-int enterData(double* matrix, double *vector, int n, FILE* fin)
+void enterData(double* matrix, double *vector, int n, FILE* fin)
 {
-    int i;
-    int j;
-    
-    if (fin)
+    for (int i = 0; i < n; ++i)
     {
-        for (i = 0; i < n; ++i)
+        vector[i] = 0;
+        
+        for (int j = 0; j < n; ++j)
         {
-            for (j = 0; j < n; ++j)
-            {
-                if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
-                    return -1;
-            }
+            matrix[i*n+j] = func(i, j, n);
             
-            if (fscanf(fin, "%lf", &vector[i]) != 1)
-                return -1;
+            if (j % 2 == 0)
+                vector[i] += matrix[i*n+j];
         }
     }
-    else
-    {
-        for (i = 0; i < n; ++i)
-        {
-            vector[i] = 0;
-            
-            for (j = 0; j < n; ++j)
-            {
-                matrix[i*n+j] = func(i, j);
-                
-                if (j % 2 == 0)
-                    vector[i] += matrix[i*n+j];
-            }
-        }
-    }
-    
-    return 0;
 }
 
 void printResult(double* result, int n, int m)
