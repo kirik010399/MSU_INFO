@@ -12,27 +12,23 @@ int main()
     double *matrix;
     double *vector;
     double *result;
-    FILE* fin = NULL;
-  
+    
+    printf("Enter size: "); 
     scanf("%d", &n);
    
     matrix = new double [n*n];
     vector = new double [n];
     result = new double [n];
     
-    enterData(matrix, vector, n, fin);
+    enterData(matrix, vector, n);
     solveSystem(matrix, vector, result, n);
     
     cout<<"Result vector:"<<endl;
     printResult(result, n, 10);
         
-    fscanf(fin, "%d", &n);
-    enterData(matrix, vector, n, fin);
+    enterData(matrix, vector, n);
         
-    cout<<endl<<"The norm of residual: "<<residualNorm(matrix, vector, result, n)<<endl;
-    cout<<"The norm of error: "<<errorFunction(result, n)<<endl;
-   
-    fclose(fin);
+    cout<<"The norm of residual: "<<residualNorm(matrix, vector, result, n)<<endl;
     
     delete []matrix;
     delete []vector;

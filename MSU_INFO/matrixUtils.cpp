@@ -17,7 +17,7 @@ double func(int i, int j, int n)
         return 0;
 }
 
-void enterData(double* matrix, double *vector, int n, FILE* fin)
+void enterData(double* matrix, double *vector, int n)
 {
     for (int i = 0; i < n; ++i)
     {
@@ -63,20 +63,4 @@ double residualNorm(double* matrix, double* vector, double* result, int n)
     }
     
     return sqrt(res);
-}
-
-double errorFunction(double *result, int n)
-{
-    double error = 0;
-    int i;
-    
-    for (i = 0; i < n; ++i)
-    {
-        if (i % 2)
-            error += result[i]*result[i];
-        else
-            error += (result[i]-1)*(result[i]-1);
-    }
-    
-    return sqrt(error);
 }

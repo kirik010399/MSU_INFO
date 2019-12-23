@@ -27,7 +27,7 @@
 /* Begin PBXFileReference section */
 		ED0C3B951F82C3EA00D8B1BE /* MSU_INFO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSU_INFO; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED0C3B981F82C3EA00D8B1BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
+		ED3B84001F82D29000AB9A64 /* output.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output.txt; sourceTree = "<group>"; };
 		ED568B342153DD980012834A /* matrixUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrixUtils.cpp; sourceTree = "<group>"; };
 		ED568B352153DD980012834A /* matrixUtils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = matrixUtils.hpp; sourceTree = "<group>"; };
 		ED568B372153DDBC0012834A /* solvingManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = solvingManager.cpp; sourceTree = "<group>"; };
@@ -64,7 +64,7 @@
 		ED0C3B971F82C3EA00D8B1BE /* MSU_INFO */ = {
 			isa = PBXGroup;
 			children = (
-				ED3B84001F82D29000AB9A64 /* input.txt */,
+				ED3B84001F82D29000AB9A64 /* output.txt */,
 				ED0C3B981F82C3EA00D8B1BE /* main.cpp */,
 				ED568B342153DD980012834A /* matrixUtils.cpp */,
 				ED568B352153DD980012834A /* matrixUtils.hpp */,
