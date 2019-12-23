@@ -7,7 +7,7 @@
 
 double func(double x)
 {
-    return x * sin(x);
+    return x * x * x * exp(x);
 }
 
 double integrateFunc(double x)
@@ -89,13 +89,13 @@ int main()
     printf("Newton method: %.16lf\n", integrateNewton(a, b, n));
     printf("Gauss method: %.16lf\n", integrateGauss(a, b, n));
     
-    double realResult = integrateFunc(b) - integrateFunc(a);
+    double realResult = 6 + 12 * M_E * M_E * M_E;
     printf("Real integral: %.16lf\n", realResult);
     
     for (int i = 1; i <= 100; ++i)
     {
-        fprintf(foutNewton, "%.16lf, ", fabs(realResult - integrateNewton(a, b, i)));
-        fprintf(foutGauss, "%.16lf, ", fabs(realResult - integrateGauss(a, b, i)));
+        fprintf(foutNewton, "%.16lf, ", fabs(realResult - integrateNewton(a, b, i))/fabs(realResult));
+        fprintf(foutGauss, "%.16lf, ", fabs(realResult - integrateGauss(a, b, i))/fabs(realResult));
     }
     
     fclose(fin);
