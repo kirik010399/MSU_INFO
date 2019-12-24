@@ -60,6 +60,33 @@ double errorFunction(double *x, int n)
     return maxError;
 }
 
+double calculateNorm(double *tau, int iteration, double m, double M, int N)
+{
+    double maxProd = 1;
+    
+    for (int i = 0; i < iteration; ++i)
+    {
+        maxProd *= fabs(1 - tau[iteration%N]*m);
+    }
+    
+    for (double lam = m+0.01; lam <= M; lam+=0.01)
+    {
+        double prod = 1;
+        
+        for (int i = 0; i < iteration; ++i)
+        {
+            prod *= fabs(1 - tau[iteration%N]*lam);
+        }
+        
+        if (prod > maxProd)
+        {
+            maxProd = prod;
+        }
+    }
+    
+    return maxProd;
+}
+
 void solveSystem(double* matrix, double* vector, double* result, int n)
 {
     double h = 1.0/(n-1);
@@ -114,15 +141,15 @@ void solveSystem(double* matrix, double* vector, double* result, int n)
             tempVector1[i] = 0;
             tempVector2[i] = 0;
         }
-        
-        fprintf(fout, "%d %.16lf\n", iteration, errorFunction(result, n));
-        printf("%d %.16lf\n", iteration, errorFunction(result, n));
+                
+        fprintf(fout, "%.16lf\n", errorFunction(result, n));
+        printf("%d %.16lf %.16lf\n", iteration, errorFunction(result, n), calculateNorm(tau, iteration, m, M, N));
     }
     
-    free(tau);
-    free(tempResult);
-    free(tempVector1);
-    free(tempVector2);
+    delete []tau;
+    delete []tempResult;
+    delete []tempVector1;
+    delete []tempVector2;
 
     fclose(fout);
 }
