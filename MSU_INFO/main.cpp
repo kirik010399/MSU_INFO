@@ -11,6 +11,7 @@ void enterData(double* matrix, double *vector, int n);
 void printResult(double* result, int n);
 void fillTau(double *tau, int n, double m, double M, int N);
 double errorFunction(double *x, int n);
+double calculateNorm(double *tau, int iteration, int N, int n);
 void solveSystem(double* matrix, double* vector, double* result, int n);
 
 void fillTau(double *tau, int n, double m, double M, int N)
@@ -65,29 +66,24 @@ double errorFunction(double *x, int n)
     return maxError;
 }
 
-double calculateNorm(double *tau, int iteration, double m, double M, int N)
+double calculateNorm(double *tau, int iteration, int N, int n)
 {
-    double maxProd = 1;
-    double maxLam = m;
+    double maxProd = 0;
+    double h = 1.0/(n-1);
     
-    for (int i = 0; i < iteration; ++i)
-    {
-        maxProd *= fabs(1 - tau[i%N]*m);
-    }
-    
-    for (double lam = m+0.01; lam <= M; lam+=0.01)
+    for (int m = 1; m < n; ++m)
     {
         double prod = 1;
         
         for (int i = 0; i < iteration; ++i)
         {
-            prod *= fabs(1 - tau[i%N]*lam);
+            double lam = 4*sin(0.5*M_PI*m*h)*sin(0.5*M_PI*m*h)/(h*h);
+            prod *= fabs(1 - tau[i%N] * lam);
         }
-                
+
         if (prod > maxProd)
         {
             maxProd = prod;
-            maxLam = lam;
         }
     }
     
@@ -98,7 +94,7 @@ void solveSystem(double* matrix, double* vector, double* result, int n)
 {
     double h = 1.0/(n-1);
     double m = 4.0, M = 4.0/(h*h);
-    int N = 16;
+    int N = 64;
     
     FILE *fout;
     fout = fopen("output.txt", "w");
@@ -122,7 +118,7 @@ void solveSystem(double* matrix, double* vector, double* result, int n)
         tempVector2[i] = 0;
     }
     
-    for (int iteration = 0; iteration <= 300; ++iteration)
+    for (int iteration = 0; iteration <= 2000; ++iteration)
     {
         for(int i = 0; i < n; ++i)//t1 = Ax
             for(int j = 0; j < n; ++j)
@@ -149,8 +145,8 @@ void solveSystem(double* matrix, double* vector, double* result, int n)
             tempVector2[i] = 0;
         }
                 
-        fprintf(fout, "%.16lf,", calculateNorm(tau, iteration, m, M, N));
-        printf("%d %.16lf %.16lf\n", iteration, errorFunction(result, n), calculateNorm(tau, iteration, m, M, N));
+        fprintf(fout, "%.16lf,", calculateNorm(tau, iteration, N, n));
+        printf("%d %.16lf %.16lf\n", iteration, errorFunction(result, n), calculateNorm(tau, iteration, N, n));
     }
     
     delete []tau;
@@ -179,7 +175,7 @@ int main()
     solveSystem(matrix, vector, result, n);
     
     cout<<"Result vector:"<<endl;
-    printResult(result, n, 10);
+    printResult(result, n);
                     
     delete []matrix;
     delete []vector;
