@@ -62,7 +62,8 @@ private:
     void firstScheme(double *y)
     {
         y[0] = 1;
-        for (int i = 0; i < n; i++)
+        
+        for (int i = 0; i < n; ++i)
             y[i+1] = y[i] - h*A * y[i];
     }
     
@@ -70,14 +71,15 @@ private:
     {
         y[0] = 1;
         
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
             y[i+1] = 1.0/(1.0+h*A) * y[i];
     }
     
     void thirdScheme(double *y)
     {
         y[0] = 1;
-        for (int i = 0; i < n; i++)
+        
+        for (int i = 0; i < n; ++i)
             y[i+1] = (2.0-h*A)/(2.0+h*A) * y[i];
     }
 
@@ -86,7 +88,7 @@ private:
         y[0] = 1;
         y[1] = 1 - A*h;
         
-        for (int i = 1; i < n; i++)
+        for (int i = 1; i < n; ++i)
             y[i+1] = y[i-1] - 2.0*h*A * y[i];
     }
 
@@ -95,7 +97,7 @@ private:
         y[0] = 1;
         y[1] = 1 - A*h;
         
-        for (int i = 1; i < n; i++)
+        for (int i = 1; i < n; ++i)
             y[i+1] = 4.0/3.0 * y[i] - (1.0+2.0*h*A)/3.0 * y[i-1];
     }
     
@@ -106,7 +108,7 @@ private:
     
     void fillExactY(double *y)
     {
-        for (int i = 0; i < n+1; i++)
+        for (int i = 0; i < n+1; ++i)
             y[i] = exactSolution(i*h);
     }
     
@@ -115,7 +117,7 @@ private:
         double norm = 0;
         double dif;
         
-        for (int i = 0; i < n+1; i++)
+        for (int i = 0; i < n+1; ++i)
         {
             dif = fabs(y1[i] - y2[i]);
             norm += dif*dif * h;
