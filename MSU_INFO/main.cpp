@@ -14,7 +14,7 @@ public:
     {
         double *x, *y;
         
-        for (n = 10; n <= 1e8; n *= 10)
+        for (n = 10; n <= 1e5; n *= 10)
         {
             h = 1.0/n;
            
