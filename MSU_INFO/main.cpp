@@ -14,16 +14,16 @@ public:
     {
         double *x, *y;
         
-        for (n = 100; n <= 10000000; n *= 10)
+        for (n = 10; n <= 1e8; n *= 10)
         {
-            h = 10.0/n;
+            h = 1.0/n;
            
             x = new double[n+1];
             y = new double[n+1];
            
             fillX(x);
             fillY(y);
-            error(x, y);
+            normError(x, y);
             
             delete []x;
             delete []y;
@@ -76,14 +76,14 @@ private:
         y[0] = 1;
         
         for (int i = 0; i < n; i++)
-            y[i+1] = 1/(1 + h*A) * y[i];
+            y[i+1] = 1.0/(1.0+h*A) * y[i];
     }
     
     void thirdScheme(double *y)
     {
         y[0] = 1;
         for (int i = 0; i < n; i++)
-            y[i+1] = (2 - h*A)/(2 + h*A) * y[i];
+            y[i+1] = (2.0-h*A)/(2.0+h*A) * y[i];
     }
 
     void fourthScheme(double *y)
@@ -92,7 +92,7 @@ private:
         y[1] = 1 - A*h;
         
         for (int i = 1; i < n; i++)
-            y[i+1] = y[i-1] - 2*h*A * y[i];
+            y[i+1] = y[i-1] - 2.0*h*A * y[i];
     }
 
     void fifthScheme(double *y)
@@ -101,24 +101,21 @@ private:
         y[1] = 1 - A*h;
         
         for (int i = 1; i < n; i++)
-            y[i+1] = 4./3 * y[i] - 1./3 * y[i-1] - 1./3 * 2*h*A * y[i-1];
+            y[i+1] = 4.0/3.0 * y[i] - (1.0+2.0*h*A)/3.0 * y[i-1];
     }
     
-    void error(double *x, double *y)
+    void normError(double *x, double *y)
     {
-        double maxDif, dif;
-
-        maxDif = 0;
+        double norm = 0;
+        double dif;
         
         for (int i = 0; i < n+1; i++)
         {
             dif = fabs(y[i] - exactSolution(x[i]));
-            
-            if (dif > maxDif)
-                maxDif = dif;
+            norm += dif*dif * h;
         }
         
-        printf("%d %.16lf\n", n, maxDif / pow(h, getConvergence()));
+        printf("%d %.16lf\n", n, sqrt(norm)/pow(h, getConvergence()));
     }
     
     double exactSolution(double x)
@@ -140,29 +137,25 @@ private:
         }
         return -1;
     }
-    
 };
 
+void calculateErrorsForFactor(double A)
+{
+    printf("Factor: %lf\n", A);
+    for (int schemeNumber = 1; schemeNumber <= 5; ++schemeNumber)
+    {
+        printf("\nScheme number: %d\nErrors:\n", schemeNumber);
+        solvingScheme Scheme(schemeNumber, A);
+        Scheme.printErrors();
+    }
+    printf("\n\n");
+}
 
 int main()
 {
-    int schemeNumber;
-    double A;
-    
-    printf("Enter scheme number: ");
-    scanf("%d", &schemeNumber);
-    
-    if (!(schemeNumber >= 1 && schemeNumber <= 5))
-    {
-        printf("Incorrect scheme number");
-        return -1;
-    }
-    
-    printf("Enter factor А: ");
-    scanf("%lf", &A);
-    
-    solvingScheme Scheme(schemeNumber, A);
-    Scheme.printErrors();
-    
+    calculateErrorsForFactor(1);
+    calculateErrorsForFactor(2);
+    calculateErrorsForFactor(5);
+
     return 0;
 }
