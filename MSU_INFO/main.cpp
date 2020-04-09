@@ -156,6 +156,7 @@ int main()
     calculateErrorsForFactor(1);
     calculateErrorsForFactor(2);
     calculateErrorsForFactor(5);
+    calculateErrorsForFactor(10);
 
     return 0;
 }
