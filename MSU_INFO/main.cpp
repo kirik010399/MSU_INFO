@@ -145,12 +145,15 @@ private:
 void calculateErrorsForFactor(double A)
 {
     printf("Factor: %lf\n", A);
+    
     for (int schemeNumber = 1; schemeNumber <= 5; ++schemeNumber)
     {
         printf("\nScheme number: %d\nErrors:\n", schemeNumber);
+        
         solvingScheme Scheme(schemeNumber, A);
         Scheme.printErrors();
     }
+    
     printf("\n\n");
 }
 
