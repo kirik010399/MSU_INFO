@@ -12,21 +12,22 @@ public:
     
     void printErrors()
     {
-        double *x, *y;
+        double *y_exact, *y_scheme;
         
         for (n = 10; n <= 1e5; n *= 10)
         {
             h = 1.0/n;
            
-            x = new double[n+1];
-            y = new double[n+1];
+            y_scheme = new double[n+1];
+            y_exact = new double[n+1];
            
-            fillX(x);
-            fillY(y);
-            normError(x, y);
+            fillSchemeY(y_scheme);
+            fillExactY(y_exact);
             
-            delete []x;
-            delete []y;
+            normError(y_scheme, y_exact);
+            
+            delete []y_scheme;
+            delete []y_exact;
         }
     }
 
@@ -35,14 +36,8 @@ private:
     double A;
     double h;
     int n;
-    
-    void fillX(double *x)
-    {
-        for (int i = 0; i < n+1; i++)
-            x[i] = i*h;
-    }
        
-    void fillY(double *y)
+    void fillSchemeY(double *y)
     {
         switch (schemeNumber)
         {
@@ -104,23 +99,29 @@ private:
             y[i+1] = 4.0/3.0 * y[i] - (1.0+2.0*h*A)/3.0 * y[i-1];
     }
     
-    void normError(double *x, double *y)
+    double exactSolution(double x)
+    {
+        return exp(-A*x);
+    }
+    
+    void fillExactY(double *y)
+    {
+        for (int i = 0; i < n+1; i++)
+            y[i] = exactSolution(i*h);
+    }
+    
+    void normError(double *y1, double *y2)
     {
         double norm = 0;
         double dif;
         
         for (int i = 0; i < n+1; i++)
         {
-            dif = fabs(y[i] - exactSolution(x[i]));
+            dif = fabs(y1[i] - y2[i]);
             norm += dif*dif * h;
         }
         
         printf("%d %.16lf\n", n, sqrt(norm)/pow(h, getConvergence()));
-    }
-    
-    double exactSolution(double x)
-    {
-        return exp(-A*x);
     }
     
     int getConvergence()
