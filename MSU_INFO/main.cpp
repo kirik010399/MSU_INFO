@@ -14,9 +14,9 @@ public:
     {
         double *y_exact, *y_scheme;
         
-        for (n = 10; n <= 1e5; n *= 10)
+        for (n = 100; n <= 1e5; n *= 10)
         {
-            h = 1.0/n;
+            h = 10.0/n;
            
             y_scheme = new double[n+1];
             y_exact = new double[n+1];
