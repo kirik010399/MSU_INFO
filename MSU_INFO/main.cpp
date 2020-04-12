@@ -8,13 +8,14 @@ public:
     {
         schemeNumber = num;
         A = factor;
+        previousC = 0;
     }
     
     void printErrors()
     {
         double *y_exact, *y_scheme;
         
-        for (n = 100; n <= 1e5; n *= 10)
+        for (n = 100; n <= 1e6; n *= 10)
         {
             h = 10.0/n;
            
@@ -36,6 +37,7 @@ private:
     double A;
     double h;
     int n;
+    double previousC;
        
     void fillSchemeY(double *y)
     {
@@ -122,6 +124,11 @@ private:
             dif = fabs(y1[i] - y2[i]);
             norm += dif*dif * h;
         }
+        
+        if (previousC != 0)
+            printf("%lf\n", sqrt(norm)/pow(h, getConvergence())/previousC);
+        
+        previousC = sqrt(norm)/pow(h, getConvergence());
         
         printf("%d %.16lf\n", n, sqrt(norm)/pow(h, getConvergence()));
     }
