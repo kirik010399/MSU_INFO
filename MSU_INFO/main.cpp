@@ -8,7 +8,7 @@ public:
     {
         schemeNumber = num;
         A = factor;
-        previousC = 0;
+        previousNorm = 0;
     }
     
     void printErrors()
@@ -37,7 +37,7 @@ private:
     double A;
     double h;
     int n;
-    double previousC;
+    double previousNorm;
        
     void fillSchemeY(double *y)
     {
@@ -125,12 +125,14 @@ private:
             norm += dif*dif * h;
         }
         
-        if (previousC != 0)
-            printf("%lf\n", sqrt(norm)/pow(h, getConvergence())/previousC);
+        double currentNorm = sqrt(norm)/pow(h, getConvergence());
         
-        previousC = sqrt(norm)/pow(h, getConvergence());
+        if (previousNorm != 0)
+            printf("%lf\n", currentNorm/previousNorm);
         
-        printf("%d %.16lf\n", n, sqrt(norm)/pow(h, getConvergence()));
+        previousNorm = currentNorm;
+        
+        printf("%d %.16lf\n", n, currentNorm);
     }
     
     int getConvergence()
