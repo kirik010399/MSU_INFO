@@ -8,7 +8,7 @@ public:
     {
         schemeNumber = num;
         A = factor;
-        previousNorm = 0;
+        previousNorm = -1;
     }
     
     void printErrors()
@@ -131,7 +131,7 @@ private:
         
         printf("n: %d, norm: %.16lf; ", n, currentNorm);
 
-        if (previousNorm != 0)
+        if (previousNorm != -1)
             printf("Norm over Norm: %lf\n", currentNorm/previousNorm);
         else
             printf("\n");
