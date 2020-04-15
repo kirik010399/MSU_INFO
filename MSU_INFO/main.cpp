@@ -155,27 +155,26 @@ private:
     }
 };
 
-void calculateErrorsForFactor(double A)
+void calculateErrorsForScheme(int schemeNumber)
 {
-    printf("Factor: %lf\n", A);
+    printf("Scheme number: %d\n", schemeNumber);
     
-    for (int schemeNumber = 1; schemeNumber <= 5; ++schemeNumber)
+    int factorsArray[4] = {1, 2, 5, 10};
+    
+    for (int i = 0; i < 4; ++i)
     {
-        printf("\nScheme number: %d\nErrors:\n", schemeNumber);
-        
+        double A = factorsArray[i];
+        printf("\nFactor: %lf\nErrors:\n", A);
         solvingScheme Scheme(schemeNumber, A);
         Scheme.printErrors();
     }
-    
     printf("\n\n");
 }
 
 int main()
 {
-    calculateErrorsForFactor(1);
-    calculateErrorsForFactor(2);
-    calculateErrorsForFactor(5);
-    calculateErrorsForFactor(10);
+    for (int schemeNumber = 1; schemeNumber <= 5; ++schemeNumber)
+        calculateErrorsForScheme(schemeNumber);
 
     return 0;
 }
