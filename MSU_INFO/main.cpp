@@ -15,7 +15,7 @@ public:
     {
         double *y_exact, *y_scheme;
         
-        for (n = 100; n <= 1e6; n *= 10)
+        for (n = 100; n <= 1e7; n *= 10)
         {
             h = 10.0/n;
            
@@ -116,23 +116,27 @@ private:
     
     void normError(double *y1, double *y2)
     {
-        double norm = 0;
+        double maxDif = 0;
         double dif;
         
         for (int i = 0; i < n+1; ++i)
         {
             dif = fabs(y1[i] - y2[i]);
-            norm += dif*dif * h;
+            
+            if (dif > maxDif)
+                maxDif = dif;
         }
         
-        double currentNorm = sqrt(norm)/pow(h, getConvergence());
+        double currentNorm = maxDif/pow(h, getConvergence());
         
+        printf("n: %d, norm: %.16lf; ", n, currentNorm);
+
         if (previousNorm != 0)
-            printf("%lf\n", currentNorm/previousNorm);
+            printf("Norm over Norm: %lf\n", currentNorm/previousNorm);
+        else
+            printf("\n");
         
         previousNorm = currentNorm;
-        
-        printf("%d %.16lf\n", n, currentNorm);
     }
     
     int getConvergence()
