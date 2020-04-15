@@ -159,7 +159,7 @@ void calculateErrorsForScheme(int schemeNumber)
 {
     printf("Scheme number: %d\n", schemeNumber);
     
-    int factorsArray[4] = {1, 2, 5, 10};
+    double factorsArray[4] = {1, 2, 5, 10};
     
     for (int i = 0; i < 4; ++i)
     {
