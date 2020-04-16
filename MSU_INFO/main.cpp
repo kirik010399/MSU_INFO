@@ -91,6 +91,16 @@ class ThomasAlgorithm: public CommonSolver
 public:
     ThomasAlgorithm(){}
 
+    double f(double x)
+    {
+   
+    }
+
+    double exactSolution(double x) // True solution of a given differential equation
+    {
+
+    }
+    
     void solver_progonka(double* y, double* a, double* b, double* c, double* f, int N)
     {
         int i;
@@ -119,52 +129,82 @@ public:
     }
 };
 
-class FourierAlgorithm
+class FourierAlgorithm: public CommonSolver
 {
 public:
     FourierAlgorithm(){}
     
-    double eigen_value(int m, double coef, double h, int N)
+    double f(double x)
     {
-        return 4/(h*h) * sin(M_PI*(m+0.5)*h/2) * sin(M_PI*(m+0.5)*h/2) + coef;
-    }
-
-    void eigen_func(double* g, int m, double h, int N)
-    {
-        for (int i = 0; i < N+1; i++)
-            g[i] = sin(M_PI*(m+0.5)*(i*h-h/2));
-    }
-
-    double dot_product(double* f, double* g, double h, int N)
-    {
-        double product = 0;
         
-        for (int i = 1; i < N; i++) // Скалярное
-            product += f[i] * g[i] * h;
-        product += f[N] * g[N] * h/2;
-        
-        return product;
     }
 
-    void f2c(double *C, double *f, double* eig_func, double b, double h, const int N)
+    double exactSolution(double x) // True solution of a given differential equation
     {
-        for (int m = 0; m < N; m++)
+        
+    }
+    
+    double eigenFunctionComponent(int m, int k)
+    {
+        return sin(M_PI*h*(2*m-1)*(2*k-1)/4);
+    }
+
+    void fillEigenFunction(double *e, int m)
+    {
+        e[0] = 0;
+        e[n] = 0;
+        
+        for (int k = 1; k <= n-1; ++k)
+            e[i] = eigenFunctionComponent(m, k);
+    }
+    
+    void product(double *y1, double *y2)
+    {
+        double sum = 0;
+        
+        for (int k = 1; k <= n-1; ++k)
+            sum += y1[k] * y2[k] * h;
+    }
+    
+    double eigenValue(int m, double b)
+    {
+        return 4/(h*h) * sin(M_PI*h*(2*m-1)/4)*sin(M_PI*h*(2*m-1)/4) + b;
+    }
+    
+    void solve()
+    {
+        double *c;
+        c = new double[n+1];
+        
+        f2c(c);
+        c2y(c);
+        delete []c;
+    }
+    
+    void f2c(double *f)
+    {
+        double *e;
+        e = new double[n+1];
+        
+        c[0] = 0;
+        c[n] = 0;
+        
+        for (int m = 1; m <= n-1; ++m)
         {
-            eigen_func(eig_func, m, h, N);
-            C[m] = dot_product(f, eig_func, h, N) / (dot_product(eig_func, eig_func, h, N) * eigen_value(m, b, h, N));
+            fillEigenFunction(e, m);
+            c[m] = product(f, e) / (eigenValue(m) * product(e, e));
         }
-        return;
+        
+        delete []e;
     }
 
-    void c2y(double* C, double* y, double h, int N)
+    void c2y(double* y)
     {
-        int i, m;
-        
-        for (i = 0; i < N+1; i++)
+        for (int k = 1; k <= n-1; ++k)
         {
-            y[i] = 0;
-            for (m = 0; m < N; m++)
-                y[i] += C[m] * sin(M_PI*(m+0.5)*(i*h-h/2));
+            y[k] = 0;
+            for (int m = 1; m <= n-1; ++m)
+                y[k] += c[m] * eigenFunctionComponent(m, k);
         }
     }
 };
