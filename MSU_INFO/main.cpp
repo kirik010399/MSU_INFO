@@ -109,7 +109,7 @@ public:
     
     void setFactor()
     {
-        b = 3;
+        b = 3.0;
     }
     
     double eigenFunctionComponent(int m, int k)
@@ -186,13 +186,16 @@ public:
         f = new double[n+1];
         y = new double[n+1];
         sol = new double[n+1];
+        factor = new double[n+1];
 
         generateFunction(f);
         setFactor();
         fillMatrix(a, b, c);
 
+        solveMatrix(y, a, b, c, f);
+
         generateSolution(sol);
-        
+
         double res = residual(y, sol);
         
         delete []a;
@@ -201,6 +204,7 @@ public:
         delete []f;
         delete []y;
         delete []sol;
+        delete []factor;
         
         return res;
     }
@@ -217,26 +221,66 @@ public:
     
     void setFactor()
     {
-        b[0] = -h/2;
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            b[k] = i;
-            ++k;
-        }
-        if (k != n)
-           printf("error\n");
-        
-        b[n] = 1+h/2;
+        for (int i = 0; i < n+1; ++i)
+            factor[i] = 3.0;
+//        factor[0] = -h/2;
+//        int k = 1;
+//        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
+//        {
+//            factor[k] = i;
+//            ++k;
+//        }
+//        if (k != n)
+//           printf("error\n");
+//
+//        factor[n] = 1+h/2;
     }
     
-    void fillMatrix()
+    void fillMatrix(double *a, double *b, double *c)
     {
+        c[0] = 1.0;
+        b[0] = -1.0;
         
+        for (int i = 1; i < n; ++i)
+        {
+            a[i] = 1.0/(h*h);
+            c[i] = 2.0/(h*h) + factor[i];
+            b[i] = 1.0/(h*h);
+        }
+        
+        a[n] = 1.0;
+        c[n] = 1.0;
+    }
+    
+    void solveMatrix(double *y, double* a, double* b, double* c, double *f)
+    {
+        int i;
+        double* alpha;
+        double* beta;
+        
+        alpha = new double[n+1];
+        beta = new double[n+1];
+        
+        alpha[1] = b[0]/c[0];
+        beta[1] = f[0]/c[0];
+        
+        for (i = 1; i < n; ++i)
+        {
+            alpha[i+1] = b[i] / (c[i] - a[i]*alpha[i]);
+            beta[i+1] = (f[i] + a[i]*beta[i]) / (c[i] - a[i]*alpha[i]);
+        }
+        
+        y[n] = (f[n] + a[n]*beta[n]) / (c[n] - a[n]*alpha[n]);
+        
+        for (i = n-1; i >= 0; --i)
+            y[i] = alpha[i+1]*y[i+1] + beta[i+1];
+        
+        delete []alpha;
+        delete []beta;
     }
     
 private:
-    double *b;
+    double *factor;
 };
 
 int main()
