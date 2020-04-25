@@ -172,10 +172,80 @@ private:
     double b;
 };
 
+class ThomasSolver: public CommonSolver
+{
+public:
+    ThomasSolver(){}
+    
+    virtual double getErrorToN()
+    {
+        double *a, *b, *c, *f, *y, *sol;
+        a = new double[n+1];
+        b = new double[n+1];
+        c = new double[n+1];
+        f = new double[n+1];
+        y = new double[n+1];
+        sol = new double[n+1];
+
+        generateFunction(f);
+        setFactor();
+        fillMatrix(a, b, c);
+
+        generateSolution(sol);
+        
+        double res = residual(y, sol);
+        
+        delete []a;
+        delete []b;
+        delete []c;
+        delete []f;
+        delete []y;
+        delete []sol;
+        
+        return res;
+    }
+    
+    virtual double function(double x)
+    {
+        return sin(M_PI*x/2);
+    }
+    
+    virtual double solution(double x)
+    {
+        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
+    }
+    
+    void setFactor()
+    {
+        b[0] = -h/2;
+        int k = 1;
+        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
+        {
+            b[k] = i;
+            ++k;
+        }
+        if (k != n)
+           printf("error\n");
+        
+        b[n] = 1+h/2;
+    }
+    
+    void fillMatrix()
+    {
+        
+    }
+    
+private:
+    double *b;
+};
+
 int main()
 {
-    FourierSolver solver;
-    solver.printErrors();
+    FourierSolver fourierSolver;
+    fourierSolver.printErrors();
+    
+    ThomasSolver thomasSolver;
+    thomasSolver.printErrors();
     
     return 0;
 }
