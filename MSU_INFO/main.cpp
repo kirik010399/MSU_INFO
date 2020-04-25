@@ -284,9 +284,11 @@ private:
 
 int main()
 {
+    printf("Thomas alrgorithm errors:\n");
     ThomasSolver thomasSolver;
     thomasSolver.printErrors();
     
+    printf("\nFourier alrgorithm errors:\n");
     FourierSolver fourierSolver;
     fourierSolver.printErrors();
     return 0;
