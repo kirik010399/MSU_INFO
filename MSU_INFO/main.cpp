@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <math.h>
 
-class FourierAlgorithm
+class CommonSolver
 {
 public:
-    FourierAlgorithm(){}
+    CommonSolver(){}
+    virtual double function(double x){return 0;}
+    virtual double solution(double x){return 0;}
+    virtual double getErrorToN(){return 0;}
     
     void printErrors()
     {
@@ -16,7 +19,59 @@ public:
         }
     }
     
-    double getErrorToN()
+    double residual(double *y1, double *y2)
+    {
+        double res = 0;
+        
+        for (int i = 0; i < n+1; ++i)
+        {
+            double dif = y1[i] - y2[i];
+            res += dif*dif * h;
+        }
+        return sqrt(res)/(h*h);
+    }
+    
+    void generateFunction(double *f)
+    {
+        f[0] = -function(h/2);
+        int k = 1;
+        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
+        {
+            f[k] = function(i);
+            ++k;
+        }
+        if (k != n)
+           printf("error\n");
+        
+        f[n] = function(1-h/2);
+    }
+    
+    void generateSolution(double *y)
+    {
+        y[0] = -solution(h/2);
+        int k = 1;
+        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
+        {
+            y[k] = solution(i);
+            ++k;
+        }
+        if (k != n)
+           printf("error\n");
+        
+        y[n] = solution(1-h/2);
+    }
+    
+protected:
+    int n;
+    double h;
+};
+
+class FourierSolver: public CommonSolver
+{
+public:
+    FourierSolver(){}
+    
+    virtual double getErrorToN()
     {
         double *c, *f, *y, *sol;
         c = new double[n+1];
@@ -42,19 +97,19 @@ public:
         return res;
     }
     
-    double function(double x)
+    virtual double function(double x)
     {
         return sin(M_PI*x/2);
+    }
+    
+    virtual double solution(double x)
+    {
+        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
     }
     
     void setFactor()
     {
         b = 3;
-    }
-
-    double solution(double x)
-    {
-        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
     }
     
     double eigenFunctionComponent(int m, int k)
@@ -103,48 +158,6 @@ public:
                 y[k] += c[m] * eigenFunctionComponent(m, k);
         }
     }
-    
-    double residual(double *y1, double *y2)
-    {
-        double res = 0;
-        
-        for (int i = 0; i < n+1; ++i)
-        {
-            double dif = y1[i] - y2[i];
-            res += dif*dif * h;
-        }
-        return sqrt(res)/(h*h);
-    }
-    
-    void generateFunction(double *f)
-    {
-        f[0] = -function(h/2);
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            f[k] = function(i);
-            ++k;
-        }
-        if (k != n)
-           printf("error\n");
-        
-        f[n] = function(1-h/2);
-    }
-    
-    void generateSolution(double *y)
-    {
-        y[0] = -solution(h/2);
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            y[k] = solution(i);
-            ++k;
-        }
-        if (k != n)
-           printf("error\n");
-        
-        y[n] = solution(1-h/2);
-    }
 
     void fillEigenFunction(double *e, int m)
     {
@@ -156,15 +169,13 @@ public:
     }
     
 private:
-    int n;
-    double h;
     double b;
 };
 
 int main()
 {
-    FourierAlgorithm FourierSolve;
-    FourierSolve.printErrors();
+    FourierSolver solver;
+    solver.printErrors();
     
     return 0;
 }
