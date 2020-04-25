@@ -189,6 +189,9 @@ public:
         factor = new double[n+1];
 
         generateFunction(f);
+        f[0] = 0;
+        f[n] = 0;
+        
         setFactor();
         fillMatrix(a, b, c);
 
