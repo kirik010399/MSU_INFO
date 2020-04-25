@@ -40,8 +40,6 @@ public:
             f[k] = function(i);
             ++k;
         }
-        if (k != n)
-           printf("error\n");
         
         f[n] = function(1-h/2);
     }
@@ -55,8 +53,6 @@ public:
             y[k] = solution(i);
             ++k;
         }
-        if (k != n)
-           printf("error\n");
         
         y[n] = solution(1-h/2);
     }
@@ -214,29 +210,29 @@ public:
     
     virtual double function(double x)
     {
-        return sin(M_PI*x/2);
+        return x * sin(M_PI*x/2) + M_PI*M_PI * sin(M_PI*x/2)/4;
     }
     
     virtual double solution(double x)
     {
-        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
+        return sin(M_PI*x/2);
     }
     
+    double factorFunction(double x)
+    {
+        return x;
+    }
     void setFactor()
     {
-        for (int i = 0; i < n+1; ++i)
-            factor[i] = 3.0;
-//        factor[0] = -h/2;
-//        int k = 1;
-//        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-//        {
-//            factor[k] = i;
-//            ++k;
-//        }
-//        if (k != n)
-//           printf("error\n");
-//
-//        factor[n] = 1+h/2;
+        factor[0] = -factorFunction(h/2);
+        int k = 1;
+        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
+        {
+            factor[k] = factorFunction(i);
+            ++k;
+        }
+        
+        factor[n] = factorFunction(1-h/2);
     }
     
     void fillMatrix(double *a, double *b, double *c)
