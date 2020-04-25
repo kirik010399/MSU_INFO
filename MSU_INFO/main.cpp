@@ -285,11 +285,10 @@ private:
 
 int main()
 {
-    FourierSolver fourierSolver;
-    fourierSolver.printErrors();
-    
     ThomasSolver thomasSolver;
     thomasSolver.printErrors();
     
+    FourierSolver fourierSolver;
+    fourierSolver.printErrors();
     return 0;
 }
