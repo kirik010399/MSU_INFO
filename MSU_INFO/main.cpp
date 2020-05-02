@@ -8,9 +8,13 @@ public:
     CommonSolver(){}
     virtual void getSolution(){}
     virtual void fillSizes(int k){}
+    virtual double divFunc(){return 1;}
+    virtual void calculateNext(int i){}
     
     void printErrors()
     {
+        double *temp;
+        
         for (int k = 20; k <= 1000; k += 20)
         {
             T = 1.0;
@@ -19,11 +23,38 @@ public:
             h = 1.0/(m-1);
             
             data = fopen("data.txt", "w");
-            getSolution();
+            
+            u_cur = new double[m+1];
+            u_next = new double[m+1];
+            
+            for(int j = 0; j <= m; ++j)
+            {
+                u_cur[j] = answerFunction(0, j*h-h/2);
+                fprintf(data, "%.16lf ", u_cur[j]);
+            }
+            fprintf(data, "\n");
+            
+            for (int i = 0; i < n; ++i)
+            {
+                calculateNext(i);
+                
+                temp = u_next;
+                u_next = u_cur;
+                u_cur = temp;
+//                swap(u_next, u_cur);
+                
+                for (int j = 0; j <= m; ++j)
+                    fprintf(data, "%.16lf ", u_cur[j]);
+                
+                fprintf(data, "\n");
+            }
             fclose(data);
             
             data = fopen("data.txt", "r");
-            printf("n: %d, max error: %lf\n", n, residual());
+            printf("size: %d, max error: %lf\n", m, residual()/divFunc());
+            
+            delete []u_cur;
+            delete []u_next;
             fclose(data);
         }
     }
@@ -32,9 +63,9 @@ public:
     {
         double maxDif = 0;
         
-        for (int i = 0; i < n+1; ++i)
+        for (int i = 0; i <= n; ++i)
         {
-            for (int j = 0; j < m+1; ++j)
+            for (int j = 0; j <= m; ++j)
             {
                 double temp;
                 fscanf(data, "%lf", &temp);
@@ -68,6 +99,7 @@ protected:
     double h;
     double tau, T;
     FILE *data;
+    double *u_cur, *u_next;
 };
 
 class ExplicitSolver: public CommonSolver
@@ -78,16 +110,23 @@ public:
     virtual void fillSizes(int k)
     {
         m = k;
-        n = T*(2*k-1)*(2*k-1)/2;
+        n = T * (2*k-1)*(2*k-1)/2;
     }
     
-    virtual void getSolution()
+    virtual double divFunc()
     {
-        
+        return tau + h*h;
     }
     
-    
-private:
+    void calculateNext(int i)
+    {
+        for(int j = 1; j < m; ++j)
+            u_next[j] =  (u_cur[j+1] - 2 * u_cur[j] + u_cur[j-1]) * tau/(h*h) + u_cur[j]
+                        - tau * factorFunction(h*j - h/2) * u_cur[j] + tau * function(tau*i, h*j - h/2);
+
+        u_next[0] = -u_next[1];
+        u_next[m] = u_next[m-1];
+    }
 };
 
 class KrankNikolsonSolver: public CommonSolver
@@ -101,80 +140,82 @@ public:
         n = k;
     }
     
-    virtual void getSolution()
+    virtual double divFunc()
     {
-        double *a, *b, *c, *f, *y, *sol;
-        a = new double[n+1];
-        b = new double[n+1];
-        c = new double[n+1];
-        f = new double[n+1];
-        y = new double[n+1];
-        sol = new double[n+1];
-        factor = new double[n+1];
-
-        f[0] = 0;
-        f[n] = 0;
+        return tau*tau + h*h;
+    }
+    
+    void calculateNext(int i)
+    {
+        double *a, *b, *c, *f;
+        
+        a = new double[m+1];
+        b = new double[m+1];
+        c = new double[m+1];
+        f = new double[m+1];
         
         fillMatrix(a, b, c);
-
-        solveMatrix(y, a, b, c, f);
-
-//        double res = residual(y, sol);
+        fillF(f, i);
+        
+        solveMatrix(u_next, a, b, c, f);
         
         delete []a;
         delete []b;
         delete []c;
         delete []f;
-        delete []y;
-        delete []sol;
-        delete []factor;
     }
-    
+        
     void fillMatrix(double *a, double *b, double *c)
     {
         c[0] = 1.0;
         b[0] = -1.0;
         
-        for (int i = 1; i < n; ++i)
+        for (int j = 1; j < m; ++j)
         {
-            a[i] = 1.0/(h*h);
-            c[i] = 2.0/(h*h) + factor[i];
-            b[i] = 1.0/(h*h);
+            a[j] = 1.0/(2*h*h);
+            c[j] = 2.0/(h*h) + 1.0/tau + factorFunction(h*j-h/2)/2;
+            b[j] = 1.0/(2*h*h);
         }
         
-        a[n] = 1.0;
-        c[n] = 1.0;
+        a[m] = 1.0;
+        c[m] = 1.0;
     }
     
-    void solveMatrix(double *y, double* a, double* b, double* c, double *f)
+    void fillF(double *f, int i)
     {
-        int i;
-        double* alpha;
-        double* beta;
+        for (int j = 1; j <= m; ++j)
+            f[j] = (u_cur[j+1] - 2*u_cur[j] + u_cur[j-1])/(2*h*h) + u_cur[j]/tau
+                    - factorFunction(h*j-h/2)/2 * u_cur[j] + (function(tau*(i+1), h*j-h/2) + function(tau*i, h*j-h/2))/2;
         
-        alpha = new double[n+1];
-        beta = new double[n+1];
+        f[0] = 0;
+        f[m] = 0;
+    }
+    
+    void solveMatrix(double *y, double *a, double *b, double *c, double *f)
+    {
+        double *alpha;
+        double *beta;
+        
+        alpha = new double[m+1];
+        beta = new double[m+1];
         
         alpha[1] = b[0]/c[0];
         beta[1] = f[0]/c[0];
         
-        for (i = 1; i < n; ++i)
+        for (int i = 1; i < m; ++i)
         {
             alpha[i+1] = b[i] / (c[i] - a[i]*alpha[i]);
             beta[i+1] = (f[i] + a[i]*beta[i]) / (c[i] - a[i]*alpha[i]);
         }
         
-        y[n] = (f[n] + a[n]*beta[n]) / (c[n] - a[n]*alpha[n]);
+        y[m] = (f[m] + a[m]*beta[m]) / (c[m] - a[m]*alpha[m]);
         
-        for (i = n-1; i >= 0; --i)
+        for (int i = m-1; i >= 0; --i)
             y[i] = alpha[i+1]*y[i+1] + beta[i+1];
         
         delete []alpha;
         delete []beta;
     }
-    
-private:
-    double *factor;
 };
 
 int main()
