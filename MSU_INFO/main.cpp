@@ -6,174 +6,102 @@ class CommonSolver
 {
 public:
     CommonSolver(){}
-    virtual double function(double x){return 0;}
-    virtual double solution(double x){return 0;}
-    virtual double getErrorToN(){return 0;}
+    virtual void getSolution(){}
+    virtual void fillSizes(int k){}
     
     void printErrors()
     {
-        for (n = 10; n <= 10000; n*=10)
+        for (int k = 20; k <= 1000; k += 20)
         {
-            h = 1.0/(n-1);
-            printf("n: %d, norm: %lf\n", n, getErrorToN());
+            T = 1.0;
+            fillSizes(k);
+            tau = T/n;
+            h = 1.0/(m-1);
+            
+            data = fopen("data.txt", "w");
+            getSolution();
+            fclose(data);
+            
+            data = fopen("data.txt", "r");
+            printf("n: %d, max error: %lf\n", n, residual());
+            fclose(data);
         }
     }
     
-    double residual(double *y1, double *y2)
+    double residual()
     {
-        double res = 0;
+        double maxDif = 0;
         
         for (int i = 0; i < n+1; ++i)
         {
-            double dif = y1[i] - y2[i];
-            res += dif*dif * h;
+            for (int j = 0; j < m+1; ++j)
+            {
+                double temp;
+                fscanf(data, "%lf", &temp);
+                double dif = fabs(temp - answerFunction(i*tau, j*h-h/2));
+                
+                if (dif > maxDif)
+                    maxDif = dif;
+            }
         }
-        return sqrt(res)/(h*h);
+        return maxDif;
     }
     
-    void generateFunction(double *f)
+    double answerFunction(double t, double x)
     {
-        f[0] = -function(h/2);
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            f[k] = function(i);
-            ++k;
-        }
-        
-        f[n] = function(1-h/2);
+        return 0;
     }
     
-    void generateSolution(double *y)
+    double factorFunction(double x)
     {
-        y[0] = -solution(h/2);
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            y[k] = solution(i);
-            ++k;
-        }
-        
-        y[n] = solution(1-h/2);
+        return x;
+    }
+    
+    double function(double t, double x)
+    {
+        return 0;
     }
     
 protected:
-    int n;
+    int n; //for t
+    int m; //for x
     double h;
+    double tau, T;
+    FILE *data;
 };
 
-class FourierSolver: public CommonSolver
+class ExplicitSolver: public CommonSolver
 {
 public:
-    FourierSolver(){}
+    ExplicitSolver(){}
     
-    virtual double getErrorToN()
+    virtual void fillSizes(int k)
     {
-        double *c, *f, *y, *sol;
-        c = new double[n+1];
-        f = new double[n+1];
-        y = new double[n+1];
-        sol = new double[n+1];
-
-        generateFunction(f);
-        setFactor();
-        
-        f2c(f, c);
-        c2y(c, y);
-
-        generateSolution(sol);
-        
-        double res = residual(y, sol);
-        
-        delete []c;
-        delete []f;
-        delete []y;
-        delete []sol;
-        
-        return res;
+        m = k;
+        n = T*(2*k-1)*(2*k-1)/2;
     }
     
-    virtual double function(double x)
+    virtual void getSolution()
     {
-        return sin(M_PI*x/2);
+        
     }
     
-    virtual double solution(double x)
-    {
-        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
-    }
-    
-    void setFactor()
-    {
-        b = 3.0;
-    }
-    
-    double eigenFunctionComponent(int m, int k)
-    {
-        return sin(M_PI*h*(2*m-1)*(2*k-1)/4);
-    }
-    
-    double eigenValue(int m)
-    {
-        return 4/(h*h) * sin(M_PI*h*(2*m-1)/4)*sin(M_PI*h*(2*m-1)/4) + b;
-    }
-    
-    double product(double *y1, double *y2)
-    {
-        double sum = 0;
-        
-        for (int k = 1; k <= n-1; ++k)
-            sum += y1[k] * y2[k] * h;
-        
-        return sum;
-    }
-    
-    void f2c(double *f, double *c)
-    {
-        double *e;
-        e = new double[n+1];
-        
-        c[0] = 0;
-        c[n] = 0;
-        
-        for (int m = 1; m <= n-1; ++m)
-        {
-            fillEigenFunction(e, m);
-            c[m] = product(f, e) / (eigenValue(m) * product(e, e));
-        }
-        
-        delete []e;
-    }
-
-    void c2y(double* c, double *y)
-    {
-        for (int k = 0; k < n+1; ++k)
-        {
-            y[k] = 0;
-            for (int m = 0; m < n+1; ++m)
-                y[k] += c[m] * eigenFunctionComponent(m, k);
-        }
-    }
-
-    void fillEigenFunction(double *e, int m)
-    {
-        e[0] = 0;
-        e[n] = 0;
-        
-        for (int k = 1; k <= n-1; ++k)
-            e[k] = eigenFunctionComponent(m, k);
-    }
     
 private:
-    double b;
 };
 
-class ThomasSolver: public CommonSolver
+class KrankNikolsonSolver: public CommonSolver
 {
 public:
-    ThomasSolver(){}
+    KrankNikolsonSolver(){}
     
-    virtual double getErrorToN()
+    virtual void fillSizes(int k)
+    {
+        m = k;
+        n = k;
+    }
+    
+    virtual void getSolution()
     {
         double *a, *b, *c, *f, *y, *sol;
         a = new double[n+1];
@@ -184,18 +112,14 @@ public:
         sol = new double[n+1];
         factor = new double[n+1];
 
-        generateFunction(f);
         f[0] = 0;
         f[n] = 0;
         
-        setFactor();
         fillMatrix(a, b, c);
 
         solveMatrix(y, a, b, c, f);
 
-        generateSolution(sol);
-
-        double res = residual(y, sol);
+//        double res = residual(y, sol);
         
         delete []a;
         delete []b;
@@ -204,35 +128,6 @@ public:
         delete []y;
         delete []sol;
         delete []factor;
-        
-        return res;
-    }
-    
-    virtual double function(double x)
-    {
-        return x * sin(M_PI*x/2) + M_PI*M_PI * sin(M_PI*x/2)/4;
-    }
-    
-    virtual double solution(double x)
-    {
-        return sin(M_PI*x/2);
-    }
-    
-    double factorFunction(double x)
-    {
-        return x;
-    }
-    void setFactor()
-    {
-        factor[0] = -factorFunction(h/2);
-        int k = 1;
-        for (double i = h/2; i <= 1-h/2 + 1e-10; i += h)
-        {
-            factor[k] = factorFunction(i);
-            ++k;
-        }
-        
-        factor[n] = factorFunction(1-h/2);
     }
     
     void fillMatrix(double *a, double *b, double *c)
@@ -284,12 +179,12 @@ private:
 
 int main()
 {
-    printf("Thomas alrgorithm errors:\n");
-    ThomasSolver thomasSolver;
-    thomasSolver.printErrors();
+    printf("Explicit alrgorithm errors:\n");
+    ExplicitSolver explicitSolver;
+    explicitSolver.printErrors();
     
-    printf("\nFourier alrgorithm errors:\n");
-    FourierSolver fourierSolver;
-    fourierSolver.printErrors();
+    printf("Krank Nikolson alrgorithm errors:\n");
+    KrankNikolsonSolver krankNikolsonSolver;
+    krankNikolsonSolver.printErrors();
     return 0;
 }
