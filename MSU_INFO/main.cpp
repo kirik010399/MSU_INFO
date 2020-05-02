@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 
+using namespace std;
+
 class CommonSolver
 {
 public:
@@ -10,12 +12,11 @@ public:
     virtual void fillSizes(int k){}
     virtual double divFunc(){return 1;}
     virtual void calculateNext(int i){}
+    virtual double maxSize(){return 100;}
     
     void printErrors()
     {
-        double *temp;
-        
-        for (int k = 20; k <= 1000; k += 20)
+        for (int k = 20; k <= maxSize(); k += 20)
         {
             T = 1.0;
             fillSizes(k);
@@ -38,10 +39,7 @@ public:
             {
                 calculateNext(i);
                 
-                temp = u_next;
-                u_next = u_cur;
-                u_cur = temp;
-//                swap(u_next, u_cur);
+                swap(u_next, u_cur);
                 
                 for (int j = 0; j <= m; ++j)
                     fprintf(data, "%.16lf ", u_cur[j]);
@@ -80,7 +78,7 @@ public:
     
     double answerFunction(double t, double x)
     {
-        return 0;
+        return exp(-t * M_PI*M_PI/4)*sin(M_PI*x/2) + t*t*x*(2-x);
     }
     
     double factorFunction(double x)
@@ -90,7 +88,7 @@ public:
     
     double function(double t, double x)
     {
-        return 0;
+        return 2*t*x*(2-x) + 2*t*t + factorFunction(x) * answerFunction(t, x);
     }
     
 protected:
@@ -106,6 +104,11 @@ class ExplicitSolver: public CommonSolver
 {
 public:
     ExplicitSolver(){}
+    
+    double maxSize()
+    {
+        return 200;
+    }
     
     virtual void fillSizes(int k)
     {
@@ -133,6 +136,11 @@ class KrankNikolsonSolver: public CommonSolver
 {
 public:
     KrankNikolsonSolver(){}
+    
+    double maxSize()
+    {
+        return 1000;
+    }
     
     virtual void fillSizes(int k)
     {
@@ -173,7 +181,7 @@ public:
         for (int j = 1; j < m; ++j)
         {
             a[j] = 1.0/(2*h*h);
-            c[j] = 2.0/(h*h) + 1.0/tau + factorFunction(h*j-h/2)/2;
+            c[j] = 1.0/(h*h) + 1.0/tau + factorFunction(h*j-h/2)/2;
             b[j] = 1.0/(2*h*h);
         }
         
@@ -224,8 +232,11 @@ int main()
     ExplicitSolver explicitSolver;
     explicitSolver.printErrors();
     
+    printf("\n");
+    
     printf("Krank Nikolson alrgorithm errors:\n");
     KrankNikolsonSolver krankNikolsonSolver;
     krankNikolsonSolver.printErrors();
+    
     return 0;
 }
