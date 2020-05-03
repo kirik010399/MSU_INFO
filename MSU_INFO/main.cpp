@@ -12,7 +12,7 @@ public:
     
     void printErrors()
     {
-        for (n = 10; n <= 10000; n*=10)
+        for (n = 7; n <= 7; n*=10)
         {
             h = 1.0/(n-1);
             printf("n: %d, norm: %lf\n", n, getErrorToN());
@@ -83,6 +83,10 @@ public:
 
         generateSolution(sol);
         
+        for (int i = 0; i < n+1; ++i)
+            printf("%.16lf ", sol[i]);
+        printf("\n");
+        
         double res = residual(y, sol);
         
         delete []c;
@@ -100,12 +104,12 @@ public:
     
     virtual double solution(double x)
     {
-        return 4 * sin(M_PI*x/2)/(12+M_PI*M_PI);
+        return 4 * sin(M_PI*x/2)/(4+M_PI*M_PI);
     }
     
     void setFactor()
     {
-        b = 3.0;
+        b = 1.0;
     }
     
     double eigenFunctionComponent(int m, int k)
@@ -194,6 +198,10 @@ public:
         solveMatrix(y, a, b, c, f);
 
         generateSolution(sol);
+        
+        for (int i = 0; i < n+1; ++i)
+            printf("%.16lf ", sol[i]);
+        printf("\n");
 
         double res = residual(y, sol);
         
@@ -210,17 +218,17 @@ public:
     
     virtual double function(double x)
     {
-        return x * sin(M_PI*x/2) + M_PI*M_PI * sin(M_PI*x/2)/4;
+        return sin(M_PI*x/2);
     }
     
     virtual double solution(double x)
     {
-        return sin(M_PI*x/2);
+        return 4 * sin(M_PI*x/2)/(4+M_PI*M_PI);
     }
     
     double factorFunction(double x)
     {
-        return x;
+        return 1;
     }
     void setFactor()
     {
