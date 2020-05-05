@@ -91,46 +91,58 @@ int solveSystem(double* matrix, double* vector, double* result, int n, FILE *fou
 
     double eps = 1e-16;
     
-    for (j = 0; j < n; ++j)
+    for (i = 0; i < n; ++i)
     {
-        a = matrix[j*n+j];
-        b = j;
+        a = matrix[i*n+i];
+        b = i;
         
-        for (i = j+1; i < n; ++i)
+        for (j = i+1; j < n; ++j)
         {
-            if (fabs(matrix[i*n+j]) > fabs(a))
+            if (fabs(matrix[j*n+i]) > fabs(a))
             {
-                a = matrix[i*n+j];
-                b = i;
+                a = matrix[j*n+i];
+                b = j;
             }
         }
         
         if (fabs(a) < eps)
             return -1;
         
-        if (b != j)
+        if (b != i)
         {
-            for (i = j; i < n; ++i)
-                swap(matrix[b*n+i], matrix[j*n+i]);
+            for (j = i; j < n; ++j)
+                swap(matrix[b*n+j], matrix[i*n+j]);
             
-            swap(vector[b], vector[j]);
+            swap(vector[b], vector[i]);
         }
         
-        for(i = 0; i < n; ++i)
+        a = 1.0/matrix[i*n+i];
+               
+        for (j = i; j < n; ++j)
+            matrix[i*n+j] *= a;
+       
+        vector[i] *= a;
+       
+        for (j = i+1; j < n; ++j)
         {
-            if (i != j && fabs(matrix[i*n+j]) > eps)
-            {
-                a = matrix[i*n+j]/matrix[j*n+j];
-                
-                for(k = j; k < n; ++k)
-                    matrix[i*n+k] -= a*matrix[j*n+k];
-                
-                vector[i] -= a*vector[j];
-            }
+            a = matrix[j*n+i];
+         
+            for (k = i; k < n; ++k)
+                matrix[j*n+k] -= matrix[i*n+k] * a;
+           
+            vector[j] -= vector[i] * a;
         }
     }
-    for (i = 0; i < n; ++i)
-        result[i] = vector[i]/matrix[i*n+i];
+   
+    for (i = n-1; i >= 0; --i)
+    {
+        a = vector[i];
+       
+        for (j = i+1; j < n; ++j)
+            a -= matrix[i * n + j] * result[j];
+       
+        result[i] = a;
+    }
     
     printMatrix(matrix, n, fout);
     fprintf(fout, "\n");
