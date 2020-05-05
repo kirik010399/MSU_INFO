@@ -5,13 +5,16 @@
 using namespace std;
 
 void printMatrix(double* matrix, int n, FILE *fout);
-int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout);
+void printVector(double* result, int n, FILE *fout);
+
+int solveSystem(double* matrix, double* vector, double* result, int n, FILE *fout);
 
 int main()
 {
     int n;
     double *matrix;
-    double *inverseMatrix;
+    double *vector;
+    double *result;
     FILE *fin, *fout;
     
     fin = fopen("input.txt", "r");
@@ -25,7 +28,8 @@ int main()
     }
   
     matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
+    vector = new double [n];
+    result = new double [n];
 
     for (int i = 0; i < n; ++i)
     {
@@ -36,17 +40,28 @@ int main()
                 fclose(fin);
                 fclose(fout);
                 delete []matrix;
-                delete []inverseMatrix;
+                delete []vector;
+                delete []result;
                 
                 return -1;
             }
         }
+        if (fscanf(fin, "%lf", &vector[i]) != 1)
+        {
+            fclose(fin);
+            fclose(fout);
+            delete []matrix;
+            delete []vector;
+            delete []result;
+            
+            return -1;
+        }
     }
     
-    int returnFlag = invertMatrix(matrix, inverseMatrix, n, fout);
+    int returnFlag = solveSystem(matrix, vector, result, n, fout);
     
     if (returnFlag != -1)
-        printMatrix(inverseMatrix, n, fout);
+        printVector(result, n, fout);
     else
     {
         fprintf(fout, "Error");
@@ -54,7 +69,8 @@ int main()
         fclose(fin);
         fclose(fout);
         delete []matrix;
-        delete []inverseMatrix;
+        delete []vector;
+        delete []result;
         
         return -2;
     }
@@ -62,78 +78,61 @@ int main()
     fclose(fin);
     fclose(fout);
     delete []matrix;
-    delete []inverseMatrix;
+    delete []vector;
+    delete []result;
     
     return 0;
 }
 
-int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout)
+int solveSystem(double* matrix, double* vector, double* result, int n, FILE *fout)
 {
-    int i, j, k, maxElemIndex;
-    double a, maxElem;
-    
+    int i, j, k, b;
+    double a;
+
     double eps = 1e-16;
     
-    for (i = 0; i < n; ++i)
+    for (j = 0; j < n; ++j)
     {
-        for (j = 0; j < n; ++j)
-        {
-            if (i == j)
-                inverseMatrix[i*n+j] = 1;
-            else
-                inverseMatrix[i*n+j] = 0;
-        }
-    }
-
-    for (i = 0; i < n; ++i)
-    {
-        maxElem = fabs(matrix[i*n+i]);
-        maxElemIndex = i;
+        a = matrix[j*n+j];
+        b = j;
         
-        for (j = i + 1; j < n; ++j)
+        for (i = j+1; i < n; ++i)
         {
-            if (maxElem < fabs(matrix[j*n+i]))
+            if (fabs(matrix[i*n+j]) > fabs(a))
             {
-                maxElem = fabs(matrix[j*n+i]);
-                maxElemIndex = j;
+                a = matrix[i*n+j];
+                b = i;
             }
         }
         
-        for (j = 0; j < n; ++j)
-            swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
-        
-        for (j = 0; j < n; ++j)
-            swap (inverseMatrix[i*n+j], inverseMatrix[maxElemIndex*n+j]);
-        
-        if (fabs(matrix[i*n+i]) < eps)
+        if (fabs(a) < eps)
             return -1;
         
-        a = 1.0/matrix[i*n+i];
-        
-        for (j = i; j < n; ++j)
-            matrix[i*n+j] *= a;
-        
-        for (j = 0; j < n; ++j)
-            inverseMatrix[i*n+j] *= a;
-        
-        for (j = 0; j < n; ++j)
+        if (b != j)
         {
-            if (i == j)
-                continue;
+            for (i = j; i < n; ++i)
+                swap(matrix[b*n+i], matrix[j*n+i]);
             
-            a = matrix[j*n+i];
-            
-            for (k = i; k < n; ++k)
-                matrix[j*n+k] -= matrix[i*n+k] * a;
-            
-            for (k = 0; k < n; ++k)
-                inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
+            swap(vector[b], vector[j]);
+        }
+        
+        for(i = 0; i < n; ++i)
+        {
+            if (i != j && fabs(matrix[i*n+j]) > eps)
+            {
+                a = matrix[i*n+j]/matrix[j*n+j];
+                
+                for(k = j; k < n; ++k)
+                    matrix[i*n+k] -= a*matrix[j*n+k];
+                
+                vector[i] -= a*vector[j];
+            }
         }
     }
+    for (i = 0; i < n; ++i)
+        result[i] = vector[i]/matrix[i*n+i];
     
     printMatrix(matrix, n, fout);
-    fprintf(fout, "\n");
-    printMatrix(inverseMatrix, n, fout);
     fprintf(fout, "\n");
     
     return 0;
@@ -150,4 +149,13 @@ void printMatrix(double* matrix, int n, FILE *fout)
         }
         fprintf(fout, "\n");
     }
+}
+
+void printVector(double* result, int n, FILE *fout)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        fprintf(fout, "%.6lf ", result[i]);
+    }
+    fprintf(fout, "\n");
 }
