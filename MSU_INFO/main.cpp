@@ -116,8 +116,11 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout)
         for (j = 0; j < n; ++j)
             inverseMatrix[i*n+j] *= a;
         
-        for (j = i+1; j < n; ++j)
+        for (j = 0; j < n; ++j)
         {
+            if (i == j)
+                continue;
+            
             a = matrix[j*n+i];
             
             for (k = i; k < n; ++k)
@@ -132,19 +135,6 @@ int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout)
     fprintf(fout, "\n");
     printMatrix(inverseMatrix, n, fout);
     fprintf(fout, "\n");
-    
-    for (k = 0; k < n; ++k)
-    {
-        for (i = n - 1; i >= 0; --i)
-        {
-            a = inverseMatrix[i*n+k];
-            
-            for (j = i+1; j < n; ++j)
-                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
-            
-            inverseMatrix[i*n+k] = a;
-        }
-    }
     
     return 0;
 }
