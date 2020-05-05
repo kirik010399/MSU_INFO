@@ -1,128 +1,163 @@
 #include <iostream>
 #include <time.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "invertingManager.hpp"
 
 using namespace std;
 
+void printMatrix(double* matrix, int n, FILE *fout);
+int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout);
+
 int main()
 {
-    int n, m;
+    int n;
     double *matrix;
     double *inverseMatrix;
-    FILE* fin = NULL;
-    clock_t t;
-    int inputType;
-    int returnFlag;
+    FILE *fin, *fout;
     
-    cout<<"Choose type of entering data: 1 - from file, 2 - from formula"<<endl;
-    cin>>inputType;
-    
-    if (inputType == 1)
+    fin = fopen("input.txt", "r");
+    fout = fopen("output.txt", "w");
+        
+    if (fscanf(fin, "%d", &n) != 1 || n <= 0)
     {
-        fin = fopen("input.txt", "r");
-        
-        if (!fin)
-        {
-            cout<<"File don't exist"<<endl;
-            fclose(fin);
-            return -1;
-        }
-        
-        if (fscanf(fin, "%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
-            fclose(fin);
-            return -2;
-        }
-    }
-    else if (inputType == 2)
-    {
-        cout<<"Enter size: ";
-    
-        if (scanf("%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
-            return -2;
-        }
-    }
-    else
-    {
-        cout<<"Input type isn't correct"<<endl;
-        return -2;
-    }
-    
-    matrix = new double [n*n];
-    inverseMatrix = new double [n*n];
-    
-    if (!(matrix && inverseMatrix))
-    {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []inverseMatrix;
-        
-        return -2;
-    }
-
-    returnFlag = enterMatrix(matrix, n, fin);
-    
-    if (returnFlag == -1)
-    {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []inverseMatrix;
-        
-        return -2;
-    }
-    
-    cout<<"Enter size of printing matrix: ";
-    cin>>m;
-    
-    t = clock();
-    returnFlag = invertMatrix(matrix, inverseMatrix, n);
-    t = clock() - t;
-    
-    if (returnFlag)
-    {
-        cout<<"Inverse Matrix:"<<endl; 
-        printMatrix(inverseMatrix, n, m);
-        
-        if (inputType == 1)
-            fseek(fin, 1, SEEK_SET);
-        
-        returnFlag = enterMatrix(matrix, n, fin);
-        
-        cout<<endl<<"The norm of residual: "<<residualNorm(matrix, inverseMatrix, n)<<endl;
-        
-        cout<<"Inversion time =  "<< t * 1.0/CLOCKS_PER_SEC << " seconds"<<endl;
-    }
-    else
-    {
-        cout<<"Error while inverting matrix"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []inverseMatrix;
-        
+        fclose(fin);
+        fclose(fout);
         return -1;
     }
+  
+    matrix = new double [n*n];
+    inverseMatrix = new double [n*n];
+
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
+            {
+                fclose(fin);
+                fclose(fout);
+                delete []matrix;
+                delete []inverseMatrix;
+                
+                return -1;
+            }
+        }
+    }
     
-    if (inputType == 1)
+    int returnFlag = invertMatrix(matrix, inverseMatrix, n, fout);
+    
+    if (returnFlag != -1)
+        printMatrix(inverseMatrix, n, fout);
+    else
+    {
+        fprintf(fout, "Error");
+
         fclose(fin);
+        fclose(fout);
+        delete []matrix;
+        delete []inverseMatrix;
+        
+        return -2;
+    }
     
+    fclose(fin);
+    fclose(fout);
     delete []matrix;
     delete []inverseMatrix;
     
     return 0;
+}
+
+int invertMatrix(double* matrix, double* inverseMatrix, int n, FILE *fout)
+{
+    int i, j, k, maxElemIndex;
+    double a, maxElem;
+    
+    double eps = 1e-16;
+    
+    for (i = 0; i < n; ++i)
+    {
+        for (j = 0; j < n; ++j)
+        {
+            if (i == j)
+                inverseMatrix[i*n+j] = 1;
+            else
+                inverseMatrix[i*n+j] = 0;
+        }
+    }
+
+    for (i = 0; i < n; ++i)
+    {
+        maxElem = fabs(matrix[i*n+i]);
+        maxElemIndex = i;
+        
+        for (j = i + 1; j < n; ++j)
+        {
+            if (maxElem < fabs(matrix[j*n+i]))
+            {
+                maxElem = fabs(matrix[j*n+i]);
+                maxElemIndex = j;
+            }
+        }
+        
+        for (j = 0; j < n; ++j)
+            swap (matrix[i*n+j], matrix[maxElemIndex*n+j]);
+        
+        for (j = 0; j < n; ++j)
+            swap (inverseMatrix[i*n+j], inverseMatrix[maxElemIndex*n+j]);
+        
+        if (fabs(matrix[i*n+i]) < eps)
+            return -1;
+        
+        a = 1.0/matrix[i*n+i];
+        
+        for (j = i; j < n; ++j)
+            matrix[i*n+j] *= a;
+        
+        for (j = 0; j < n; ++j)
+            inverseMatrix[i*n+j] *= a;
+        
+        for (j = i+1; j < n; ++j)
+        {
+            a = matrix[j*n+i];
+            
+            for (k = i; k < n; ++k)
+                matrix[j*n+k] -= matrix[i*n+k] * a;
+            
+            for (k = 0; k < n; ++k)
+                inverseMatrix[j*n+k] -= inverseMatrix[i*n+k] * a;
+        }
+    }
+    
+    printMatrix(matrix, n, fout);
+    fprintf(fout, "\n");
+    printMatrix(inverseMatrix, n, fout);
+    fprintf(fout, "\n");
+    
+    for (k = 0; k < n; ++k)
+    {
+        for (i = n - 1; i >= 0; --i)
+        {
+            a = inverseMatrix[i*n+k];
+            
+            for (j = i+1; j < n; ++j)
+                a -= matrix[i*n+j] * inverseMatrix[j*n+k];
+            
+            inverseMatrix[i*n+k] = a;
+        }
+    }
+    
+    return 0;
+}
+
+
+void printMatrix(double* matrix, int n, FILE *fout)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            fprintf(fout, "%.6lf ", matrix[i*n+j]);
+        }
+        fprintf(fout, "\n");
+    }
 }
