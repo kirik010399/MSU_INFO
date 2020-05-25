@@ -98,17 +98,21 @@ public:
     
     void loop()
     {
-        FILE* out_T;
-        FILE* out_omega;
-        FILE* out_psi;
+        FILE* foutT;
+        FILE* foutOmega;
+        FILE* foutPsi;
 
-        FILE* out_last_T;
-        FILE* out_last_omega;
-        FILE* out_last_psi;
+        char bufferT[32];
+        char bufferOmega[32];
+        char bufferPsi[32];
+        
+        snprintf(bufferT, sizeof(char) * 32, "./data/T/T%i.txt", 0);
+        snprintf(bufferOmega, sizeof(char) * 32, "./data/Omega/Omega%i.txt", 0);
+        snprintf(bufferPsi, sizeof(char) * 32, "./data/Psi/Psi%i.txt", 0);
 
-        out_T = fopen("output_T.txt", "w");
-        out_omega = fopen("output_omega.txt", "w");
-        out_psi = fopen("output_psi.txt", "w");
+        foutT = fopen(bufferT, "w");
+        foutOmega = fopen(bufferOmega, "w");
+        foutPsi = fopen(bufferPsi, "w");
         
         for (int i = 0; i < Mx+1; ++i)
         {
@@ -118,17 +122,22 @@ public:
                 omega[i][j] = omega0(i*hx, j*hy);
                 psi[i][j] = psi0(i*hx, j*hy);
 
-                fprintf(out_T, "%.16lf ", T[i][j]);
-                fprintf(out_omega, "%.16lf ", omega[i][j]);
-                fprintf(out_psi, "%.16lf ", psi[i][j]);
+                fprintf(foutT, "%.16lf ", T[i][j]);
+                fprintf(foutOmega, "%.16lf ", omega[i][j]);
+                fprintf(foutPsi, "%.16lf ", psi[i][j]);
             }
+            fprintf(foutT, "\n");
+            fprintf(foutOmega, "\n");
+            fprintf(foutPsi, "\n");
         }
-        fprintf(out_T, "\n");
-        fprintf(out_omega, "\n");
-        fprintf(out_psi, "\n");
+        
+        fclose(foutT);
+        fclose(foutOmega);
+        fclose(foutPsi);
 
-        for (int n = 0; n < N; ++n)
+        for (int n = 1; n <= N; ++n)
         {
+            cout<<n<<endl;
             generateDataForT();
             calculateNextWithData(T_next, k);
 
@@ -138,47 +147,34 @@ public:
             generateDataForPsi();
             calculateNextPsi();
 
+            snprintf(bufferT, sizeof(char) * 32, "./data/T/T%i.txt", n);
+            snprintf(bufferOmega, sizeof(char) * 32, "./data/Omega/Omega%i.txt", n);
+            snprintf(bufferPsi, sizeof(char) * 32, "./data/Psi/Psi%i.txt", n);
+
+            foutT = fopen(bufferT, "w");
+            foutOmega = fopen(bufferOmega, "w");
+            foutPsi = fopen(bufferPsi, "w");
+            
             for (int i = 0; i < Mx+1; ++i)
             {
                 for (int j = 0; j < My+1; ++j)
                 {
-                    fprintf(out_T, "%.16lf ", T_next[i][j]);
-                    fprintf(out_omega, "%.16lf ", omega_next[i][j]);
-                    fprintf(out_psi, "%.16lf ", psi[i][j]);
+                    fprintf(foutT, "%.16lf ", T_next[i][j]);
+                    fprintf(foutOmega, "%.16lf ", omega_next[i][j]);
+                    fprintf(foutPsi, "%.16lf ", psi[i][j]);
                 }
+                fprintf(foutT, "\n");
+                fprintf(foutOmega, "\n");
+                fprintf(foutPsi, "\n");
             }
-            fprintf(out_T, "\n");
-            fprintf(out_omega, "\n");
-            fprintf(out_psi, "\n");
+            
+            fclose(foutT);
+            fclose(foutOmega);
+            fclose(foutPsi);
 
             swap(T, T_next);
             swap(omega, omega_next);
         }
-
-        fclose(out_T);
-        fclose(out_omega);
-        fclose(out_psi);
-
-        out_last_T = fopen("output_last_T.txt", "w");
-        out_last_omega = fopen("output_last_omega.txt", "w");
-        out_last_psi = fopen("output_last_psi.txt", "w");
-
-        for (int i = 0; i < Mx+1; ++i)
-        {
-            for (int j = 0; j < My+1; ++j)
-            {
-                fprintf(out_last_T, "%.16lf ", T[i][j]);
-                fprintf(out_last_omega, "%.16lf ", omega[i][j]);
-                fprintf(out_last_psi, "%.16lf", psi[i][j]);
-            }
-            fprintf(out_last_T, "\n");
-            fprintf(out_last_omega, "\n");
-            fprintf(out_last_psi, "\n");
-        }
-
-        fclose(out_last_T);
-        fclose(out_last_omega);
-        fclose(out_last_psi);
     }
     
     void generateDataForT()
@@ -189,9 +185,9 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1/tau * T[i][j] - (T[i+1][j]-T[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy +
-                                                     (T[i][j+1]-T[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx +
-                                                      q(i*hx, j*hy)/(r*c);
+                f[i][j] = 1/tau * T[i][j] - (T[i+1][j]-T[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
+                                            + (T[i][j+1]-T[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx
+                                            + q(i*hx, j*hy)/(r*c);
     }
     
     void generateDataForOmega()
@@ -202,9 +198,9 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1/tau * omega[i][j] - (omega[i+1][j]-omega[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy +
-                                                         (omega[i][j+1]-omega[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx +
-                                                          G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
+                f[i][j] = 1/tau * omega[i][j] - (omega[i+1][j]-omega[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
+                                                + (omega[i][j+1]-omega[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx
+                                                + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
     }
     
     void generateDataForPsi()
@@ -247,10 +243,7 @@ public:
 
     void f2c()
     {
-        double hx, hy, norm;
-
-        hx = 1.0/Mx;
-        hy = 1.0/My;
+        double norm;
 
         for (int m = 0; m < Mx+1; ++m)
             for (int l = 0; l < My+1; ++l)
@@ -291,8 +284,7 @@ public:
 
     double c2f(double x, double y)
     {
-        double func;
-        func = 0;
+        double func = 0;
 
         for (int m = 1; m < Mx; ++m)
             for (int l = 1; l < My; ++l)
@@ -317,14 +309,15 @@ private:
 
 int main()
 {
-//    int Mx, My, N;
-//    printf("Введите Mx (количество узлов по x): ");
-//    scanf("%d", &Mx);
-//    printf("Введите My (количество узлов по y): ");
-//    scanf("%d", &My);
-//    printf("Введите N (количество узлов по t): ");
-//    scanf("%d", &N);
-    StocksSolver stocksSolver(10, 10, 10);
+    int Mx, My, N;
+    printf("Enter x count of steps: ");
+    scanf("%d", &Mx);
+    printf("Enter y count of steps: ");
+    scanf("%d", &My);
+    printf("Enter time: ");
+    scanf("%d", &N);
+    
+    StocksSolver stocksSolver(Mx, My, N);
     stocksSolver.loop();
     return 0;
 }
