@@ -96,7 +96,7 @@ public:
         delete []d;
     }
     
-    void loop()
+    void gifLoop()
     {
         FILE* foutT;
         FILE* foutOmega;
@@ -177,6 +177,138 @@ public:
         }
     }
     
+    double omega0Null(double x, double y)
+    {
+        return sin(M_PI*x) * sin(M_PI*y);
+    }
+        
+    double T0Null(double x, double y)
+    {
+        return sin(M_PI*x) * sin(M_PI*y);
+    }
+    
+    double psi0Null(double x, double y)
+    {
+        return sin(M_PI*x) * sin(M_PI*y);
+    }
+    
+    double answerNullFunctionWithCoef(double x, double y, double t, double coef)
+    {
+        return exp(-2*coef*M_PI*M_PI*t)*sin(M_PI*x)*sin(M_PI*y);
+    }
+    
+    double answerNullFunction(double x, double y, double t, double coef)
+    {
+        return -exp(-2*coef*M_PI*M_PI*t)*sin(M_PI*x)*sin(M_PI*y)/(2.0*M_PI*M_PI);
+    }
+    
+    void nullGifLoop()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+        {
+            for (int j = 0; j < My+1; ++j)
+            {
+                T[i][j] = T0Null(i*hx, j*hy);
+                omega[i][j] = omega0Null(i*hx, j*hy);
+                psi[i][j] = psi0Null(i*hx, j*hy);
+            }
+        }
+        
+        double maxT = 0, maxOmega = 0, maxPsi = 0;
+        double minT = 0, minOmega = 0, minPsi = 0;
+        
+        for (int n = 1; n <= N; ++n)
+        {
+            cout<<n<<endl;
+            generateNullDataForT();
+            calculateNextWithData(T_next, k);
+
+            generateNullDataForOmega();
+            calculateNextWithData(omega_next, nu);
+
+            generateDataForPsi();
+            calculateNextPsi();
+            
+            double curMaxT = 0, curMaxOmega = 0, curMaxPsi = 0;
+            double curMinT = 0, curMinOmega = 0, curMinPsi = 0;
+            
+            for (int i = 0; i < Mx+1; ++i)
+            {
+                for (int j = 0; j < My+1; ++j)
+                {
+                    if (T_next[i][j] > curMaxT)
+                        curMaxT = T_next[i][j];
+                    if (T_next[i][j] < curMinT)
+                        curMinT = T_next[i][j];
+                    
+                    if (omega_next[i][j] > curMaxOmega)
+                        curMaxOmega = omega_next[i][j];
+                    if (omega_next[i][j] < curMinOmega)
+                        curMinOmega = omega_next[i][j];
+                    
+                    if (psi[i][j] > curMaxPsi)
+                        curMaxPsi = psi[i][j];
+                    if (psi[i][j] < curMinPsi)
+                        curMinPsi = psi[i][j];
+                }
+            }
+            
+            if (curMaxT > maxT)
+                maxT = curMaxT;
+            if (curMinT < minT)
+                minT = curMinT;
+            
+            if (curMaxOmega > maxOmega)
+                maxOmega = curMaxOmega;
+            if (curMinOmega < minOmega)
+                minOmega = curMinOmega;
+            
+            if (curMaxPsi > maxPsi)
+                maxPsi = curMaxPsi;
+            if (curMinPsi < minPsi)
+                minPsi = curMinPsi;
+            
+            swap(T, T_next);
+            swap(omega, omega_next);
+        }
+        
+        double maxRealT = 0, maxRealOmega = 0, maxRealPsi = 0;
+        double minRealT = 0, minRealOmega = 0, minRealPsi = 0;
+        
+        for (int n = 1; n <= N; ++n)
+        {
+            for (int i = 0; i < Mx+1; ++i)
+            {
+                for (int j = 0; j < My+1; ++j)
+                {
+                    if (answerNullFunctionWithCoef(i*hx, j*hy, n*tau, k) > maxRealT)
+                        maxRealT = answerNullFunctionWithCoef(i*hx, j*hy, n*tau, k);
+                    if (answerNullFunctionWithCoef(i*hx, j*hy, n*tau, k) < minRealT)
+                        minRealT = answerNullFunctionWithCoef(i*hx, j*hy, n*tau, k);
+                    
+                    if (answerNullFunctionWithCoef(i*hx, j*hy, n*tau, nu) > maxRealOmega)
+                        maxRealOmega = answerNullFunctionWithCoef(i*hx, j*hy, n*tau, nu);
+                    if (answerNullFunctionWithCoef(i*hx, j*hy, n*tau, nu) < minRealOmega)
+                        minRealOmega = answerNullFunctionWithCoef(i*hx, j*hy, n*tau, nu);
+                    
+                    if (answerNullFunction(i*hx, j*hy, n*tau, nu) > maxRealPsi)
+                        maxRealPsi = answerNullFunction(i*hx, j*hy, n*tau, nu);
+                    if (answerNullFunction(i*hx, j*hy, n*tau, nu) < minRealPsi)
+                        minRealPsi = answerNullFunction(i*hx, j*hy, n*tau, nu);
+                }
+            }
+        }
+        
+        printf("Scheme T amplitude: %.16lf, Real T amplitude: %.16lf\n", maxT - minT, maxRealT - minRealT);
+        printf("Error: %.16lf\n", fabs((maxT - minT) - (maxRealT - minRealT)));
+
+        printf("Scheme Omega amplitude: %.16lf, Real Omega amplitude: %.16lf\n", maxOmega - minOmega, maxRealOmega - minRealOmega);
+        printf("Error: %.16lf\n", fabs((maxOmega - minOmega) - (maxRealOmega - minRealOmega)));
+
+        printf("Scheme Psi amplitude: %.16lf, Real Psi amplitude: %.16lf\n", maxPsi - minPsi, maxRealPsi - minRealPsi);
+        printf("Error: %.16lf\n", fabs((maxPsi - minPsi) - (maxRealPsi - minRealPsi)));
+    }
+    
     void generateDataForT()
     {
         for (int i = 0; i < Mx+1; ++i)
@@ -208,6 +340,20 @@ public:
         for (int i = 0; i < Mx+1; ++i)
             for (int j = 0; j < My+1; ++j)
                 f[i][j] = -omega_next[i][j];
+    }
+    
+    void generateNullDataForT()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 1.0/tau * T[i][j];
+    }
+       
+    void generateNullDataForOmega()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 1.0/tau * omega[i][j];
     }
     
     void calculateNextWithData(double **u_next, double a)
@@ -318,7 +464,7 @@ int main()
     scanf("%d", &N);
     
     StocksSolver stocksSolver(Mx, My, N);
-    stocksSolver.loop();
+    stocksSolver.nullGifLoop();
     return 0;
 }
 

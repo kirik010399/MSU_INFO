@@ -3,3 +3,4 @@ main.o
 main.s
 matrixUtils.o
 program
+*.txt
