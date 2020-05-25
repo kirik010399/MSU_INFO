@@ -11,7 +11,7 @@ public:
     
     void fillInitialData()
     {
-        nu = 1e-4;
+        nu = 1.0/100;
         k = 1;
         r = 1;
         c = 1;
@@ -20,7 +20,7 @@ public:
     
     double q(double x, double y)
     {
-        return 3 * sin(2*M_PI*x) * sin(2*M_PI*y);
+        return sin(M_PI*x) * sin(M_PI*y);
     }
     
     double omega0(double x, double y)
@@ -207,7 +207,7 @@ public:
     {
         for (int i = 0; i < Mx+1; ++i)
             for (int j = 0; j < My+1; ++j)
-                f[i][j] = -1.0 * omega[i][j];
+                f[i][j] = -1.0 * omega_next[i][j];
     }
     
     void calculateNextWithData(double **u_next, double a)
