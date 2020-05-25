@@ -185,7 +185,7 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1/tau * T[i][j] - (T[i+1][j]-T[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
+                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
                                             + (T[i][j+1]-T[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx
                                             + q(i*hx, j*hy)/(r*c);
     }
@@ -198,7 +198,7 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1/tau * omega[i][j] - (omega[i+1][j]-omega[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
+                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i][j])/hx * (psi[i][j+1]-psi[i][j])/hy
                                                 + (omega[i][j+1]-omega[i][j])/hy * (psi[i+1][j]-psi[i][j])/hx
                                                 + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
     }
@@ -216,7 +216,7 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                C[i][j] = C[i][j]/(a * (lambda(i, hx) + lambda(j, hy)) + 1/tau);
+                C[i][j] = C[i][j]/(a * (lambda(i, hx) + lambda(j, hy)) + 1.0/tau);
 
         for (int i = 0; i < Mx+1; ++i)
             for (int j = 0; j < My+1; ++j)
