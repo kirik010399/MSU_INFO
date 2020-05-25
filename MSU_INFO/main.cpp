@@ -185,8 +185,8 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i-1][j])/hx * (psi[i][j+1]-psi[i][j-1])/hy
-                                            + (T[i][j+1]-T[i][j-1])/hy * (psi[i+1][j]-psi[i-1][j])/hx
+                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j-1])/(2*hy)
+                                            + (T[i][j+1]-T[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
                                             + q(i*hx, j*hy)/(r*c);
     }
     
@@ -198,8 +198,8 @@ public:
 
         for (int i = 1; i < Mx; ++i)
             for (int j = 1; j < My; ++j)
-                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i-1][j])/hx * (psi[i][j+1]-psi[i][j])/hy
-                                                + (omega[i][j+1]-omega[i][j-1])/hy * (psi[i+1][j]-psi[i-1][j])/hx
+                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j])/(2*hy)
+                                                + (omega[i][j+1]-omega[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
                                                 + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
     }
     
