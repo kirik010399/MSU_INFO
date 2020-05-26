@@ -43,6 +43,7 @@ public:
         Mx = xCount;
         My = yCount;
         N = timeCount;
+        maxSize = Mx; //for common dtor
         
         hx = 1.0/Mx;
         hy = 1.0/My;
@@ -72,9 +73,48 @@ public:
         }
     }
     
+    void fillInitialConvData()
+    {
+        nu = 1;
+        k = 1;
+        r = 1;
+        c = 1;
+        G = 1;
+    }
+    
+    StocksSolver(int size, int timeCount)
+    {
+        maxSize = size;
+        N = timeCount;
+        tau = 1.0/N;
+
+        fillInitialConvData();
+        
+        T = new double *[(maxSize+1)];
+        T_next = new double *[(maxSize+1)];
+        omega = new double *[(maxSize+1)];
+        omega_next = new double *[(maxSize+1)];
+        psi = new double *[(maxSize+1)];
+        f = new double *[(maxSize+1)];
+        C = new double *[(maxSize+1)];
+        d = new double *[(maxSize+1)];
+
+        for(int i = 0; i < maxSize+1; ++i)
+        {
+            T[i] = new double[maxSize+1];
+            T_next[i] = new double[maxSize+1];
+            omega[i] = new double[maxSize+1];
+            omega_next[i] = new double[maxSize+1];
+            psi[i] = new double[maxSize+1];
+            f[i] = new double[maxSize+1];
+            C[i] = new double[maxSize+1];
+            d[i] = new double[maxSize+1];
+        }
+    }
+    
     virtual ~StocksSolver()
     {
-        for(int i = 0; i < Mx+1; ++i)
+        for(int i = 0; i < maxSize+1; ++i)
         {
             delete [] T[i];
             delete [] T_next[i];
@@ -95,7 +135,7 @@ public:
         delete []C;
         delete []d;
     }
-    
+    //basic loop
     void gifLoop()
     {
         FILE* foutT;
@@ -177,6 +217,40 @@ public:
         }
     }
     
+    void generateDataForT()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 0;
+
+        for (int i = 1; i < Mx; ++i)
+            for (int j = 1; j < My; ++j)
+                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j-1])/(2*hy)
+                                            + (T[i][j+1]-T[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
+                                            + q(i*hx, j*hy)/(r*c);
+    }
+    
+    void generateDataForOmega()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 0;
+
+        for (int i = 1; i < Mx; ++i)
+            for (int j = 1; j < My; ++j)
+                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j])/(2*hy)
+                                                + (omega[i][j+1]-omega[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
+                                                + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
+    }
+    
+    void generateDataForPsi()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = -omega_next[i][j];
+    }
+    
+    //2.1
     double omega0Null(double x, double y)
     {
         return sin(M_PI*x) * sin(M_PI*y);
@@ -202,7 +276,7 @@ public:
         return -exp(-2*coef*M_PI*M_PI*t)*sin(M_PI*x)*sin(M_PI*y)/(2.0*M_PI*M_PI);
     }
     
-    void nullGifLoop()
+    void nullLoop()
     {
         for (int i = 0; i < Mx+1; ++i)
         {
@@ -309,39 +383,6 @@ public:
         printf("Error: %.16lf\n", fabs((maxPsi - minPsi) - (maxRealPsi - minRealPsi)));
     }
     
-    void generateDataForT()
-    {
-        for (int i = 0; i < Mx+1; ++i)
-            for (int j = 0; j < My+1; ++j)
-                f[i][j] = 0;
-
-        for (int i = 1; i < Mx; ++i)
-            for (int j = 1; j < My; ++j)
-                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j-1])/(2*hy)
-                                            + (T[i][j+1]-T[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
-                                            + q(i*hx, j*hy)/(r*c);
-    }
-    
-    void generateDataForOmega()
-    {
-        for (int i = 0; i < Mx+1; ++i)
-            for (int j = 0; j < My+1; ++j)
-                f[i][j] = 0;
-
-        for (int i = 1; i < Mx; ++i)
-            for (int j = 1; j < My; ++j)
-                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j])/(2*hy)
-                                                + (omega[i][j+1]-omega[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
-                                                + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx);
-    }
-    
-    void generateDataForPsi()
-    {
-        for (int i = 0; i < Mx+1; ++i)
-            for (int j = 0; j < My+1; ++j)
-                f[i][j] = -omega_next[i][j];
-    }
-    
     void generateNullDataForT()
     {
         for (int i = 0; i < Mx+1; ++i)
@@ -354,6 +395,151 @@ public:
         for (int i = 0; i < Mx+1; ++i)
             for (int j = 0; j < My+1; ++j)
                 f[i][j] = 1.0/tau * omega[i][j];
+    }
+    
+    //2.2
+    double omegaReal(double x, double y, double t)
+    {
+        return exp(sin(t)) * sin(2*M_PI*x) * sin(2*M_PI*y);
+    }
+        
+    double TReal(double x, double y, double t)
+    {
+        return (1 - exp(-t)) * sin(2*M_PI*x) * sin(2*M_PI*y);
+    }
+    
+    double psiReal(double x, double y, double t)
+    {
+        return -1 / (8*M_PI*M_PI) * exp(sin(t)) * sin(2*M_PI*x) * sin(2*M_PI*y);
+    }
+    
+    double omega0Conv(double x, double y)
+    {
+        return omegaReal(x, y, 0);
+    }
+        
+    double T0Conv(double x, double y)
+    {
+        return TReal(x, y, 0);
+    }
+    
+    double psi0Conv(double x, double y)
+    {
+        return psiReal(x, y, 0);
+    }
+    
+    double f1(double x, double y, double t)
+    {
+        return (cos(t) + 8*M_PI*M_PI) * exp(sin(t)) * sin(2*M_PI*x) * sin(2*M_PI*y) - 2*M_PI*(1 - exp(-t)) * cos(2*M_PI*x) * sin(2*M_PI*y);
+    }
+    
+    double f2(double x, double y, double t)
+    {
+        return (exp(-t) + 8*M_PI*M_PI*(1 - exp(-t))) * sin(2*M_PI*x) * sin(2*M_PI*y);
+    }
+    
+    void convLoop()
+    {
+        FILE *foutDifT, *foutDifOmega, *foutDifPsi, *foutDif;
+        foutDifT = fopen("difT.txt", "w");
+        foutDifOmega = fopen("difOmega.txt", "w");
+        foutDifPsi = fopen("difPsi.txt", "w");
+        foutDif = fopen("difScheme.txt", "w");
+
+        for (int iter = 10; iter <= maxSize; iter+=10)
+        {
+            cout<<iter<<endl;
+            Mx = iter;
+            My = iter;
+            hx = 1.0/iter;
+            hy = 1.0/iter;
+            
+            for (int i = 0; i < Mx+1; ++i)
+            {
+                for (int j = 0; j < My+1; ++j)
+                {
+                    T[i][j] = T0Conv(i*hx, j*hy);
+                    omega[i][j] = omega0Conv(i*hx, j*hy);
+                    psi[i][j] = psi0Conv(i*hx, j*hy);
+                }
+            }
+                        
+            for (time = 1; time <= N; ++time)
+            {
+                generateConvDataForT();
+                calculateNextWithData(T_next, k);
+
+                generateConvDataForOmega();
+                calculateNextWithData(omega_next, nu);
+
+                generateDataForPsi();
+                calculateNextPsi();
+                
+                swap(T, T_next);
+                swap(omega, omega_next);
+            }
+                        
+            double maxDifT = 0, maxDifOmega = 0, maxDifPsi = 0;
+            
+            for (int i = 0; i < Mx+1; ++i)
+            {
+                for (int j = 0; j < My+1; ++j)
+                {
+                    double difT = fabs(T[i][j] - TReal(i*hx, j*hy, N*tau));
+                    double difOmega = fabs(omega[i][j] - omegaReal(i*hx, j*hy, N*tau));
+                    double difPsi = fabs(psi[i][j] - psiReal(i*hx, j*hy, N*tau));
+                    
+                    if (difT > maxDifT)
+                        maxDifT = difT;
+                    
+                    if (difOmega > maxDifOmega)
+                        maxDifOmega = difOmega;
+                    
+                    if (difPsi > maxDifPsi)
+                        maxDifPsi = difPsi;
+                }
+            }
+            
+            fprintf(foutDifT, "%.16lf\n", maxDifT/(tau+hx*hx+hy*hy));
+            fprintf(foutDifOmega, "%.16lf\n", maxDifOmega/(tau+hx*hx+hy*hy));
+            fprintf(foutDifPsi, "%.16lf\n", maxDifPsi/(tau+hx*hx+hy*hy));
+            fprintf(foutDif, "%.16lf\n", (maxDifT + maxDifOmega + maxDifOmega)/(tau+hx*hx+hy*hy));
+            
+            printf("T: %.16lf\n", maxDifT/(tau+hx*hx+hy*hy));
+            printf("Omega: %.16lf\n", maxDifOmega/(tau+hx*hx+hy*hy));
+            printf("Psi: %.16lf\n", maxDifPsi/(tau+hx*hx+hy*hy));
+            printf("Sceme: %.16lf\n", (maxDifT + maxDifOmega + maxDifOmega)/(tau+hx*hx+hy*hy));
+        }
+        
+        fclose(foutDifT);
+        fclose(foutDifOmega);
+        fclose(foutDifPsi);
+    }
+    
+    void generateConvDataForT()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 0;
+
+        for (int i = 1; i < Mx; ++i)
+            for (int j = 1; j < My; ++j)
+                f[i][j] = 1.0/tau * T[i][j] - (T[i+1][j]-T[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j-1])/(2*hy)
+                                            + (T[i][j+1]-T[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
+                                            + q(i*hx, j*hy)/(r*c) + f2(i*hx, j*hy, time*tau);
+    }
+    
+    void generateConvDataForOmega()
+    {
+        for (int i = 0; i < Mx+1; ++i)
+            for (int j = 0; j < My+1; ++j)
+                f[i][j] = 0;
+
+        for (int i = 1; i < Mx; ++i)
+            for (int j = 1; j < My; ++j)
+                f[i][j] = 1.0/tau * omega[i][j] - (omega[i+1][j]-omega[i-1][j])/(2*hx) * (psi[i][j+1]-psi[i][j-1])/(2*hy)
+                                                + (omega[i][j+1]-omega[i][j-1])/(2*hy) * (psi[i+1][j]-psi[i-1][j])/(2*hx)
+                                                + G * (T_next[i+1][j]-T_next[i-1][j])/(2*hx) + f1(i*hx, j*hy, time*tau);
     }
     
     void calculateNextWithData(double **u_next, double a)
@@ -440,8 +626,9 @@ public:
     }
     
 private:
-    int Mx, My, N;
+    int Mx, My, N, maxSize;
     double hx, hy, tau, nu, k, r, c, G;
+    int time;
     
     double **T;
     double **T_next;
@@ -462,9 +649,10 @@ int main()
     scanf("%d", &My);
     printf("Enter time: ");
     scanf("%d", &N);
-    
+   
     StocksSolver stocksSolver(Mx, My, N);
-    stocksSolver.nullGifLoop();
+    stocksSolver.gifLoop();
+    
     return 0;
 }
 
