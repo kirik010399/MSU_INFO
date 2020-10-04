@@ -2,12 +2,24 @@
 #include <stdio.h>
 #include <math.h>
 
-double f(int i, int j)
+double f(int k, int n, int i, int j)
 {
-    return i+j;
+    switch (k)
+    {
+        case 1:
+            return n-fmax(i, j)+1;
+        case 2:
+            return fmax(i, j);
+        case 3:
+            return fabs(i-j);
+        case 4:
+            return 1.0/(i+j-1);
+        default:
+            return -1;
+    }
 }
 
-int enter_matrix(double* a, int n, FILE* fin)
+int enter_matrix(double* a, int n, int k, FILE* fin)
 {
     int i, j;
     
@@ -28,7 +40,7 @@ int enter_matrix(double* a, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                a[i*n+j] = f(i, j);
+                a[i*n+j] = f(k, n, i, j);
             }
         }
     }
@@ -39,13 +51,12 @@ int enter_matrix(double* a, int n, FILE* fin)
 void print_matrix(double* a, int n, int m)
 {
     int i, j;
-    int min_ = fmin(n,m);
     
-    for (i = 0; i < min_; ++i)
+    for (i = 0; i < m; ++i)
     {
-        for (j = 0; j < min_; ++j)
+        for (j = 0; j < m; ++j)
         {
-            printf("%f ", a[i*n+j]);
+            printf("%10.3e ", a[i*n+j]);
         }
         printf("\n");
     }

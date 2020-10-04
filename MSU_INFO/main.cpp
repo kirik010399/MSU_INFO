@@ -4,142 +4,133 @@
 #include "matrix.hpp"
 #include "invert.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-    int n, m;
+    int n, m, k;
     double *a;
     double *a_inv;
+    double *x;
+    char filename[120];
     FILE* fin = nullptr;
     clock_t t;
-    int type;
     int flag;
     
-    printf("Выберите тип входных данных: 1 - из файла, 2 - из формулы:\n");
+    if (argc < 4)
+    {
+        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m k *filename (если k != 0)");
+        return -1;
+    }
     
-    if (scanf("%d", &type) != 1)
+    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1 || sscanf(argv[3], "%d", &k) != 1)
+    {
+        printf("Данные запуска некорректны.\n");
+        return -1;
+    }
+    
+    if ((k == 0 && argc != 5) || (k != 0 && argc != 4))
+    {
+        printf("Данные запуска некорректны.\n");
+        return -1;
+    }
+    
+    if (n < 0 || m < 0 || m > n || k < 0 || k > 4)
     {
         printf("Данные некорректны.\n");
-        return -2;
+        return -1;
     }
-         
-    if (type == 1)
+
+    if (k == 0)
     {
-        fin = fopen("input.txt", "r");
+        if(sscanf(argv[4], "%s", filename) != 1)
+        {
+            printf("Данные запуска некорректны.\n");
+            return -1;
+        }
+            
+        fin = fopen(filename, "r");
         
         if (!fin)
         {
             printf("Файла не существует.\n");
             fclose(fin);
-            return -1;
-        }
-        
-        if (fscanf(fin, "%d", &n) != 1 || n <= 0)
-        {
-            printf("Данные некорректны.\n");
-            fclose(fin);
             return -2;
         }
-    }
-    else if (type == 2)
-    {
-        printf("Введите размер:\n");
-    
-        if (scanf("%d", &n) != 1 || n <= 0)
-        {
-            printf("Данные некорректны.\n");
-            return -2;
-        }
-    }
-    else
-    {
-        printf("Некорректный тип ввода.\n");
-        return -2;
     }
     
     a = new double [n*n];
     a_inv = new double [n*n];
+    x = new double [n];
     
-    if (!(a && a_inv))
+    if (!(a && a_inv && x))
     {
         printf("Недостаточно памяти.\n");
         
-        if (type == 1)
+        if (k == 0)
             fclose(fin);
         
         delete []a;
         delete []a_inv;
+        delete []x;
         
         return -2;
     }
 
-    flag = enter_matrix(a, n, fin);
+    flag = enter_matrix(a, n, k, fin);
     
-    if (flag == -1)
+    if (flag < 0)
     {
-        printf("Данные некорректны.\n");
+        printf("Матрица некорректна.\n");
         
-        if (type == 1)
+        if (k == 0)
             fclose(fin);
         
         delete []a;
         delete []a_inv;
+        delete []x;
         
         return -2;
     }
     
-    printf("Введите размер угла печати:\n");
-    
-    if (scanf("%d", &m) != 1 || m <= 0)
-    {
-        printf("Данные некорректны.\n");
-        
-        if (type == 1)
-            fclose(fin);
-        
-        delete []a;
-        delete []a_inv;
-        
-        return -2;
-    }
+    printf("\nИзначальная матрица:\n");
+    print_matrix(a, n, m);
     
     t = clock();
-    flag = invert(a, a_inv, n);
+    flag = invert(a, a_inv, x, n);
     t = clock() - t;
     
     if (flag == 0)
     {
         printf("\nОбратная матрица:\n");
         print_matrix(a_inv, n, m);
-        
-        if (type == 1)
-        {
-            fseek(fin, 0, SEEK_SET);
-            fscanf(fin, "%d", &n);
-        }
-        
-        flag = enter_matrix(a, n, fin);
-        
-        printf("\nПогрешность: %f\n", norm(a, a_inv, n));
         printf("Время: %f с.\n", t*1.0/CLOCKS_PER_SEC);
+        
+        if (k == 0)
+            fseek(fin, 0, SEEK_SET);
+        
+        flag = enter_matrix(a, n, k, fin);
+        
+        printf("\nПогрешность: %10.3e\n", norm(a, a_inv, n));
     }
     else
     {
         printf("Произошла ошибка во время обращения матрицы.\n");
         
-        if (type == 1)
+        if (k == 0)
             fclose(fin);
         
         delete []a;
         delete []a_inv;
+        delete []x;
         
         return -1;
     }
     
-    if (type == 1)
+    if (k == 0)
         fclose(fin);
     
     delete []a;
     delete []a_inv;
-    
+    delete []x;
+
     return 0;
 }

@@ -1,18 +1,16 @@
 #include "invert.hpp"
 #include <math.h>
 
-int invert(double* a, double* a_inv, int n)
+int invert(double* a, double* a_inv, double *x, int n)
 {
     int i, j, k;
-    double temp1, temp2;
 
     double eps = 1e-16;
-    double *d = new double [n]; 
 //    double eps = fmax(pow(10, -n*3), 1e-100);//strange thing for strange a
         
     for (i = 0; i < n; ++i)
     {
-        d[i] = 0;
+        x[i] = 0;
         
         for (j = 0; j < n; ++j)
         {
@@ -25,63 +23,61 @@ int invert(double* a, double* a_inv, int n)
     
     for (i = 0; i < n; ++i)
     {
-        temp1 = 0.0;
-        for (j = i + 1; j < n; j++)
-            temp1 += a[j*n+i] * a[j*n+i];//(12)
+        double s = 0.0;
+        for (j = i+1; j < n; ++j)
+            s += a[j*n+i] * a[j*n+i];//(12)
 
-        temp2 = sqrt(temp1 + a[i*n+i] * a[i*n+i]);//(13)
+        double norm_a1 = sqrt(a[i*n+i]*a[i*n+i] + s);//(13)
 
-        if (temp2 < eps)
+        if (norm_a1 < eps)
             return -1; //det = 0;
 
-        d[i] = a[i*n+i] - temp2;
+        x[i] = a[i*n+i] - norm_a1;
         
         for (j = i+1; j < n; ++j)
-            d[j] = a[j*n+i]; //(14)
+            x[j] = a[j*n+i]; //(14)
         
-        temp1 = sqrt(d[i] * d[i] + temp1);//(15)
+        double norm_x = sqrt(x[i]*x[i] + s);//(15)
 
-        if (temp1 < eps)
+        if (norm_x < eps)
             continue;
 
         for (j = i; j < n; ++j)
-            d[j] /= temp1; //(16)
+            x[j] /= norm_x; //(16)
 
-        for (k = i + 1; k < n; ++k)
+        for (k = i; k < n; ++k) //лемма 10-11
         {
-            temp1 = 0.0;
+            double sum = 0.0;
             for (j = i; j < n; ++j)
-                temp1 += d[j] * a[j*n+k];
+                sum += x[j] * a[j*n+k];
 
-            temp1 *= 2.0;//from formula
+            sum *= 2.0;
             for (j = i; j < n; ++j)
-                a[j*n+k] -= temp1 * d[j];
+                a[j*n+k] -= sum * x[j];
         }
 
-        for (k = 0; k < n; ++k)
+        for (k = 0; k < n; ++k)//лемма 10-11
         {
-            temp1 = 0.0;
+            double sum = 0.0;
             for (j = i; j < n; ++j)
-                temp1 += d[j] * a_inv[j*n+k];
+                sum += x[j] * a_inv[j*n+k];
 
-            temp1 *= 2.0;//from formula
+            sum *= 2.0;
             for (j = i; j < n; ++j)
-                a_inv[j*n+k] -= temp1 * d[j];
+                a_inv[j*n+k] -= sum * x[j];
         }
-
-        a[i*n+i] = temp2;
     }
 
     for (k = 0; k < n; ++k)
     {
-        for (i = n - 1; i >= 0; --i)
+        for (i = n-1; i >= 0; --i)
         {
-            temp1 = a_inv[i*n+k];
+            double temp = a_inv[i*n+k];
 
-            for (j = i + 1; j < n; ++j)
-                temp1 -= a[i*n+j] * a_inv[j*n+k];
+            for (j = i+1; j < n; ++j)
+                temp -= a[i*n+j] * a_inv[j*n+k];
 
-            a_inv[i*n+k] = temp1/a[i*n+i];
+            a_inv[i*n+k] = temp/a[i*n+i];
         }
     }//Reverse Gauss
     

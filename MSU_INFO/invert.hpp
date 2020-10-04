@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-int invert(double* a, double* a_inv, int n);
+int invert(double* a, double* a_inv, double *x, int n);
 
 #endif /* invert_hpp */
