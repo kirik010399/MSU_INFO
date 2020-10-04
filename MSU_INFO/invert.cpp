@@ -5,8 +5,7 @@ int invert(double* a, double* a_inv, double *x, int n)
 {
     int i, j, k;
 
-    double eps = 1e-16;
-//    double eps = fmax(pow(10, -n*3), 1e-100);//strange thing for strange a
+    double eps = 1e-20;
         
     for (i = 0; i < n; ++i)
     {
@@ -79,7 +78,7 @@ int invert(double* a, double* a_inv, double *x, int n)
 
             a_inv[i*n+k] = temp/a[i*n+i];
         }
-    }//Reverse Gauss
+    }//Обратный Гаусс
     
     return 0;
 

@@ -13,7 +13,7 @@ double f(int k, int n, int i, int j)
         case 3:
             return fabs(i-j);
         case 4:
-            return 1.0/(i+j-1);
+            return 1.0/(i+j+1);
         default:
             return -1;
     }
