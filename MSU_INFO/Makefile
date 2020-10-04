@@ -1,2 +1,2 @@
 all:
-	gcc main.c matrixUtils.c invertingManager.c -o program
+	g++ main.cpp matrix.cpp invert.cpp

@@ -1,13 +1,13 @@
-#include "matrixUtils.h"
+#include "matrix.hpp"
 #include <stdio.h>
 #include <math.h>
 
-double func(int i, int j, int n)
+double f(int i, int j)
 {
-    return i+j== n-1 ?1:0;
+    return i+j;
 }
 
-int enterMatrix(double* matrix, int n, FILE* fin)
+int enter_matrix(double* a, int n, FILE* fin)
 {
     int i, j;
     
@@ -17,7 +17,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                if (fscanf(fin, "%lf", &matrix[i*n+j]) != 1)
+                if (fscanf(fin, "%lf", &a[i*n+j]) != 1)
                     return -1;
             }
         }
@@ -28,7 +28,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                matrix[i*n+j] = func(i, j, n);
+                a[i*n+j] = f(i, j);
             }
         }
     }
@@ -36,7 +36,7 @@ int enterMatrix(double* matrix, int n, FILE* fin)
     return 0;
 }
 
-void printMatrix(double* matrix, int n, int m)
+void print_matrix(double* a, int n, int m)
 {
     int i, j;
     int min_ = fmin(n,m);
@@ -45,16 +45,16 @@ void printMatrix(double* matrix, int n, int m)
     {
         for (j = 0; j < min_; ++j)
         {
-            printf("%f ", matrix[i*n+j]);
+            printf("%f ", a[i*n+j]);
         }
         printf("\n");
     }
 }
 
-double residualNorm(double* matrix, double* inverseMatrix, int n)
+double norm(double* a, double* a_inv, int n)
 {
     int i, j, k;
-    double a, sum = 0.0, max = 0.0;
+    double temp, sum = 0.0, max = 0.0;
         
     for (i = 0; i < n; ++i)
     {
@@ -62,15 +62,15 @@ double residualNorm(double* matrix, double* inverseMatrix, int n)
         
         for (j = 0; j < n; ++j)
         {
-            a = 0.0;
+            temp = 0.0;
             
             for (k = 0; k < n; ++k)
-                a += matrix[i*n+k] * inverseMatrix[k*n+j];
+                temp += a[i*n+k] * a_inv[k*n+j];
             
             if (i == j)
-                a -= 1.0;
+                temp -= 1.0;
             
-            sum += fabs(a);
+            sum += fabs(temp);
         }
         
         if (sum > max)
