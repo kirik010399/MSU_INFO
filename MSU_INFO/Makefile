@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp matrix.cpp solve.cpp
+	g++ main.cpp func.cpp solve.cpp
