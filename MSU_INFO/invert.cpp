@@ -1,86 +1,75 @@
 #include "invert.hpp"
 #include <math.h>
 
-int invert(double* a, double* a_inv, double *x, int n)
+using namespace std;
+
+int solve(double* a, double* b, double* x, int *ind, int n)
 {
     int i, j, k;
+    double value;
+    
+    int maxStrInd, maxColInd;
 
-    double eps = 1e-20;
-        
+    double eps = 1e-30;
+    
+    for (i = 0; i < n; ++i)
+        ind[i] = i;
+    
     for (i = 0; i < n; ++i)
     {
-        x[i] = 0;
+        value = fabs(a[i*n+i]);
+        maxStrInd = i;
+        maxColInd = i;
         
-        for (j = 0; j < n; ++j)
+        for (j = i; j < n; ++j)
         {
-            if (i == j)
-                a_inv[i*n+j] = 1;
-            else
-                a_inv[i*n+j] = 0;
+            for (k = i; k < n; ++k)
+            {
+                if (fabs(a[j*n+k]) > value)// Search for max in matrix
+                {
+                    value = fabs(a[j*n+k]);
+                    maxStrInd = j;
+                    maxColInd = k;
+                }
+            }
+        }
+        
+        if (fabs(value) < eps)
+            return -1;
+        
+        if (maxStrInd != i) // Swap strings (i <-> max)
+        {
+            for (j = 0; j < n; ++j)
+                swap(a[maxStrInd*n+j], a[i*n+j]);
+            
+            swap(b[maxStrInd], b[i]);
+        }
+        
+        swap(ind[i], ind[maxColInd]);//swap variables
+
+        if (maxColInd != i) // Swap columns (i <-> max)
+        {
+            for (j = 0; j < n; ++j)
+                swap(a[j*n+maxColInd], a[j*n+i]);
+        }
+        
+        for(j = 0; j < n; ++j) // Subtraction from all lines
+        {
+            if (j != i)
+            {
+                value = a[j*n+i]/a[i*n+i];
+                
+                for(k = i; k < n; ++k)
+                    a[j*n+k] -= value*a[i*n+k];
+                
+                b[j] -= value*b[i];
+            }
         }
     }
     
     for (i = 0; i < n; ++i)
-    {
-        double s = 0.0;
-        for (j = i+1; j < n; ++j)
-            s += a[j*n+i] * a[j*n+i];//(12)
-
-        double norm_a1 = sqrt(a[i*n+i]*a[i*n+i] + s);//(13)
-
-        if (norm_a1 < eps)
-            return -1; //det = 0;
-
-        x[i] = a[i*n+i] - norm_a1;
-        
-        for (j = i+1; j < n; ++j)
-            x[j] = a[j*n+i]; //(14)
-        
-        double norm_x = sqrt(x[i]*x[i] + s);//(15)
-
-        if (norm_x < eps)
-            continue;
-
-        for (j = i; j < n; ++j)
-            x[j] /= norm_x; //(16)
-
-        for (k = i; k < n; ++k) //лемма 10-11
-        {
-            double sum = 0.0;
-            for (j = i; j < n; ++j)
-                sum += x[j] * a[j*n+k];
-
-            sum *= 2.0;
-            for (j = i; j < n; ++j)
-                a[j*n+k] -= sum * x[j];
-        }
-
-        for (k = 0; k < n; ++k)//лемма 10-11
-        {
-            double sum = 0.0;
-            for (j = i; j < n; ++j)
-                sum += x[j] * a_inv[j*n+k];
-
-            sum *= 2.0;
-            for (j = i; j < n; ++j)
-                a_inv[j*n+k] -= sum * x[j];
-        }
-    }
-
-    for (k = 0; k < n; ++k)
-    {
-        for (i = n-1; i >= 0; --i)
-        {
-            double temp = a_inv[i*n+k];
-
-            for (j = i+1; j < n; ++j)
-                temp -= a[i*n+j] * a_inv[j*n+k];
-
-            a_inv[i*n+k] = temp/a[i*n+i];
-        }
-    }//Обратный Гаусс
+        x[ind[i]] = b[i]/a[i*n+i];
     
     return 0;
-
 }
 

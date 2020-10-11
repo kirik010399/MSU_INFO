@@ -8,8 +8,9 @@ int main(int argc, char **argv)
 {
     int n, m, k;
     double *a;
-    double *a_inv;
+    double *b;
     double *x;
+    int *ind;
     char filename[120];
     FILE* fin = nullptr;
     clock_t t;
@@ -58,10 +59,11 @@ int main(int argc, char **argv)
     }
     
     a = new double [n*n];
-    a_inv = new double [n*n];
+    b = new double [n];
     x = new double [n];
+    ind = new int [n];
     
-    if (!(a && a_inv && x))
+    if (!(a && b && x && ind))
     {
         printf("Недостаточно памяти.\n");
         
@@ -69,13 +71,14 @@ int main(int argc, char **argv)
             fclose(fin);
         
         delete []a;
-        delete []a_inv;
+        delete []b;
         delete []x;
+        delete []ind;
         
         return -2;
     }
 
-    flag = enter_matrix(a, n, k, fin);
+    flag = enter_matrix(a, b, n, k, fin);
     
     if (flag < 0)
     {
@@ -85,31 +88,33 @@ int main(int argc, char **argv)
             fclose(fin);
         
         delete []a;
-        delete []a_inv;
+        delete []b;
         delete []x;
+        delete []ind;
         
         return -2;
     }
     
-    printf("\nИзначальная матрица:\n");
-    print_matrix(a, n, m);
+    printf("Изначальная матрица:\n");
+    print_matrix(a, n, n, m);
     
     t = clock();
-    flag = invert(a, a_inv, x, n);
+    flag = solve(a, b, x, ind, n);
     t = clock() - t;
     
     if (flag == 0)
     {
-        printf("\nОбратная матрица:\n");
-        print_matrix(a_inv, n, m);
-        printf("Время: %f с.\n", t*1.0/CLOCKS_PER_SEC);
+        printf("Решение системы:\n");
+        print_matrix(x, 1, n, m);
+        printf("\nВремя: %f с.\n", t*1.0/CLOCKS_PER_SEC);
         
         if (k == 0)
             fseek(fin, 0, SEEK_SET);
         
-        flag = enter_matrix(a, n, k, fin);
+        flag = enter_matrix(a, b, n, k, fin);
         
-        printf("\nПогрешность: %10.3e\n", norm(a, a_inv, n));
+        printf("Норма невязки: %10.3e\n", norm(a, b, x, n));
+        printf("Норма ошибки: %10.3e\n", error_norm(x, n));
     }
     else
     {
@@ -119,8 +124,9 @@ int main(int argc, char **argv)
             fclose(fin);
         
         delete []a;
-        delete []a_inv;
+        delete []b;
         delete []x;
+        delete []ind;
         
         return -1;
     }
@@ -129,8 +135,9 @@ int main(int argc, char **argv)
         fclose(fin);
     
     delete []a;
-    delete []a_inv;
+    delete []b;
     delete []x;
+    delete []ind;
 
     return 0;
 }
