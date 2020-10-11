@@ -2,7 +2,7 @@
 #include <time.h>
 #include <math.h>
 #include "matrix.hpp"
-#include "invert.hpp"
+#include "solve.hpp"
 
 int main(int argc, char **argv)
 {

@@ -1,8 +1,8 @@
-#ifndef invert_hpp
-#define invert_hpp
+#ifndef solve_hpp
+#define solve_hpp
 
 #include <stdio.h>
 
 int solve(double* a, double* b, double* x, int *ind, int n);
 
-#endif /* invert_hpp */
+#endif /* solve_hpp */

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		EDA422AE2529CDD1003A4101 /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA422A92529CDD1003A4101 /* matrix.cpp */; };
 		EDA422AF2529CDD1003A4101 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA422AA2529CDD1003A4101 /* main.cpp */; };
-		EDA422B02529CDD1003A4101 /* invert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA422AB2529CDD1003A4101 /* invert.cpp */; };
+		EDA422B02529CDD1003A4101 /* solve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDA422AB2529CDD1003A4101 /* solve.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,9 +29,9 @@
 		ED3B84001F82D29000AB9A64 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		EDA422A92529CDD1003A4101 /* matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix.cpp; sourceTree = "<group>"; };
 		EDA422AA2529CDD1003A4101 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		EDA422AB2529CDD1003A4101 /* invert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = invert.cpp; sourceTree = "<group>"; };
+		EDA422AB2529CDD1003A4101 /* solve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = solve.cpp; sourceTree = "<group>"; };
 		EDA422AC2529CDD1003A4101 /* matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = matrix.hpp; sourceTree = "<group>"; };
-		EDA422AD2529CDD1003A4101 /* invert.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = invert.hpp; sourceTree = "<group>"; };
+		EDA422AD2529CDD1003A4101 /* solve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = solve.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,8 +68,8 @@
 				EDA422AA2529CDD1003A4101 /* main.cpp */,
 				EDA422AC2529CDD1003A4101 /* matrix.hpp */,
 				EDA422A92529CDD1003A4101 /* matrix.cpp */,
-				EDA422AD2529CDD1003A4101 /* invert.hpp */,
-				EDA422AB2529CDD1003A4101 /* invert.cpp */,
+				EDA422AD2529CDD1003A4101 /* solve.hpp */,
+				EDA422AB2529CDD1003A4101 /* solve.cpp */,
 			);
 			path = MSU_INFO;
 			sourceTree = "<group>";
@@ -133,7 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDA422AF2529CDD1003A4101 /* main.cpp in Sources */,
-				EDA422B02529CDD1003A4101 /* invert.cpp in Sources */,
+				EDA422B02529CDD1003A4101 /* solve.cpp in Sources */,
 				EDA422AE2529CDD1003A4101 /* matrix.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
