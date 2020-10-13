@@ -11,27 +11,27 @@ int invert(double* a, double* a_inv, double* d, int n)
 
     for (i = 0; i < n; ++i)
         for (j = 0; j < n; ++j)
-            a_inv[get_elem(i, j)] = double(i == j);
+            a_inv[get_elem(i, j, n)] = double(i == j);
     
     for (i = 0; i < n; ++i)
     {
-        tmp = a[get_elem(i, i)];
+        tmp = a[get_elem(i, i, n)];
         for (k = 0; k < i; ++k)
-            tmp -= a[get_elem(k, i)] * a[get_elem(k, i)] * d[k];
+            tmp -= a[get_elem(k, i, n)] * a[get_elem(k, i, n)] * d[k];
         
         d[i] = tmp > 0 ? 1.0 : -1.0;
 
         if (fabs(tmp) < eps)
             return -1;
 
-        a[get_elem(i, i)] = sqrt(fabs(tmp));
+        a[get_elem(i, i, n)] = sqrt(fabs(tmp));
 
         for (j = i+1; j < n; ++j)
         {
-            tmp = a[get_elem(i, j)];
+            tmp = a[get_elem(i, j, n)];
             for (k = 0; k < i; ++k)
-                tmp -= a[get_elem(k, i)] * d[k] * a[get_elem(k, j)];
-            a[get_elem(i, j)] = tmp/(a[get_elem(i, i)] * d[i]);
+                tmp -= a[get_elem(k, i, n)] * d[k] * a[get_elem(k, j, n)];
+            a[get_elem(i, j, n)] = tmp/(a[get_elem(i, i, n)] * d[i]);
         }
     }
     
@@ -42,17 +42,17 @@ int invert(double* a, double* a_inv, double* d, int n)
             tmp = double(k == i);
             
             for (j = 0; j < i; ++j)
-                tmp -= a[get_elem(j, i)] * a_inv[get_elem(j, k)];
+                tmp -= a[get_elem(j, i, n)] * a_inv[get_elem(j, k, n)];
             
-            a_inv[get_elem(i, k)] = tmp/a[get_elem(i, i)];
+            a_inv[get_elem(i, k, n)] = tmp/a[get_elem(i, i, n)];
         }
 
         for (i = n-1; i >= 0; --i)
         {
-            tmp = a_inv[get_elem(i, k)];
+            tmp = a_inv[get_elem(i, k, n)];
             for (j = i+1; j < n; ++j)
-                tmp -= a[get_elem(i, j)] * a_inv[get_elem(j, k)];
-            a_inv[get_elem(i, k)] = tmp/(a[get_elem(i, i)] * d[i]);
+                tmp -= a[get_elem(i, j, n)] * a_inv[get_elem(j, k, n)];
+            a_inv[get_elem(i, k, n)] = tmp/(a[get_elem(i, i, n)] * d[i]);
         }
     }
 
