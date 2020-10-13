@@ -73,7 +73,7 @@ void print_matrix(double* a, int n, int m)
     {
         for (j = 0; j < m; ++j)
         {
-            printf("%10.3e ", a[get_elem(i, j)]);
+            printf("%10.3e ", a[get_elem(i, j, n)]);
         }
         printf("\n");
     }
