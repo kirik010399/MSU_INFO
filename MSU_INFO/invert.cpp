@@ -26,7 +26,7 @@ int invert(double* a, double* a_inv, double* d, int n)
 
         a[get_elem(i, i)] = sqrt(fabs(tmp));
 
-        for (j = i + 1; j < n; ++j)
+        for (j = i+1; j < n; ++j)
         {
             tmp = a[get_elem(i, j)];
             for (k = 0; k < i; ++k)
@@ -40,16 +40,17 @@ int invert(double* a, double* a_inv, double* d, int n)
         for (i = 0; i < n; ++i)
         {
             tmp = double(k == i);
+            
             for (j = 0; j < i; ++j)
                 tmp -= a[get_elem(j, i)] * a_inv[get_elem(j, k)];
             
             a_inv[get_elem(i, k)] = tmp/a[get_elem(i, i)];
         }
 
-        for (i = n - 1; i >= 0; --i)
+        for (i = n-1; i >= 0; --i)
         {
             tmp = a_inv[get_elem(i, k)];
-            for (j = i + 1; j < n; ++j)
+            for (j = i+1; j < n; ++j)
                 tmp -= a[get_elem(i, j)] * a_inv[get_elem(j, k)];
             a_inv[get_elem(i, k)] = tmp/(a[get_elem(i, i)] * d[i]);
         }
