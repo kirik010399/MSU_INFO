@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     int n, m, k;
     double *a;
     double *a_inv;
-    double *x;
+    double *d;
     char filename[120];
     FILE* fin = nullptr;
     clock_t t;
@@ -57,11 +57,11 @@ int main(int argc, char **argv)
         }
     }
     
-    a = new double [n*n];
-    a_inv = new double [n*n];
-    x = new double [n];
+    a = new double [n*(n+1)/2];
+    a_inv = new double [n*(n+1)/2];
+    d = new double [n];
     
-    if (!(a && a_inv && x))
+    if (!(a && a_inv && d))
     {
         printf("Недостаточно памяти.\n");
         
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []a_inv;
-        delete []x;
+        delete []d;
         
         return -2;
     }
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []a_inv;
-        delete []x;
+        delete []d;
         
         return -2;
     }
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
     print_matrix(a, n, m);
     
     t = clock();
-    flag = invert(a, a_inv, x, n);
+    flag = invert(a, a_inv, d, n);
     t = clock() - t;
     
     if (flag == 0)
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []a_inv;
-        delete []x;
+        delete []d;
         
         return -1;
     }
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
     
     delete []a;
     delete []a_inv;
-    delete []x;
+    delete []d;
 
     return 0;
 }

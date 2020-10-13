@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <math.h>
 
+int get_elem(int i, int j)
+{
+    if (i < j)
+        return j*(j+1)/2 + i;
+    else
+        return i*(i+1)/2 + j;
+}
+
 double f(int k, int n, int i, int j)
 {
     switch (k)
@@ -29,7 +37,7 @@ int enter_matrix(double* a, int n, int k, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                if (fscanf(fin, "%lf", &a[i*n+j]) != 1)
+                if (fscanf(fin, "%lf", &a[get_elem(i, j)]) != 1)
                     return -1;
             }
         }
@@ -40,7 +48,7 @@ int enter_matrix(double* a, int n, int k, FILE* fin)
         {
             for (j = 0; j < n; ++j)
             {
-                a[i*n+j] = f(k, n, i, j);
+                a[get_elem(i, j)] = f(k, n, i, j);
             }
         }
     }
@@ -56,7 +64,7 @@ void print_matrix(double* a, int n, int m)
     {
         for (j = 0; j < m; ++j)
         {
-            printf("%10.3e ", a[i*n+j]);
+            printf("%10.3e ", a[get_elem(i, j)]);
         }
         printf("\n");
     }
@@ -76,7 +84,7 @@ double norm(double* a, double* a_inv, int n)
             temp = 0.0;
             
             for (k = 0; k < n; ++k)
-                temp += a[i*n+k] * a_inv[k*n+j];
+                temp += a[get_elem(i, k)] * a_inv[get_elem(k, j)];
             
             if (i == j)
                 temp -= 1.0;
