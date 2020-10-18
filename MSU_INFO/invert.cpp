@@ -19,8 +19,11 @@ int invert(double* a, double* a_inv, double* d, int n)
         for (k = 0; k < i; ++k)
             tmp -= a[get_elem(k, i, n)] * a[get_elem(k, i, n)] * d[k];
         
-        d[i] = tmp > 0 ? 1.0 : -1.0;
-
+        if (tmp > 0)
+            d[i] = 1.0;
+        else
+            d[i] = -1.0;
+        
         if (fabs(tmp) < eps)
             return -1;
 

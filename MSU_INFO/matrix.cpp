@@ -40,7 +40,7 @@ int enter_matrix(double* a, int n, int k, FILE* fin)
 {
     int i, j;
     
-    if (fin)
+    if (k == 0)
     {
         for (i = 0; i < n; ++i)
         {
