@@ -5,7 +5,11 @@ int invert(double* a, double* a_inv, double *x, int n)
 {
     int i, j, k;
 
-    double eps = 1e-20;
+    double eps;
+    if (n < 10)
+        eps = 1e-12;
+    else
+        eps = 1e-20; 
         
     for (i = 0; i < n; ++i)
     {

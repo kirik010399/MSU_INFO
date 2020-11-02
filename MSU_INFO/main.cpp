@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <iostream>
 #include <time.h>
 #include <math.h>
 #include "matrix.hpp"
 #include "invert.hpp"
+
+using namespace std;
 
 int main(int argc, char **argv)
 {
@@ -57,24 +60,22 @@ int main(int argc, char **argv)
         }
     }
     
-    a = new double [n*n];
-    a_inv = new double [n*n];
-    x = new double [n];
-    
-    if (!(a && a_inv && x))
+    try
+    {
+        a = new double [n*n];
+        a_inv = new double [n*n];
+        x = new double [n];
+    }
+    catch (bad_alloc&)
     {
         printf("Недостаточно памяти.\n");
-        
+
         if (k == 0)
             fclose(fin);
         
-        delete []a;
-        delete []a_inv;
-        delete []x;
-        
         return -2;
     }
-
+    
     flag = enter_matrix(a, n, k, fin);
     
     if (flag < 0)
@@ -113,7 +114,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Произошла ошибка во время обращения матрицы.\n");
+        printf("Матрица вырождена.\n");
         
         if (k == 0)
             fclose(fin);
