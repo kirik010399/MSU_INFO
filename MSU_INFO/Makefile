@@ -7,7 +7,7 @@ main.o: main.cpp matrix.hpp invert.hpp
 matrix.o: matrix.cpp matrix.hpp
 	g++ matrix.cpp -c -o matrix.o
 
-inverting.o: invert.cpp invert.hpp
+invert.o: invert.cpp invert.hpp
 	g++ invert.cpp -c -o invert.o
 
 clean:
