@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     double *a;
     double *a_inv;
     double *x;
-    int continue_flag, return_flag;
+    int continue_flag = 1, return_flag = 1;
     char filename[120];
     FILE* fin = nullptr;
     long double t;

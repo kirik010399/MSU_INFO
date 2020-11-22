@@ -29,8 +29,10 @@ int invert(double *a, double *a_inv, double *x, int n, int thread_num, int threa
         }
     }
     
+    
     for (i = 0; i < n; ++i)
     {
+        double norm_a1 = 0;
         synchronize(threads_count);
 
         if (thread_num == 0)
@@ -39,7 +41,7 @@ int invert(double *a, double *a_inv, double *x, int n, int thread_num, int threa
             for (j = i+1; j < n; ++j)
                 s += a[j*n+i] * a[j*n+i];//(12)
 
-            double norm_a1 = sqrt(a[i*n+i]*a[i*n+i] + s);//(13)
+            norm_a1 = sqrt(a[i*n+i]*a[i*n+i] + s);//(13)
 
             if (norm_a1 < eps)
                 *return_flag = 0;
@@ -116,6 +118,11 @@ int invert(double *a, double *a_inv, double *x, int n, int thread_num, int threa
                     a_inv[j*n+k] -= sum * x[j];
             }
         }
+        
+        synchronize(threads_count);
+        
+        if (thread_num == 0 && *return_flag && *continue_flag)
+            a[i*n+i] = norm_a1;
     }
     
     synchronize(threads_count);
