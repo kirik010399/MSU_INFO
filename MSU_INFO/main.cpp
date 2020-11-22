@@ -4,39 +4,69 @@
 #include <math.h>
 #include "matrix.hpp"
 #include "invert.hpp"
+#include <sys/time.h>
+#include <pthread.h>
 
 using namespace std;
 
-int main(int argc, char **argv)
+long double get_time();
+
+typedef struct
 {
-    int n, m, k;
     double *a;
     double *a_inv;
     double *x;
+    int n;
+    int thread_num;
+    int threads_count;
+    int flag;
+    int *continue_flag;
+    int *return_flag;
+} Args;
+
+void *invert(void *Arg)
+{
+    Args *arg = (Args*)Arg;
+    
+    arg->flag = invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
+    
+    return NULL;
+}
+
+int main(int argc, char **argv)
+{
+    int n, m, k, i;
+    double *a;
+    double *a_inv;
+    double *x;
+    int continue_flag, return_flag;
     char filename[120];
     FILE* fin = nullptr;
-    clock_t t;
+    long double t;
+    int threads_count;
+    pthread_t *threads;
+    Args *args;
     int flag;
     
-    if (argc < 4)
+    if (argc < 5)
     {
-        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m k *filename (если k != 0)");
+        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m threads k *filename (если k != 0)");
         return -1;
     }
     
-    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1 || sscanf(argv[3], "%d", &k) != 1)
-    {
-        printf("Данные запуска некорректны.\n");
-        return -1;
-    }
-    
-    if ((k == 0 && argc != 5) || (k != 0 && argc != 4))
+    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1 || sscanf(argv[3], "%d", &threads_count) != 1 || sscanf(argv[4], "%d", &k) != 1)
     {
         printf("Данные запуска некорректны.\n");
         return -1;
     }
     
-    if (n < 0 || m < 0 || m > n || k < 0 || k > 4)
+    if ((k == 0 && argc != 6) || (k != 0 && argc != 5))
+    {
+        printf("Данные запуска некорректны.\n");
+        return -1;
+    }
+    
+    if (n < 0 || m < 0 || m > n || k < 0 || k > 4 || threads_count < 1)
     {
         printf("Данные некорректны.\n");
         return -1;
@@ -44,7 +74,7 @@ int main(int argc, char **argv)
 
     if (k == 0)
     {
-        if(sscanf(argv[4], "%s", filename) != 1)
+        if(sscanf(argv[5], "%s", filename) != 1)
         {
             printf("Данные запуска некорректны.\n");
             return -1;
@@ -65,6 +95,8 @@ int main(int argc, char **argv)
         a = new double [n*n];
         a_inv = new double [n*n];
         x = new double [n];
+        args = new Args [threads_count];
+        threads = new pthread_t [threads_count];
     }
     catch (bad_alloc&)
     {
@@ -88,6 +120,8 @@ int main(int argc, char **argv)
         delete []a;
         delete []a_inv;
         delete []x;
+        delete []args;
+        delete []threads;
         
         return -2;
     }
@@ -95,36 +129,90 @@ int main(int argc, char **argv)
     printf("\nИзначальная матрица:\n");
     print_matrix(a, n, m);
     
-    t = clock();
-    flag = invert(a, a_inv, x, n);
-    t = clock() - t;
+    for (i = 0; i < threads_count; ++i)
+    {
+        args[i].a = a;
+        args[i].a_inv = a_inv;
+        args[i].x = x;
+        args[i].n = n;
+        args[i].thread_num = i;
+        args[i].threads_count = threads_count;
+        args[i].flag = 0;
+        args[i].continue_flag = &continue_flag;
+        args[i].return_flag = &return_flag;
+    }
     
-    if (flag == 0)
+    t = get_time();
+    
+    for (i = 0; i < threads_count; ++i)
     {
-        printf("\nОбратная матрица:\n");
-        print_matrix(a_inv, n, m);
-        printf("Время: %f с.\n", t*1.0/CLOCKS_PER_SEC);
-        
-        if (k == 0)
-            fseek(fin, 0, SEEK_SET);
-        
-        flag = enter_matrix(a, n, k, fin);
-        
-        printf("\nПогрешность: %10.3e\n", norm(a, a_inv, n));
+        if (pthread_create(threads+i, 0, invert, args+i))
+        {
+            printf("Поток не создался.\n");
+            
+            if (k == 0)
+                fclose(fin);
+            
+            delete []a;
+            delete []a_inv;
+            delete []x;
+            delete []args;
+            delete []threads;
+            
+            return -1;
+        }
     }
-    else
+    
+    for (i = 0; i < threads_count; ++i)
     {
-        printf("Матрица вырождена.\n");
-        
-        if (k == 0)
-            fclose(fin);
-        
-        delete []a;
-        delete []a_inv;
-        delete []x;
-        
-        return -1;
+        if (pthread_join(threads[i], 0))
+        {
+            printf("Поток не запустился");
+            
+            if (k == 0)
+                fclose(fin);
+            
+            delete []a;
+            delete []a_inv;
+            delete []x;
+            delete []args;
+            delete []threads;
+            
+            return -1;
+        }
     }
+    
+    for (i = 0; i < threads_count; i++)
+    {
+        if (args[i].flag != 0)
+        {
+            printf("Матрица вырождена.\n");
+            
+            if (k == 0)
+                fclose(fin);
+            
+            delete []a;
+            delete []a_inv;
+            delete []x;
+            delete []args;
+            delete []threads;
+            
+            return -1;
+        }
+    }
+    
+    t = get_time() - t;
+    
+    printf("\nОбратная матрица:\n");
+    print_matrix(a_inv, n, m);
+    printf("Время: %Lf с.\n", t);
+    
+    if (k == 0)
+        fseek(fin, 0, SEEK_SET);
+    
+    flag = enter_matrix(a, n, k, fin);
+    
+    printf("\nПогрешность: %10.3e\n", norm(a, a_inv, n));
     
     if (k == 0)
         fclose(fin);
@@ -134,4 +222,11 @@ int main(int argc, char **argv)
     delete []x;
 
     return 0;
+}
+
+long double get_time()
+{
+    struct timeval t;
+    gettimeofday(&t, 0);
+    return t.tv_sec + t.tv_usec/1000000.0;
 }

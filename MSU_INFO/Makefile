@@ -1,5 +1,5 @@
 all: main.o matrix.o invert.o
-	g++ main.o matrix.o invert.o
+	g++ -lpthread main.o matrix.o invert.o
 
 main.o: main.cpp matrix.hpp invert.hpp 
 	g++ main.cpp -c -o main.o
