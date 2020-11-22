@@ -83,11 +83,11 @@ int invert(double *a, double *a_inv, double *x, int n, int thread_num, int threa
         
         if (*return_flag && *continue_flag)
         {
-            begin_col = (n-i-1) * thread_num;
-            begin_col = begin_col/threads_count + i+1;
-            last_col = (n-i-1) * (thread_num+1);
-            last_col = last_col/threads_count + i+1;
-            
+            begin_col = (n-i) * thread_num;
+            begin_col = begin_col/threads_count + i;
+            last_col = (n-i) * (thread_num+1);
+            last_col = last_col/threads_count + i;
+                        
             for (k = begin_col; k < last_col; ++k) //лемма 10-11
             {
                 double sum = 0.0;
@@ -118,11 +118,6 @@ int invert(double *a, double *a_inv, double *x, int n, int thread_num, int threa
                     a_inv[j*n+k] -= sum * x[j];
             }
         }
-        
-        synchronize(threads_count);
-        
-        if (thread_num == 0 && *return_flag && *continue_flag)
-            a[i*n+i] = norm_a1;
     }
     
     synchronize(threads_count);
