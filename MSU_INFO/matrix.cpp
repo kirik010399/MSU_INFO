@@ -94,7 +94,7 @@ double error_norm(double* a, double* a_inv, int n)
 double matrix_norm(double* a, int n)
 {
     int i, j;
-    double temp, sum = 0.0, max = 0.0;
+    double sum = 0.0, max = 0.0;
         
     for (i = 0; i < n; ++i)
     {
