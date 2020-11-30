@@ -62,7 +62,7 @@ void print_matrix(double* a, int n, int m)
     }
 }
 
-double norm(double* a, double* a_inv, int n)
+double error_norm(double* a, double* a_inv, int n)
 {
     int i, j, k;
     double temp, sum = 0.0, max = 0.0;
@@ -83,6 +83,25 @@ double norm(double* a, double* a_inv, int n)
             
             sum += fabs(temp);
         }
+        
+        if (sum > max)
+            max = sum;
+    }
+    
+    return max;
+}
+
+double matrix_norm(double* a, int n)
+{
+    int i, j;
+    double temp, sum = 0.0, max = 0.0;
+        
+    for (i = 0; i < n; ++i)
+    {
+        sum = 0.0;
+        
+        for (j = 0; j < n; ++j)
+            sum += fabs(a[i*n+j]);
         
         if (sum > max)
             max = sum;

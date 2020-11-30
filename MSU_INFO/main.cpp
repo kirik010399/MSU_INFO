@@ -19,7 +19,6 @@ typedef struct
     int n;
     int thread_num;
     int threads_count;
-    int flag;
     int *continue_flag;
     int *return_flag;
 } Args;
@@ -28,7 +27,7 @@ void *invert(void *Arg)
 {
     Args *arg = (Args*)Arg;
     
-    arg->flag = invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
+    invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
     
     return NULL;
 }
@@ -137,7 +136,6 @@ int main(int argc, char **argv)
         args[i].n = n;
         args[i].thread_num = i;
         args[i].threads_count = threads_count;
-        args[i].flag = 0;
         args[i].continue_flag = &continue_flag;
         args[i].return_flag = &return_flag;
     }
@@ -182,23 +180,20 @@ int main(int argc, char **argv)
         }
     }
     
-    for (i = 0; i < threads_count; i++)
+    if(!return_flag)
     {
-        if (args[i].flag != 0)
-        {
-            printf("Матрица вырождена.\n");
-            
-            if (k == 0)
-                fclose(fin);
-            
-            delete []a;
-            delete []a_inv;
-            delete []x;
-            delete []args;
-            delete []threads;
-            
-            return -1;
-        }
+        printf("Матрица вырождена.\n");
+        
+        if (k == 0)
+            fclose(fin);
+        
+        delete []a;
+        delete []a_inv;
+        delete []x;
+        delete []args;
+        delete []threads;
+        
+        return -1;
     }
     
     t = get_time() - t;
@@ -212,7 +207,7 @@ int main(int argc, char **argv)
     
     flag = enter_matrix(a, n, k, fin);
     
-    printf("\nПогрешность: %10.3e\n", norm(a, a_inv, n));
+    printf("\nПогрешность: %10.3e\n", error_norm(a, a_inv, n));
     
     if (k == 0)
         fclose(fin);
