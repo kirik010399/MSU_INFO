@@ -229,6 +229,8 @@ int main(int argc, char **argv)
     delete []a;
     delete []a_inv;
     delete []x;
+    delete []args;
+    delete []threads;
 
     return 0;
 }
