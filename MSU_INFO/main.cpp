@@ -21,14 +21,22 @@ typedef struct
     int threads_count;
     int *continue_flag;
     int *return_flag;
+    long double time;
 } Args;
 
 void *invert(void *Arg)
 {
     Args *arg = (Args*)Arg;
+    long double t;
     
+    synchronize(arg->threads_count);
+    t = get_time();
+
     invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
     
+    synchronize(arg->threads_count);
+    arg->time = get_time() - t;
+
     return NULL;
 }
 
@@ -140,8 +148,6 @@ int main(int argc, char **argv)
         args[i].return_flag = &return_flag;
     }
     
-    t = get_time();
-    
     for (i = 0; i < threads_count; ++i)
     {
         if (pthread_create(threads+i, 0, invert, args+i))
@@ -196,11 +202,19 @@ int main(int argc, char **argv)
         return -1;
     }
     
-    t = get_time() - t;
+//    printf("%d, %LF\n", 0, args[0].time);
+    t = args[0].time;
+    
+    for (i = 1; i < threads_count; ++i)
+    {
+//        printf("%d, %LF\n", i, args[i].time);
+        if (t < args[i].time)
+            t = args[i].time;
+    }
     
     printf("\nОбратная матрица:\n");
     print_matrix(a_inv, n, m);
-    printf("Время: %Lf с.\n", t);
+    printf("\nВремя: %Lf с.\n", t);
     
     if (k == 0)
         fseek(fin, 0, SEEK_SET);
