@@ -8,7 +8,7 @@ int solve(double* a, double* b, double* x, int n)
     int i, j, k;
     double value;
     double x_, y_, r;
-    double cosPhi, sinPhi;
+    double cos_phi, sin_phi;
     double a_ik, a_jk;
     double b_i, b_j;
     double eps = 1e-30;
@@ -28,23 +28,23 @@ int solve(double* a, double* b, double* x, int n)
             if (r < eps)
                 return -1;
 
-            cosPhi = x_/r;
-            sinPhi = -y_/r;
+            cos_phi = x_/r;
+            sin_phi = -y_/r;
             
             for (k = i; k < n; ++k)
             {
                 a_ik = a[i*n+k];
                 a_jk = a[j*n+k];
                 
-                a[i*n+k] = a_ik * cosPhi - a_jk * sinPhi;
-                a[j*n+k] = a_ik * sinPhi + a_jk * cosPhi;
+                a[i*n+k] = a_ik * cos_phi - a_jk * sin_phi;
+                a[j*n+k] = a_ik * sin_phi + a_jk * cos_phi;
             }
             
             b_i = b[i];
             b_j = b[j];
             
-            b[i] = b_i * cosPhi - b_j * sinPhi;
-            b[j] = b_i * sinPhi + b_j * cosPhi;
+            b[i] = b_i * cos_phi - b_j * sin_phi;
+            b[j] = b_i * sin_phi + b_j * cos_phi;
         }
     }
 
