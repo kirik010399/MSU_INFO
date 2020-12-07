@@ -10,7 +10,6 @@ int main(int argc, char **argv)
     double *a;
     double *b;
     double *x;
-    int *ind;
     char filename[120];
     FILE* fin = nullptr;
     clock_t t;
@@ -61,9 +60,8 @@ int main(int argc, char **argv)
     a = new double [n*n];
     b = new double [n];
     x = new double [n];
-    ind = new int [n];
     
-    if (!(a && b && x && ind))
+    if (!(a && b && x))
     {
         printf("Недостаточно памяти.\n");
         
@@ -73,7 +71,6 @@ int main(int argc, char **argv)
         delete []a;
         delete []b;
         delete []x;
-        delete []ind;
         
         return -2;
     }
@@ -90,7 +87,6 @@ int main(int argc, char **argv)
         delete []a;
         delete []b;
         delete []x;
-        delete []ind;
         
         return -2;
     }
@@ -99,12 +95,12 @@ int main(int argc, char **argv)
     print_matrix(a, n, n, m);
     
     t = clock();
-    flag = solve(a, b, x, ind, n);
+    flag = solve(a, b, x, n);
     t = clock() - t;
     
     if (flag == 0)
     {
-        printf("Решение системы:\n");
+        printf("\nРешение системы:\n");
         print_matrix(x, 1, n, m);
         printf("\nВремя: %f с.\n", t*1.0/CLOCKS_PER_SEC);
         
@@ -126,7 +122,6 @@ int main(int argc, char **argv)
         delete []a;
         delete []b;
         delete []x;
-        delete []ind;
         
         return -1;
     }
@@ -137,7 +132,6 @@ int main(int argc, char **argv)
     delete []a;
     delete []b;
     delete []x;
-    delete []ind;
 
     return 0;
 }
