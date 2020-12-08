@@ -16,19 +16,26 @@ typedef struct
     double *a;
     double *a_inv;
     double *x;
-    int *ind;
-    max_elem *max_;
     int n;
     int thread_num;
     int threads_count;
+    int *continue_flag;
     int *return_flag;
+    long double time;
 } Args;
 
 void *invert(void *Arg)
 {
     Args *arg = (Args*)Arg;
+    long double t;
+    
+    synchronize(arg->threads_count);
+    t = get_time();
 
-//    invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
+    invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
+    
+    synchronize(arg->threads_count);
+    arg->time = get_time() - t;
 
     return NULL;
 }
@@ -39,9 +46,8 @@ int main(int argc, char **argv)
     double *a;
     double *a_inv;
     double *x;
-    int *ind;
-    max_elem *max_;
-    int return_flag = 1;
+    int continue_flag = 1, return_flag = 1;
+    char filename[120];
     FILE* fin = nullptr;
     long double t;
     int threads_count;
@@ -75,7 +81,13 @@ int main(int argc, char **argv)
 
     if (k == 0)
     {
-        fin = fopen(argv[5], "r");
+        if(sscanf(argv[5], "%s", filename) != 1)
+        {
+            printf("Данные запуска некорректны.\n");
+            return -1;
+        }
+            
+        fin = fopen(filename, "r");
         
         if (!fin)
         {
@@ -85,26 +97,20 @@ int main(int argc, char **argv)
         }
     }
     
-    a = new double [n*n];
-    a_inv = new double [n*n];
-    x = new double [n];
-    ind = new int [n];
-    max_ = new max_elem [threads_count];
-    args = new Args [threads_count];
-    threads = new pthread_t [threads_count];
-    
-    if (!(a && a_inv && x && ind && max_ && args && threads))
+    try
+    {
+        a = new double [n*n];
+        a_inv = new double [n*n];
+        x = new double [n];
+        args = new Args [threads_count];
+        threads = new pthread_t [threads_count];
+    }
+    catch (bad_alloc&)
     {
         printf("Недостаточно памяти.\n");
-        
+
         if (k == 0)
             fclose(fin);
-        
-        delete []a;
-        delete []a_inv;
-        delete []x;
-        delete []args;
-        delete []threads;
         
         return -2;
     }
@@ -141,8 +147,6 @@ int main(int argc, char **argv)
         args[i].continue_flag = &continue_flag;
         args[i].return_flag = &return_flag;
     }
-    
-    t = get_time();
     
     for (i = 0; i < threads_count; ++i)
     {
@@ -182,8 +186,6 @@ int main(int argc, char **argv)
         }
     }
     
-    t = get_time() - t;
-    
     if(!return_flag)
     {
         printf("Матрица вырождена.\n");
@@ -198,6 +200,16 @@ int main(int argc, char **argv)
         delete []threads;
         
         return -1;
+    }
+    
+//    printf("%d, %LF\n", 0, args[0].time);
+    t = args[0].time;
+    
+    for (i = 1; i < threads_count; ++i)
+    {
+//        printf("%d, %LF\n", i, args[i].time);
+        if (t < args[i].time)
+            t = args[i].time;
     }
     
     printf("\nОбратная матрица:\n");

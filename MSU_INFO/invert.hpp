@@ -4,13 +4,6 @@
 #include <stdio.h>
 #include <pthread.h>
 
-typedef struct
-{
-    double elem;
-    int row_index;
-    int col_index;
-} max_elem;
-
 void invert(double *a, double *a_inv, double *x, int n, int thread_num, int threads_count, int *continue_flag, int *return_flag);
 void synchronize(int total_threads);
 
