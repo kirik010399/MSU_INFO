@@ -19,6 +19,7 @@ typedef struct
     int n;
     int thread_num;
     int threads_count;
+    int *continue_flag;
     int *return_flag;
 } Args;
 
@@ -26,7 +27,7 @@ void *solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
 
-    solve(arg->a, arg->b, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
+    solve(arg->a, arg->b, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
     return NULL;
 }
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
     double *a;
     double *b;
     double *x;
+    int continue_flag = 1;
     int return_flag = 1;
     FILE* fin = nullptr;
     long double t;
@@ -131,6 +133,7 @@ int main(int argc, char **argv)
         args[i].n = n;
         args[i].thread_num = i;
         args[i].threads_count = threads_count;
+        args[i].continue_flag = &continue_flag;
         args[i].return_flag = &return_flag;
     }
     

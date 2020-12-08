@@ -64,7 +64,7 @@ void print_matrix(double* a, int l, int n, int m)
 double norm(double* a, double* b, double* x, int n)
 {
     int i, j;
-    double norm1 = 0.0, norm2 = 0.0;
+    double norm1 = 0.0, norm2;
     double tmp;
     
     for (i = 0; i < n; ++i)

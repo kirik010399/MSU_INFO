@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-void solve(double *a, double *b, double *x, int n, int thread_num, int threads_count, int *return_flag);
+void solve(double *a, double *b, double *x, int n, int thread_num, int threads_count, int *continue_flag, int *return_flag);
 void synchronize(int total_threads);
 
 #endif /* solve_hpp */

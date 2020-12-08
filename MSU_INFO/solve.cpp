@@ -4,53 +4,99 @@
 
 using namespace std;
 
-void solve(double *a, double *b, double *x, int n, int thread_num, int threads_count, int *return_flag)
+void solve(double *a, double *b, double *x, int n, int thread_num, int threads_count, int *continue_flag, int *return_flag)
 {
-    int i, j, k, max_index;
-    double value, max_elem;
-    int begin_row, last_row;
-    
+    int i, j, k;
+    double value;
+    double x_, y_, r;
+    double cos_phi, sin_phi;
+    double a_ik, a_jk;
+    double b_i, b_j;
     double eps = 1e-30;
-    
-    for (i = 0; i < n; ++i)
+    int begin_row, last_row, thread_row;
+
+    for (i = 0; i < n-1; ++i)
     {
         synchronize(threads_count);
 
-        if (thread_num == 0)
+        begin_row = (n - i) * thread_num;
+        begin_row = begin_row/threads_count + i;
+        last_row = (n - i) * (thread_num + 1);
+        last_row = last_row/threads_count + i;
+        
+        for (j = begin_row+1; j < last_row; ++j)
         {
-            max_elem = fabs(a[i*n+i]);
-            max_index = i;
+            x_ = a[begin_row*n+i];
+            y_ = a[j*n+i];
+
+            r = sqrt(x_*x_+y_*y_);
             
-            for (j = i+1; j < n; ++j)
+            if (r < eps)
+                continue;
+            
+            cos_phi = x_/r;
+            sin_phi = -y_/r;
+            
+            for (k = i; k < n; ++k)
             {
-                if (max_elem < fabs(a[j*n+i]))
-                {
-                    max_elem = fabs(a[j*n+i]);
-                    max_index = j;
-                }
+                a_ik = a[begin_row*n+k];
+                a_jk = a[j*n+k];
+                
+                a[begin_row*n+k] = a_ik * cos_phi - a_jk * sin_phi;
+                a[j*n+k] = a_ik * sin_phi + a_jk * cos_phi;
             }
             
-            if (fabs(max_elem) < eps)
-                *return_flag = 0; //det = 0;
-            else
-                *return_flag = 1;
+            b_i = b[begin_row];
+            b_j = b[j];
             
-            if (*return_flag)
+            b[begin_row] = b_i * cos_phi - b_j * sin_phi;
+            b[j] = b_i * sin_phi + b_j * cos_phi;
+        }
+        
+        synchronize(threads_count);
+
+        if (!*return_flag)
+            return;
+
+        if (thread_num == 0)
+        {
+            for (thread_row = 1; thread_row < threads_count; ++thread_row)
             {
-                if (max_index != i) 
+                j = (n - i) * thread_row;
+                j = j/threads_count + i;
+                
+                if (i == j)
+                    continue;
+                
+                x_ = a[i*n+i];
+                y_ = a[j*n+i];
+
+                r = sqrt(x_*x_+y_*y_);
+                
+                if (r < eps)
                 {
-                    for (j = 0; j < n; ++j)
-                        swap(a[max_index*n+j], a[i*n+j]);
-                    
-                    swap(b[max_index], b[i]);
+                    *return_flag = 0;
                 }
-                
-                value = 1.0/a[i*n+i];
-                
-                for (j = i; j < n; ++j)
-                    a[i*n+j] *= value;
-                
-                b[i] *= value;
+                else
+                {
+                    cos_phi = x_/r;
+                    sin_phi = -y_/r;
+                    
+                    for (k = i; k < n; ++k)
+                    {
+                        a_ik = a[i*n+k];
+                        a_jk = a[j*n+k];
+                        
+                        a[i*n+k] = a_ik * cos_phi - a_jk * sin_phi;
+                        a[j*n+k] = a_ik * sin_phi + a_jk * cos_phi;
+                    }
+                    
+                    b_i = b[i];
+                    b_j = b[j];
+                    
+                    b[i] = b_i * cos_phi - b_j * sin_phi;
+                    b[j] = b_i * sin_phi + b_j * cos_phi;
+                }
             }
         }
         
@@ -58,26 +104,11 @@ void solve(double *a, double *b, double *x, int n, int thread_num, int threads_c
         
         if (!*return_flag)
             return;
-        
-        begin_row = (n - i - 1) * thread_num;
-        begin_row = begin_row/threads_count + i + 1;
-        last_row = (n - i - 1) * (thread_num + 1);
-        last_row = last_row/threads_count + i + 1;
-        
-        for (j = begin_row; j < last_row; ++j)
-        {
-            value = a[j*n+i];
-            
-            for (k = i; k < n; ++k)
-                a[j*n+k] -= a[i*n+k] * value;
-            
-            b[j] -= b[i] * value;
-        }
     }
     
     synchronize(threads_count);
     
-    if(thread_num == 0)
+    if (thread_num == 0)
     {
         for (i = n-1; i >= 0; --i)
         {
@@ -86,7 +117,10 @@ void solve(double *a, double *b, double *x, int n, int thread_num, int threads_c
             for (j = i+1; j < n; ++j)
                 value -= a[i*n+j] * x[j];
             
-            x[i] = value;
+            if (fabs(a[i*n+i]) < eps)
+                *return_flag = 0;
+            else
+                x[i] = value/a[i*n+i];
         }
     }
 }
