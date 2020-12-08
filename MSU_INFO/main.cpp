@@ -3,7 +3,7 @@
 #include <time.h>
 #include <math.h>
 #include "matrix.hpp"
-#include "invert.hpp"
+#include "solve.hpp"
 #include <sys/time.h>
 #include <pthread.h>
 
@@ -14,29 +14,21 @@ long double get_time();
 typedef struct
 {
     double *a;
-    double *a_inv;
+    double *b;
     double *x;
+    int *ind;
+    max_elem *max_; 
     int n;
     int thread_num;
     int threads_count;
-    int *continue_flag;
     int *return_flag;
-    long double time;
 } Args;
 
-void *invert(void *Arg)
+void *solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
-    long double t;
-    
-    synchronize(arg->threads_count);
-    t = get_time();
 
-    invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
-    
-    synchronize(arg->threads_count);
-    arg->time = get_time() - t;
-
+    solve(arg->a, arg->b, arg->x, arg->ind, arg->max_, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
     return NULL;
 }
 
@@ -44,10 +36,11 @@ int main(int argc, char **argv)
 {
     int n, m, k, i;
     double *a;
-    double *a_inv;
+    double *b;
     double *x;
-    int continue_flag = 1, return_flag = 1;
-    char filename[120];
+    int *ind;
+    max_elem *max_;
+    int return_flag = 1;
     FILE* fin = nullptr;
     long double t;
     int threads_count;
@@ -81,13 +74,7 @@ int main(int argc, char **argv)
 
     if (k == 0)
     {
-        if(sscanf(argv[5], "%s", filename) != 1)
-        {
-            printf("Данные запуска некорректны.\n");
-            return -1;
-        }
-            
-        fin = fopen(filename, "r");
+        fin = fopen(argv[5], "r");
         
         if (!fin)
         {
@@ -97,25 +84,33 @@ int main(int argc, char **argv)
         }
     }
     
-    try
-    {
-        a = new double [n*n];
-        a_inv = new double [n*n];
-        x = new double [n];
-        args = new Args [threads_count];
-        threads = new pthread_t [threads_count];
-    }
-    catch (bad_alloc&)
+    a = new double [n*n];
+    b = new double [n];
+    x = new double [n];
+    ind = new int [n];
+    max_ = new max_elem[threads_count];
+    args = new Args [threads_count];
+    threads = new pthread_t [threads_count];
+    
+    if (!(a &&b && x && ind && max_ && args && threads))
     {
         printf("Недостаточно памяти.\n");
-
+        
         if (k == 0)
             fclose(fin);
+        
+        delete []a;
+        delete []b;
+        delete []x;
+        delete []ind;
+        delete []args;
+        delete []threads;
+        delete []max_;
         
         return -2;
     }
     
-    flag = enter_matrix(a, n, k, fin);
+    flag = enter_matrix(a, b, n, k, fin);
     
     if (flag < 0)
     {
@@ -125,32 +120,37 @@ int main(int argc, char **argv)
             fclose(fin);
         
         delete []a;
-        delete []a_inv;
+        delete []b;
         delete []x;
+        delete []ind;
         delete []args;
         delete []threads;
+        delete []max_;
         
         return -2;
     }
     
     printf("\nИзначальная матрица:\n");
-    print_matrix(a, n, m);
+    print_matrix(a, n, n, m);
     
     for (i = 0; i < threads_count; ++i)
     {
         args[i].a = a;
-        args[i].a_inv = a_inv;
+        args[i].b = b;
         args[i].x = x;
+        args[i].ind = ind;
+        args[i].max_ = max_;
         args[i].n = n;
         args[i].thread_num = i;
         args[i].threads_count = threads_count;
-        args[i].continue_flag = &continue_flag;
         args[i].return_flag = &return_flag;
     }
     
+    t = get_time();
+    
     for (i = 0; i < threads_count; ++i)
     {
-        if (pthread_create(threads+i, 0, invert, args+i))
+        if (pthread_create(threads+i, 0, solve, args+i))
         {
             printf("Поток не создался.\n");
             
@@ -158,10 +158,12 @@ int main(int argc, char **argv)
                 fclose(fin);
             
             delete []a;
-            delete []a_inv;
+            delete []b;
             delete []x;
+            delete []ind;
             delete []args;
             delete []threads;
+            delete []max_;
             
             return -1;
         }
@@ -177,14 +179,18 @@ int main(int argc, char **argv)
                 fclose(fin);
             
             delete []a;
-            delete []a_inv;
+            delete []b;
             delete []x;
+            delete []ind;
             delete []args;
             delete []threads;
+            delete []max_;
             
             return -1;
         }
     }
+    
+    t = get_time() - t;
     
     if(!return_flag)
     {
@@ -193,44 +199,42 @@ int main(int argc, char **argv)
         if (k == 0)
             fclose(fin);
         
+        if (k == 0)
+            fclose(fin);
+        
         delete []a;
-        delete []a_inv;
+        delete []b;
         delete []x;
+        delete []ind;
         delete []args;
         delete []threads;
+        delete []max_;
         
         return -1;
     }
     
-//    printf("%d, %LF\n", 0, args[0].time);
-    t = args[0].time;
-    
-    for (i = 1; i < threads_count; ++i)
-    {
-//        printf("%d, %LF\n", i, args[i].time);
-        if (t < args[i].time)
-            t = args[i].time;
-    }
-    
-    printf("\nОбратная матрица:\n");
-    print_matrix(a_inv, n, m);
+    printf("\nРешение системы:\n");
+    print_matrix(x, 1, n, m);
     printf("\nВремя: %Lf с.\n", t);
     
     if (k == 0)
         fseek(fin, 0, SEEK_SET);
     
-    flag = enter_matrix(a, n, k, fin);
+    flag = enter_matrix(a, b, n, k, fin);
     
-    printf("\nПогрешность: %10.3e\n", error_norm(a, a_inv, n));
+    printf("Норма невязки: %10.3e\n", norm(a, b, x, n));
+    printf("Норма ошибки: %10.3e\n", error_norm(x, n));
     
     if (k == 0)
         fclose(fin);
     
     delete []a;
-    delete []a_inv;
+    delete []b;
     delete []x;
+    delete []ind;
     delete []args;
     delete []threads;
+    delete []max_;
 
     return 0;
 }
