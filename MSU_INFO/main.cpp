@@ -17,7 +17,6 @@ typedef struct
     double *b;
     double *x;
     int *ind;
-    max_elem *max_; 
     int n;
     int thread_num;
     int threads_count;
@@ -28,7 +27,7 @@ void *solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
 
-    solve(arg->a, arg->b, arg->x, arg->ind, arg->max_, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
+    solve(arg->a, arg->b, arg->x, arg->ind, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
     return NULL;
 }
 
@@ -39,7 +38,6 @@ int main(int argc, char **argv)
     double *b;
     double *x;
     int *ind;
-    max_elem *max_;
     int return_flag = 1;
     FILE* fin = nullptr;
     long double t;
@@ -88,11 +86,10 @@ int main(int argc, char **argv)
     b = new double [n];
     x = new double [n];
     ind = new int [n];
-    max_ = new max_elem[threads_count];
     args = new Args [threads_count];
     threads = new pthread_t [threads_count];
     
-    if (!(a &&b && x && ind && max_ && args && threads))
+    if (!(a &&b && x && ind && args && threads))
     {
         printf("Недостаточно памяти.\n");
         
@@ -105,7 +102,6 @@ int main(int argc, char **argv)
         delete []ind;
         delete []args;
         delete []threads;
-        delete []max_;
         
         return -2;
     }
@@ -125,7 +121,6 @@ int main(int argc, char **argv)
         delete []ind;
         delete []args;
         delete []threads;
-        delete []max_;
         
         return -2;
     }
@@ -139,7 +134,6 @@ int main(int argc, char **argv)
         args[i].b = b;
         args[i].x = x;
         args[i].ind = ind;
-        args[i].max_ = max_;
         args[i].n = n;
         args[i].thread_num = i;
         args[i].threads_count = threads_count;
@@ -163,7 +157,6 @@ int main(int argc, char **argv)
             delete []ind;
             delete []args;
             delete []threads;
-            delete []max_;
             
             return -1;
         }
@@ -184,7 +177,6 @@ int main(int argc, char **argv)
             delete []ind;
             delete []args;
             delete []threads;
-            delete []max_;
             
             return -1;
         }
@@ -208,7 +200,6 @@ int main(int argc, char **argv)
         delete []ind;
         delete []args;
         delete []threads;
-        delete []max_;
         
         return -1;
     }
@@ -234,7 +225,6 @@ int main(int argc, char **argv)
     delete []ind;
     delete []args;
     delete []threads;
-    delete []max_;
 
     return 0;
 }

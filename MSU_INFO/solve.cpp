@@ -4,9 +4,9 @@
 
 using namespace std;
 
-void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int thread_num, int threads_count, int *return_flag)
+void solve(double *a, double *b, double *x, int *ind, int n, int thread_num, int threads_count, int *return_flag)
 {
-    int i, j, k, max_str_index, max_col_index;
+    int i, j, k, max_index;
     double value, max_elem;
     int begin_row, last_row;
     
@@ -21,44 +21,18 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
     for (i = 0; i < n; ++i)
     {
         synchronize(threads_count);
-        
-        begin_row = (n - i) * thread_num;
-        begin_row = begin_row/threads_count + i;
-        last_row = (n - i) * (thread_num + 1);
-        last_row = last_row/threads_count + i;
-        
-        max_[thread_num].elem = fabs(a[begin_row*n+i]);
-        max_[thread_num].row_index = begin_row;
-        max_[thread_num].col_index = i;
-        
-        for (j = begin_row; j < last_row; ++j)
-        {
-            for (k = i; k < n; ++k)
-            {
-                if (fabs(a[j*n+k]) > max_[thread_num].elem)
-                {
-                    max_[thread_num].elem = fabs(a[j*n+k]);
-                    max_[thread_num].row_index = j;
-                    max_[thread_num].col_index = k;
-                }
-            }
-        }
-
-        synchronize(threads_count);
 
         if (thread_num == 0)
         {
-            max_elem = max_[0].elem;
-            max_str_index = max_[0].row_index;
-            max_col_index = max_[0].col_index;
+            max_elem = fabs(a[i*n+i]);
+            max_index = i;
             
-            for (k = 1; k < threads_count; ++k)
+            for (j = i+1; j < n; ++j)
             {
-                if (max_elem < max_[k].elem)
+                if (max_elem < fabs(a[i*n+j]))
                 {
-                    max_elem = max_[k].elem;
-                    max_str_index = max_[k].row_index;
-                    max_col_index = max_[k].col_index;
+                    max_elem = fabs(a[i*n+j]);
+                    max_index = j;
                 }
             }
             
@@ -69,20 +43,12 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
             
             if (*return_flag)
             {
-                if (max_str_index != i) // Swap strings (i <-> max)
+                if (max_index != i)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[max_str_index*n+j], a[i*n+j]);
+                        swap(a[j*n+max_index], a[j*n+i]);
                     
-                    swap(b[max_str_index], b[i]);
-                }
-                
-                swap(ind[i], ind[max_col_index]);//swap variables
-                
-                if (max_col_index != i) // Swap columns (i <-> max)
-                {
-                    for (j = 0; j < n; ++j)
-                        swap(a[j*n+max_col_index], a[j*n+i]);
+                    swap(ind[i], ind[max_index]);
                 }
                 
                 value = 1.0/a[i*n+i];
