@@ -10,7 +10,6 @@ int main(int argc, char **argv)
     double *a;
     double *b;
     double *x;
-    char filename[120];
     FILE* fin = nullptr;
     clock_t t;
     int flag;
@@ -40,14 +39,8 @@ int main(int argc, char **argv)
     }
 
     if (k == 0)
-    {
-        if(sscanf(argv[4], "%s", filename) != 1)
-        {
-            printf("Данные запуска некорректны.\n");
-            return -1;
-        }
-            
-        fin = fopen(filename, "r");
+    {            
+        fin = fopen(argv[4], "r");
         
         if (!fin)
         {
@@ -57,9 +50,9 @@ int main(int argc, char **argv)
         }
     }
     
-    a = new double [n*n];
-    b = new double [n];
-    x = new double [n];
+    a = new double [n*n];//матрица
+    b = new double [n];//свободный вектор
+    x = new double [n];//решение
     
     if (!(a && b && x))
     {
@@ -114,7 +107,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Произошла ошибка во время обращения матрицы.\n");
+        printf("Матрица вырождена.\n");
         
         if (k == 0)
             fclose(fin);
