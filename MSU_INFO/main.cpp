@@ -11,7 +11,6 @@ int main(int argc, char **argv)
     double *b;
     double *x;
     int *ind;
-    char filename[120];
     FILE* fin = nullptr;
     clock_t t;
     int flag;
@@ -42,13 +41,7 @@ int main(int argc, char **argv)
 
     if (k == 0)
     {
-        if(sscanf(argv[4], "%s", filename) != 1)
-        {
-            printf("Данные запуска некорректны.\n");
-            return -1;
-        }
-            
-        fin = fopen(filename, "r");
+        fin = fopen(argv[4], "r");
         
         if (!fin)
         {
@@ -104,7 +97,7 @@ int main(int argc, char **argv)
     
     if (flag == 0)
     {
-        printf("Решение системы:\n");
+        printf("\nРешение системы:\n");
         print_matrix(x, 1, n, m);
         printf("\nВремя: %f с.\n", t*1.0/CLOCKS_PER_SEC);
         
@@ -118,7 +111,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Произошла ошибка во время обращения матрицы.\n");
+        printf("Матрица вырождена.\n");
         
         if (k == 0)
             fclose(fin);

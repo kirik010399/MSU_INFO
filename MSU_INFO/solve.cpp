@@ -5,10 +5,8 @@ using namespace std;
 
 int solve(double* a, double* b, double* x, int *ind, int n)
 {
-    int i, j, k;
-    double value;
-    
-    int maxStrInd, maxColInd;
+    int i, j, k, max_str_index, max_col_index;
+    double value, max_elem;
 
     double eps = 1e-30;
     
@@ -17,58 +15,69 @@ int solve(double* a, double* b, double* x, int *ind, int n)
     
     for (i = 0; i < n; ++i)
     {
-        value = fabs(a[i*n+i]);
-        maxStrInd = i;
-        maxColInd = i;
+        max_elem = fabs(a[i*n+i]);
+        max_str_index = i;
+        max_col_index = i;
         
         for (j = i; j < n; ++j)
         {
             for (k = i; k < n; ++k)
             {
-                if (fabs(a[j*n+k]) > value)// Search for max in matrix
+                if (fabs(a[j*n+k]) > max_elem)
                 {
-                    value = fabs(a[j*n+k]);
-                    maxStrInd = j;
-                    maxColInd = k;
+                    max_elem = fabs(a[j*n+k]);
+                    max_str_index = j;
+                    max_col_index = k;
                 }
             }
         }
-        
-        if (fabs(value) < eps)
+
+        if (fabs(max_elem) < eps)
             return -1;
         
-        if (maxStrInd != i) // Swap strings (i <-> max)
+        if (max_str_index != i) // Swap strings (i <-> max)
         {
             for (j = 0; j < n; ++j)
-                swap(a[maxStrInd*n+j], a[i*n+j]);
+                swap(a[max_str_index*n+j], a[i*n+j]);
             
-            swap(b[maxStrInd], b[i]);
+            swap(b[max_str_index], b[i]);
         }
         
-        swap(ind[i], ind[maxColInd]);//swap variables
-
-        if (maxColInd != i) // Swap columns (i <-> max)
+        swap(ind[i], ind[max_col_index]);//swap variables
+        
+        if (max_col_index != i) // Swap columns (i <-> max)
         {
             for (j = 0; j < n; ++j)
-                swap(a[j*n+maxColInd], a[j*n+i]);
+                swap(a[j*n+max_col_index], a[j*n+i]);
         }
         
-        for(j = 0; j < n; ++j) // Subtraction from all lines
+        value = 1.0/a[i*n+i];
+        
+        for (j = i; j < n; ++j)
+            a[i*n+j] *= value;
+        
+        b[i] *= value;
+        
+        for (j = i+1; j < n; ++j)
         {
-            if (j != i)
-            {
-                value = a[j*n+i]/a[i*n+i];
-                
-                for(k = i; k < n; ++k)
-                    a[j*n+k] -= value*a[i*n+k];
-                
-                b[j] -= value*b[i];
-            }
+            value = a[j*n+i];
+            
+            for (k = i; k < n; ++k)
+                a[j*n+k] -= a[i*n+k] * value;
+            
+            b[j] -= b[i] * value;
         }
     }
-    
-    for (i = 0; i < n; ++i)
-        x[ind[i]] = b[i]/a[i*n+i];
+
+    for (i = n-1; i >= 0; --i)
+    {
+        value = b[i];
+        
+        for (j = i+1; j < n; ++j)
+            value -= a[i*n+j] * x[ind[j]];
+        
+        x[ind[i]] = value;
+    }
     
     return 0;
 }
