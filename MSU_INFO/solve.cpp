@@ -99,19 +99,20 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
         if (!*return_flag)
             return;
         
-        begin_row = (n - i - 1) * thread_num;
-        begin_row = begin_row/threads_count + i + 1;
-        last_row = (n - i - 1) * (thread_num + 1);
-        last_row = last_row/threads_count + i + 1;
+        begin_row = n * thread_num /threads_count;
+        last_row = n * (thread_num + 1) /threads_count;
         
-        for (j = begin_row; j < last_row; ++j)
+        for(j = begin_row; j < last_row; ++j)
         {
-            value = a[j*n+i];
-            
-            for (k = i; k < n; ++k)
-                a[j*n+k] -= a[i*n+k] * value;
-            
-            b[j] -= b[i] * value;
+            if (j != i)
+            {
+                value = a[j*n+i]/a[i*n+i];
+                
+                for(k = i; k < n; ++k)
+                    a[j*n+k] -= value*a[i*n+k];
+                
+                b[j] -= value*b[i];
+            }
         }
     }
     
@@ -119,15 +120,8 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
     
     if(thread_num == 0)
     {
-        for (i = n-1; i >= 0; --i)
-        {
-            value = b[i];
-            
-            for (j = i+1; j < n; ++j)
-                value -= a[i*n+j] * x[ind[j]];
-            
-            x[ind[i]] = value;
-        }
+        for (i = 0; i < n; ++i)
+            x[ind[i]] = b[i]/a[i*n+i];
     }
 }
 
