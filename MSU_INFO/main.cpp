@@ -22,13 +22,23 @@ typedef struct
     int thread_num;
     int threads_count;
     int *return_flag;
+    long double time;
 } Args;
 
 void *solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
+    
+    long double t;
+    
+    synchronize(arg->threads_count);
+    t = get_time();
 
     solve(arg->a, arg->b, arg->x, arg->ind, arg->max_, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
+    
+    synchronize(arg->threads_count);
+    arg->time = get_time() - t;
+    
     return NULL;
 }
 
@@ -145,9 +155,7 @@ int main(int argc, char **argv)
         args[i].threads_count = threads_count;
         args[i].return_flag = &return_flag;
     }
-    
-    t = get_time();
-    
+        
     for (i = 0; i < threads_count; ++i)
     {
         if (pthread_create(threads+i, 0, solve, args+i))
@@ -190,8 +198,14 @@ int main(int argc, char **argv)
         }
     }
     
-    t = get_time() - t;
+    t = args[0].time;
     
+    for (i = 1; i < threads_count; ++i)
+    {
+        if (t < args[i].time)
+            t = args[i].time;
+    }
+
     if(!return_flag)
     {
         printf("Матрица вырождена.\n");
