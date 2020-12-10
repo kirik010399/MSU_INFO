@@ -1,12 +1,13 @@
 #ifndef matrix_hpp
 #define matrix_hpp
 
+#include "mpi.h"
 #include <stdio.h>
 
 double f(int k, int n, int i, int j);
-int enter_matrix(double* a, int n, int k, FILE* fin);
-void print_matrix(double* a, int n, int m);
-double error_norm(double* a, double* a_inv, int n);
-double matrix_norm(double* a, int n);
+int read_matrix(double *a, double *buf, int n, char *filename, int threads_count, int thread_num);
+void init_matrix(double *a, int n, int k, int threads_count, int thread_num);
+void print_matrix(double *a, int n, int m, int threads_count, int thread_num, double *buf);
+double error_norm(double* a, double* a_inv, double *x1, double *x2, int n, int threads_count, int thread_num);
 
 #endif /* matrix_hpp */

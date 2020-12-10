@@ -2,174 +2,175 @@
 #include "matrix.hpp"
 #include <math.h>
 
-void invert(double *a, double *a_inv, double *x, int n, int thread_num, int threads_count, int *continue_flag, int *return_flag)
+int invert(double *a, double *a_inv, double *x1, double *x2, double *sum1, double *sum2, int n, int threads_count, int thread_num)
 {
     int i, j, k;
-    int begin_col;
-    int last_col;
-    double norm = 1;
-    
+    int rows;
+    int first;
+    double tmp;
+    double s1, s2;
     double eps = 1e-20;
-        
-    if (thread_num == 0)
-    {
-        norm = matrix_norm(a, n);
-        
-        for (i = 0; i < n; ++i)
-        {
-            x[i] = 0;
-            
-            for (j = 0; j < n; ++j)
-            {
-                if (i == j)
-                    a_inv[i*n+j] = 1;
-                else
-                    a_inv[i*n+j] = 0;
-                
-                a[i*n+j] /= norm; 
-            }
-        }
-    }
+
+    if (thread_num + 1 > n % threads_count)
+        rows = n/threads_count;
+    else
+        rows = n/threads_count + 1;
     
-    
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < rows; i++)
+        for (j = 0; j < n; j++)
+            a_inv[i*n+j] = (thread_num+i*threads_count == j);
+
+    for (i = 0; i < n; i++)
     {
-        synchronize(threads_count);
-        double norm_a1 = 0;
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        if (thread_num == 0)
-        {
-            double s = 0.0;
-            for (j = i+1; j < n; ++j)
-                s += a[j*n+i] * a[j*n+i];//(12)
-
-            norm_a1 = sqrt(a[i*n+i]*a[i*n+i] + s);//(13)
-
-            if (norm_a1 < eps)
-            {
-                *return_flag = 0;
-            }
-            else
-            {
-                x[i] = a[i*n+i] - norm_a1;
-                
-                for (j = i+1; j < n; ++j)
-                    x[j] = a[j*n+i]; //(14)
-                
-                double norm_x = sqrt(x[i]*x[i] + s);//(15)
-
-                if (norm_x < eps)
-                {
-                    *continue_flag = 0;
-                }
-                else
-                {
-                    *continue_flag = 1;
-                    
-                    for (j = i; j < n; ++j)
-                        x[j] /= norm_x; //(16)
-                }
-            }
-        }
+        int owner = i % threads_count;
+        int loc_i = i / threads_count;
         
-        synchronize(threads_count);
+        int first;
         
-        if (!*return_flag)
-            return;
+        if (thread_num > owner)
+            first = loc_i;
+        else
+            first = loc_i + 1;
         
-        if(!*continue_flag)
+        s1 = 0;
+
+        for (j = first; j < rows; ++j)
+            s1 += a[j*n+i] * a[j*n+i];
+
+        MPI_Allreduce(&s1, &s2, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        
+        double norm_a1;
+        if (thread_num == owner)
+            norm_a1 = sqrt(s2 + a[loc_i*n+i] * a[loc_i*n+i]);
+        
+        MPI_Bcast(&norm_a1, 1, MPI_DOUBLE, owner, MPI_COMM_WORLD);
+    
+        if (norm_a1 < eps)
+            return -1;
+        
+        for (int k = 0; k < n; ++k)
+            x1[k] = 0;
+        
+        if (thread_num == owner)
+            x1[i] = a[loc_i*n+i] - norm_a1;
+        
+        for (j = first; j < rows; ++j)
+            x1[thread_num + j*threads_count] = a[j*n+i];
+        
+        MPI_Allreduce(x1, x2, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        
+        double norm_x = sqrt(x2[i]*x2[i]+s2);
+        
+        if (norm_x < eps)
             continue;
- 
-        begin_col = (n-i) * thread_num;
-        begin_col = begin_col/threads_count + i;
-        last_col = (n-i) * (thread_num+1);
-        last_col = last_col/threads_count + i;
-                    
-        for (k = begin_col; k < last_col; ++k) //лемма 10-11
-        {
-            double sum = 0.0;
-            for (j = i; j < n; ++j)
-                sum += x[j] * a[j*n+k];
-
-            sum *= 2.0;
-            for (j = i; j < n; ++j)
-                a[j*n+k] -= sum * x[j];
-        }
-
-        synchronize(threads_count);
-
-        begin_col = n * thread_num/threads_count;
-        last_col = n * (thread_num+1)/threads_count;
         
-        for (k = begin_col; k < last_col; ++k)//лемма 10-11
+        for (j = i; j < n; ++j)
+            x2[j] /= norm_x;
+        
+        for (k = i; k < n; ++k) //лемма 10-11
         {
             double sum = 0.0;
-            for (j = i; j < n; ++j)
-                sum += x[j] * a_inv[j*n+k];
+            
+            for (j = loc_i; j < rows; ++j)
+                sum += x2[thread_num + j*threads_count] * a[j*n+k];
+            
+            sum1[k] = sum;
+        }
+        
+        MPI_Allreduce(sum1, sum2, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-            sum *= 2.0;
-            for (j = i; j < n; ++j)
-                a_inv[j*n+k] -= sum * x[j];
+        for (k = i; k < n; ++k)
+        {
+            sum2[k] *= 2.0;
+            for (j = loc_i; j < rows; ++j)
+                a[j*n+k] -= sum2[k] * x2[thread_num + j*threads_count];
+        }
+        
+        for (k = 0; k < n; ++k) //лемма 10-11
+        {
+            double sum = 0.0;
+            
+            for (j = loc_i; j < rows; ++j)
+                sum += x2[thread_num + j*threads_count] * a_inv[j*n+k];
+            
+            sum1[k] = sum;
+        }
+        
+        MPI_Allreduce(sum1, sum2, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        
+        for (k = 0; k < n; ++k)
+        {
+            sum2[k] *= 2.0;
+            for (j = loc_i; j < rows; ++j)
+                a_inv[j*n+k] -= sum2[k] * x2[thread_num + j*threads_count];
         }
     }
-    
-    synchronize(threads_count);
 
-    begin_col = n * thread_num/threads_count;
-    last_col = n * (thread_num+1)/threads_count;
     
-    for (k = begin_col; k < last_col; ++k)
+    
+    
+//    for (i = n-1; i >= 0; --i)
+//    {
+//        int owner = i % threads_count;
+//        int loc_i = i / threads_count;
+//
+//        if (thread_num == owner)
+//        {
+//            MPI_Bcast(a_inv + loc_i*n, n, MPI_DOUBLE, owner, MPI_COMM_WORLD);
+//            for (j = loc_i - 1; j >= 0 ; j--)
+//                for (k = 0; k < n; k++)
+//                    a_inv[j*n+k] -= a_inv[loc_i*n+k] * a[j*n+i];
+//        }
+//        else
+//        {
+//            MPI_Bcast(x1, n, MPI_DOUBLE, owner, MPI_COMM_WORLD);
+//
+//            if (thread_num < owner)
+//                first = loc_i;
+//            else if (loc_i - 1 >= 0)
+//                first = loc_i - 1;
+//            else
+//                continue;
+//
+//            for (j = first; j >= 0; j--)
+//                for (k = 0; k < n; k++)
+//                    a_inv[j*n+k] -= x1[k] * a[j*n+i];
+//        }
+//    }//Обратный Гаусс
+    
+    
+    
+    for (k = 0; k < n; ++k)
     {
+        for (j = 0; j < n; ++j)
+            x1[j] = 0;
+
+        for (j = 0; j < rows; ++j)
+            x1[thread_num + j*threads_count] = a_inv[j*n+k];
+
+        MPI_Allreduce(x1, x2, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
         for (i = n-1; i >= 0; --i)
         {
-            double temp = a_inv[i*n+k];
+            int owner = i % threads_count;
+            int loc_i = i / threads_count;
 
-            for (j = i+1; j < n; ++j)
-                temp -= a[i*n+j] * a_inv[j*n+k];
+            if (thread_num == owner)
+            {
+                for (j = i+1; j < n; ++j)
+                {
+                    x2[i] -= a[loc_i*n+j] * x2[j];
+                }
 
-            a_inv[i*n+k] = temp/a[i*n+i];
+                x2[i] /= a[loc_i*n+i];
+                a_inv[loc_i*n+k] = x2[i];
+            }
+            MPI_Bcast(x2, n, MPI_DOUBLE, owner, MPI_COMM_WORLD);
         }
     }//Обратный Гаусс
     
-    synchronize(threads_count);
-
-    if (thread_num == 0)
-    {
-        for (i = 0; i < n; ++i)
-            for (j = 0; j < n; ++j)
-                a_inv[i*n+j] /= norm;
-    }
-    
-    synchronize(threads_count);
+    return 0; 
 }
 
-void synchronize(int total_threads)
-{
-    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    static pthread_cond_t condvar_in = PTHREAD_COND_INITIALIZER;
-    static pthread_cond_t condvar_out = PTHREAD_COND_INITIALIZER;
-    static int threads_in = 0;
-    static int threads_out = 0;
-    
-    pthread_mutex_lock(&mutex);
-    
-    threads_in++;
-    if (threads_in >= total_threads)
-    {
-        threads_out = 0;
-        pthread_cond_broadcast(&condvar_in);
-    } else
-        while (threads_in < total_threads)
-            pthread_cond_wait(&condvar_in,&mutex);
-    
-    threads_out++;
-    if (threads_out >= total_threads)
-    {
-        threads_in = 0;
-        pthread_cond_broadcast(&condvar_out);
-    } else
-        while (threads_out < total_threads)
-            pthread_cond_wait(&condvar_out,&mutex);
-    
-    pthread_mutex_unlock(&mutex);
-}

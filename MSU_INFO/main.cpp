@@ -1,3 +1,4 @@
+#include "mpi.h"
 #include <stdio.h>
 #include <iostream>
 #include <time.h>
@@ -5,232 +6,156 @@
 #include "matrix.hpp"
 #include "invert.hpp"
 #include <sys/time.h>
-#include <pthread.h>
 
 using namespace std;
 
 long double get_time();
 
-typedef struct
+int main(int argc, char *argv[])
 {
+    int n, m, i, k;
+    int num_of_str;
+    int thread_num, threads_count;
     double *a;
     double *a_inv;
-    double *x;
-    int n;
-    int thread_num;
-    int threads_count;
-    int *continue_flag;
-    int *return_flag;
-    long double time;
-} Args;
-
-void *invert(void *Arg)
-{
-    Args *arg = (Args*)Arg;
+    double *buf;
+    double *x1, *x2;
+    double *sum1, *sum2;
+    char *filename;
     long double t;
+    int flag = 0;
     
-    synchronize(arg->threads_count);
-    t = get_time();
-
-    invert(arg->a, arg->a_inv, arg->x, arg->n, arg->thread_num, arg->threads_count, arg->continue_flag, arg->return_flag);
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &threads_count);
+    MPI_Comm_rank(MPI_COMM_WORLD, &thread_num);
     
-    synchronize(arg->threads_count);
-    arg->time = get_time() - t;
-
-    return NULL;
-}
-
-int main(int argc, char **argv)
-{
-    int n, m, k, i;
-    double *a;
-    double *a_inv;
-    double *x;
-    int continue_flag = 1, return_flag = 1;
-    char filename[120];
-    FILE* fin = nullptr;
-    long double t;
-    int threads_count;
-    pthread_t *threads;
-    Args *args;
-    int flag;
-    
-    if (argc < 5)
+    if (argc < 4)
     {
-        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m threads k *filename (если k != 0)");
+        printf("Некорректный запуск программы. Правильный формат:\n. mpirun -np threads /a.out n m k *filename (если k != 0)");
+        MPI_Finalize();
         return -1;
     }
     
-    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1 || sscanf(argv[3], "%d", &threads_count) != 1 || sscanf(argv[4], "%d", &k) != 1)
+    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1 || sscanf(argv[3], "%d", &k) != 1)
     {
         printf("Данные запуска некорректны.\n");
+        MPI_Finalize();
         return -1;
     }
     
-    if ((k == 0 && argc != 6) || (k != 0 && argc != 5))
+    if ((k == 0 && argc != 5) || (k != 0 && argc != 4))
     {
         printf("Данные запуска некорректны.\n");
+        MPI_Finalize();
         return -1;
     }
     
-    if (n < 0 || m < 0 || m > n || k < 0 || k > 4 || threads_count < 1)
+    if (n < 0 || m < 0 || m > n || k < 0 || k > 4)
     {
         printf("Данные некорректны.\n");
+        MPI_Finalize();
         return -1;
     }
 
     if (k == 0)
-    {
-        if(sscanf(argv[5], "%s", filename) != 1)
-        {
-            printf("Данные запуска некорректны.\n");
-            return -1;
-        }
-            
-        fin = fopen(filename, "r");
-        
-        if (!fin)
-        {
-            printf("Файла не существует.\n");
-            fclose(fin);
-            return -2;
-        }
-    }
+        filename = argv[4];
     
-    try
-    {
-        a = new double [n*n];
-        a_inv = new double [n*n];
-        x = new double [n];
-        args = new Args [threads_count];
-        threads = new pthread_t [threads_count];
-    }
-    catch (bad_alloc&)
-    {
-        printf("Недостаточно памяти.\n");
-
-        if (k == 0)
-            fclose(fin);
-        
-        return -2;
-    }
+    int rows;
     
-    flag = enter_matrix(a, n, k, fin);
+    if (thread_num + 1 > n % threads_count)
+        rows = n/threads_count;
+    else
+        rows = n/threads_count + 1;
+    
+    a = new double [n * rows];
+    a_inv = new double [n * rows];
+    x1 = new double [n];
+    x2 = new double [n];
+    sum1 = new double [n];
+    sum2 = new double [n];
+    buf = new double[n];
+    
+    if (k == 0)
+        flag = read_matrix(a, buf, n, filename, threads_count, thread_num);
+    else
+        init_matrix(a, n, k, threads_count, thread_num);
     
     if (flag < 0)
     {
-        printf("Матрица некорректна.\n");
-        
-        if (k == 0)
-            fclose(fin);
+        if (thread_num == 0)
+            printf("Матрица некорректна.\n");
         
         delete []a;
         delete []a_inv;
-        delete []x;
-        delete []args;
-        delete []threads;
+        delete []x1;
+        delete []x2;
+        delete []sum1;
+        delete []sum2;
+        delete []buf;
+        
+        MPI_Finalize();
         
         return -2;
     }
     
-    printf("\nИзначальная матрица:\n");
-    print_matrix(a, n, m);
+    if (thread_num == 0)
+        printf("\nИзначальная матрица:\n");
     
-    for (i = 0; i < threads_count; ++i)
-    {
-        args[i].a = a;
-        args[i].a_inv = a_inv;
-        args[i].x = x;
-        args[i].n = n;
-        args[i].thread_num = i;
-        args[i].threads_count = threads_count;
-        args[i].continue_flag = &continue_flag;
-        args[i].return_flag = &return_flag;
-    }
+    print_matrix(a, n, m, threads_count, thread_num, buf);
     
-    for (i = 0; i < threads_count; ++i)
-    {
-        if (pthread_create(threads+i, 0, invert, args+i))
-        {
-            printf("Поток не создался.\n");
-            
-            if (k == 0)
-                fclose(fin);
-            
-            delete []a;
-            delete []a_inv;
-            delete []x;
-            delete []args;
-            delete []threads;
-            
-            return -1;
-        }
-    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    t = get_time();
     
-    for (i = 0; i < threads_count; ++i)
-    {
-        if (pthread_join(threads[i], 0))
-        {
-            printf("Поток не запустился");
-            
-            if (k == 0)
-                fclose(fin);
-            
-            delete []a;
-            delete []a_inv;
-            delete []x;
-            delete []args;
-            delete []threads;
-            
-            return -1;
-        }
-    }
+    flag = invert(a, a_inv, x1, x2, sum1, sum2, n, threads_count, thread_num);
     
-    if(!return_flag)
-    {
-        printf("Матрица вырождена.\n");
+    MPI_Barrier(MPI_COMM_WORLD);
+    t = get_time() - t;
         
-        if (k == 0)
-            fclose(fin);
+    if (flag < 0)
+    {
+        if (thread_num == 0)
+            printf("Матрица некорректна.\n");
         
         delete []a;
         delete []a_inv;
-        delete []x;
-        delete []args;
-        delete []threads;
+        delete []x1;
+        delete []x2;
+        delete []sum1;
+        delete []sum2;
+        delete []buf;
         
-        return -1;
+        MPI_Finalize();
+        
+        return -2;
     }
     
-//    printf("%d, %LF\n", 0, args[0].time);
-    t = args[0].time;
+    if (thread_num == 0)
+        printf("\nОбратная матрица:\n");
     
-    for (i = 1; i < threads_count; ++i)
-    {
-//        printf("%d, %LF\n", i, args[i].time);
-        if (t < args[i].time)
-            t = args[i].time;
-    }
+    print_matrix(a_inv, n, m, threads_count, thread_num, buf);
     
-    printf("\nОбратная матрица:\n");
-    print_matrix(a_inv, n, m);
-    printf("\nВремя: %Lf с.\n", t);
+    if (thread_num == 0)
+        printf("\nВремя: %Lf с.\n", t);
     
     if (k == 0)
-        fseek(fin, 0, SEEK_SET);
+        flag = read_matrix(a, buf, n, filename, threads_count, thread_num);
+    else
+        init_matrix(a, n, k, threads_count, thread_num);
     
-    flag = enter_matrix(a, n, k, fin);
+    double err = error_norm(a, a_inv, x1, x2, n, threads_count, thread_num);
     
-    printf("\nПогрешность: %10.3e\n", error_norm(a, a_inv, n));
-    
-    if (k == 0)
-        fclose(fin);
+    if (thread_num == 0)
+        printf("\nПогрешность: %10.3e\n", err);
     
     delete []a;
     delete []a_inv;
-    delete []x;
-    delete []args;
-    delete []threads;
+    delete []x1;
+    delete []x2;
+    delete []sum1;
+    delete []sum2;
+    delete []buf;
+    
+    MPI_Finalize();
 
     return 0;
 }

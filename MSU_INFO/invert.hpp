@@ -1,10 +1,9 @@
 #ifndef invert_hpp
 #define invert_hpp
 
+#include "mpi.h"
 #include <stdio.h>
-#include <pthread.h>
 
-void invert(double *a, double *a_inv, double *x, int n, int thread_num, int threads_count, int *continue_flag, int *return_flag);
-void synchronize(int total_threads);
+int invert(double *a, double *a_inv, double *x1, double *x2, double *sum1, double *sum2, int n, int threads_count, int thread_num);
 
 #endif /* invert_hpp */
