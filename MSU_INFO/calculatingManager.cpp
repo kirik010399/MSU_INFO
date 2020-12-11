@@ -4,15 +4,11 @@
 
 using namespace std;
 
-int k = 0;
-
-int calculateValues(double* matrix, double* vector, double left, double right, double eps, int n)
+void calculateValues(double* matrix, double* vector, double left, double right, double eps, int n, int *k)
 {
     int i, j, alp;
     double maxA, maxB;
-    
-    eps = fmax(1e-10, eps);
-    
+        
     for (i = 0; i < n; ++i)
         vector[i] = 0; 
     
@@ -46,15 +42,13 @@ int calculateValues(double* matrix, double* vector, double left, double right, d
         }
     }//97
     
-    values(matrix, n, vector, left, right, eps);
+    values(matrix, n, vector, left, right, eps, k);
     
     for (i = 0; i < n; ++i)
         vector[i]*=alp;
-    
-    return k;
 }
 
-void values(double *matrix, int n, double *vector, double left, double right, double eps)
+void values(double *matrix, int n, double *vector, double left, double right, double eps, int *k)
 {
     int c, j;
     
@@ -62,51 +56,40 @@ void values(double *matrix, int n, double *vector, double left, double right, do
     
     if (right - left > eps && c != 0)
     {
-        values(matrix, n, vector, left, (left+right)/2, eps);
-        values(matrix, n, vector, (left+right)/2, right, eps);
+        values(matrix, n, vector, left, (left+right)/2, eps, k);
+        values(matrix, n, vector, (left+right)/2, right, eps, k);
     }
     else if (c != 0)
     {
         for (j = 0; j < c; ++j)
-            vector[k + j] = (left+right)/2;
+            vector[*k + j] = (left+right)/2;
         
-        k += c;
+        *k += c;
     }//95
 }
 
 int n_(double* matrix, int n, double lam)
 {
-    int i, res;
-    double x, y, u, v, a, maxx, b, gam;
+    int i;
+    int res;
+    double elem;
     
-    x = matrix[0] - lam;
-    y = 1.0;
+    elem = matrix[0] - lam;
     
-    if (x*y < 0)
+    if (elem < 0)
         res = 1;
     else
         res = 0;
     
     for (i = 1; i < n; ++i)
     {
-        a = matrix[i*n+i] - lam;
-        b = matrix[i*n + i-1];
+        if (fabs(elem) < 1e-18)
+            elem = 1e-10;
         
-        maxx = fabs(b*b*y);
+        elem = matrix[i*n+i] - lam - matrix[i*n + i-1] * matrix[(i-1)*n+i]/elem;
         
-        if (fabs(x) > maxx)
-            maxx = fabs(x);
-        
-        gam = (1/1e-18)/maxx;
-        
-        u = gam * (a*x - b*b*y);
-        v = gam * x;
-        
-        if (u*x < 0.0)
+        if (elem < 0)
             ++res;
-        
-        x = u;
-        y = v;//97
     }
     
     return res;

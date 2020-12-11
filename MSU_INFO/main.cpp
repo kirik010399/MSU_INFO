@@ -16,9 +16,9 @@ int main()
     clock_t t;
     int inputType;
     int returnFlag;
-    int retSize;
     double eps;
     double left, right;
+    int k = 0;
     pair<double, double> p;
     
     cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
@@ -140,11 +140,11 @@ int main()
     }
     
     t = clock();
-    retSize = calculateValues(matrix, vector, left, right, eps, n);
+    calculateValues(matrix, vector, left, right, eps, n, &k);
     t = clock() - t;
     
     cout<<endl<<"Values vector:"<<endl;
-    printVector(vector, n, m, retSize);
+    printVector(vector, n, m, k);
     
     if (inputType == 1)
         fseek(fin, 1, SEEK_SET);
