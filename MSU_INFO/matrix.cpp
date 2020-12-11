@@ -143,7 +143,7 @@ void print_matrix(double *a, int n, int m, int threads_count, int thread_num, do
     }
 }
 
-double error_norm(double* a, double* a_inv, double *x1, double *x2, int n, int threads_count, int thread_num)
+double error_norm(double* a, double* a_inv, double *a_inv1, double *a_inv2, int n, int threads_count, int thread_num)
 {
     int i, j, k;
     double temp, sum = 0.0, max = 0.0;
@@ -153,36 +153,45 @@ double error_norm(double* a, double* a_inv, double *x1, double *x2, int n, int t
         rows = n/threads_count;
     else
         rows = n/threads_count + 1;
-        
+    
+    for (i = 0; i < n * n; ++i)
+        a_inv1[i] = 0;
+    
     for (i = 0; i < rows; ++i)
     {
-        sum = 0.0;
-        
         for (j = 0; j < n; ++j)
         {
-            for (k = 0; k < n; ++k)
-                x1[k] = 0;
-            
-            for (k = 0; k < rows; ++k)
-                x1[thread_num + k*threads_count] = a_inv[k*n+j];
-            
-            MPI_Allreduce(x1, x2, n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            
-            temp = 0.0;
-            
-            for (k = 0; k < n; ++k)
-                temp += a[i*n+k] * x2[k];
-            
-            int global_i = thread_num + i*threads_count;
-
-            if (global_i == j)
-                temp -= 1.0;
-            
-            sum += fabs(temp);
+            a_inv1[(thread_num + i*threads_count)*n+j] = a_inv[i*n+j];
         }
+    }
+    
+    MPI_Allreduce(a_inv1, a_inv2, n*n, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         
-        if (sum > max)
-            max = sum;
+    for (i = 0; i < n; ++i)
+    {
+        int owner = i % threads_count;
+        int loc_i = i / threads_count;
+                
+        if (thread_num == owner)
+        {
+            sum = 0.0;
+
+            for (j = 0; j < n; ++j)
+            {
+                temp = 0.0;
+                
+                for (k = 0; k < n; ++k)
+                    temp += a[loc_i*n+k] * a_inv2[k*n+j];
+                
+                if (i == j)
+                    temp -= 1.0;
+                
+                sum += fabs(temp);
+            }
+            
+            if (sum > max)
+                max = sum;
+        }
     }
     
     double global_max;

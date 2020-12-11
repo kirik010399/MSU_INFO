@@ -107,40 +107,6 @@ int invert(double *a, double *a_inv, double *x1, double *x2, double *sum1, doubl
                 a_inv[j*n+k] -= sum2[k] * x2[thread_num + j*threads_count];
         }
     }
-
-    
-    
-    
-//    for (i = n-1; i >= 0; --i)
-//    {
-//        int owner = i % threads_count;
-//        int loc_i = i / threads_count;
-//
-//        if (thread_num == owner)
-//        {
-//            MPI_Bcast(a_inv + loc_i*n, n, MPI_DOUBLE, owner, MPI_COMM_WORLD);
-//            for (j = loc_i - 1; j >= 0 ; j--)
-//                for (k = 0; k < n; k++)
-//                    a_inv[j*n+k] -= a_inv[loc_i*n+k] * a[j*n+i];
-//        }
-//        else
-//        {
-//            MPI_Bcast(x1, n, MPI_DOUBLE, owner, MPI_COMM_WORLD);
-//
-//            if (thread_num < owner)
-//                first = loc_i;
-//            else if (loc_i - 1 >= 0)
-//                first = loc_i - 1;
-//            else
-//                continue;
-//
-//            for (j = first; j >= 0; j--)
-//                for (k = 0; k < n; k++)
-//                    a_inv[j*n+k] -= x1[k] * a[j*n+i];
-//        }
-//    }//Обратный Гаусс
-    
-    
     
     for (k = 0; k < n; ++k)
     {

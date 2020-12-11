@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
     int thread_num, threads_count;
     double *a;
     double *a_inv;
+    double *a_inv1;
+    double *a_inv2;
     double *buf;
     double *x1, *x2;
     double *sum1, *sum2;
@@ -75,6 +77,9 @@ int main(int argc, char *argv[])
     sum2 = new double [n];
     buf = new double[n];
     
+    a_inv1 = new double [n*n];
+    a_inv2 = new double [n*n];
+    
     if (k == 0)
         flag = read_matrix(a, buf, n, filename, threads_count, thread_num);
     else
@@ -92,6 +97,8 @@ int main(int argc, char *argv[])
         delete []sum1;
         delete []sum2;
         delete []buf;
+        delete []a_inv1;
+        delete []a_inv2;
         
         MPI_Finalize();
         
@@ -123,6 +130,8 @@ int main(int argc, char *argv[])
         delete []sum1;
         delete []sum2;
         delete []buf;
+        delete []a_inv1;
+        delete []a_inv2;
         
         MPI_Finalize();
         
@@ -142,7 +151,7 @@ int main(int argc, char *argv[])
     else
         init_matrix(a, n, k, threads_count, thread_num);
     
-    double err = error_norm(a, a_inv, x1, x2, n, threads_count, thread_num);
+    double err = error_norm(a, a_inv, a_inv1, a_inv2, n, threads_count, thread_num);
     
     if (thread_num == 0)
         printf("\nПогрешность: %10.3e\n", err);
@@ -154,6 +163,8 @@ int main(int argc, char *argv[])
     delete []sum1;
     delete []sum2;
     delete []buf;
+    delete []a_inv1;
+    delete []a_inv2;
     
     MPI_Finalize();
 
