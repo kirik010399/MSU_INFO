@@ -13,14 +13,10 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
     {
         while (fabs(a[k*n+k-1]) > exit_eps)
         {
-            printf("\n");
-            print_matrix(a, n, n, 5);
-            printf("\n");
+            double prev_value = fabs(a[k*n+k-1]);
             
             double shift = a[k*n + k];
             
-            printf("%lf %lf %lf\n", fabs(a[k*n+k-1]), shift, exit_eps);
-
             for (i = 0; i <= k; ++i)
                 a[i*n+i] -= shift;
             
@@ -30,9 +26,10 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
             for (i = 0; i <= k; ++i)
                 a[i*n+i] += shift;
             
-            printf("\n");
-            print_matrix(a, n, n, 5);
-            printf("\n");
+            double cur_value = fabs(a[k*n+k-1]);
+
+            if (fabs(cur_value - prev_value) < 1e-10)
+                break;
         }
     }
     
