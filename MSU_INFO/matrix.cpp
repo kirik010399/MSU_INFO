@@ -66,7 +66,7 @@ void print_matrix(double* a, int l, int n, int m)
     {
         for (j = 0; j < m; ++j)
         {
-            printf("%lf ", a[i*n+j]);
+            printf("%10.3e ", a[i*n+j]);
         }
         printf("\n");
     }
