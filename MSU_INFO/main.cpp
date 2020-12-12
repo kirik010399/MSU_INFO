@@ -1,166 +1,133 @@
 #include <iostream>
 #include <time.h>
 #include <math.h>
-#include "matrixUtils.hpp"
-#include "calculatingManager.hpp"
-#include <algorithm>
+#include "matrix.hpp"
+#include "values.hpp"
 
-using namespace std;
-
-int main()
+int main(int argc, char **argv)
 {
-    int n, m;
-    double *matrix;
-    double *vector;
+    int n, m, k;
+    double *a;
+    double *x;
     FILE* fin = NULL;
     clock_t t;
-    int inputType;
-    int returnFlag;
+    int flag;
     double eps;
     double left, right;
-    int k = 0;
-    pair<double, double> p;
-    
-    cout<<"Choosy type of entering data: 1 - from file, 2 - from formula"<<endl;
-    
-    if (scanf("%d", &inputType) != 1)
+    double norm1, norm2;
+    int values_count = 0;
+        
+    if (argc < 7)
     {
-        cout<<"Data isn't correct"<<endl;
-        return -2;
+        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps left right k *filename (если k != 0)");
+        return -1;
     }
-         
-    if (inputType == 1)
+    
+    if (sscanf(argv[1], "%d", &n) != 1 || sscanf(argv[2], "%d", &m) != 1
+        || sscanf(argv[3], "%lf", &eps) != 1 || sscanf(argv[4], "%lf", &left) != 1
+        || sscanf(argv[5], "%lf", &right) != 1 || sscanf(argv[6], "%d", &k) != 1)
     {
-        fin = fopen("input.txt", "r");
+        printf("Данные запуска некорректны.\n");
+        return -1;
+    }
+    
+    if ((k == 0 && argc != 8) || (k != 0 && argc != 7))
+    {
+        printf("Данные запуска некорректны.\n");
+        return -1;
+    }
+    
+    if (n < 0 || m < 0 || m > n || k < 0 || k > 4
+        || right < left || eps < 1e-16 || fabs(right - left) < 1e-16)
+    {
+        printf("Данные некорректны.\n");
+        return -1;
+    }
+
+    if (k == 0)
+    {
+        fin = fopen(argv[7], "r");
         
         if (!fin)
         {
-            cout<<"File don't exist"<<endl;
-            fclose(fin);
-            return -1;
-        }
-        
-        if (fscanf(fin, "%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
+            printf("Файла не существует.\n");
             fclose(fin);
             return -2;
         }
     }
-    else if (inputType == 2)
-    {
-        cout<<"Enter size: ";
     
-        if (scanf("%d", &n) != 1 || n <= 0)
-        {
-            cout<<"Data isn't correct"<<endl;
-            return -2;
-        }
+    a = new double [n*n];
+    x = new double [n];
+    
+    if (!(a && x))
+    {
+        printf("Недостаточно памяти.\n");
+        
+        if (k == 0)
+            fclose(fin);
+        
+        delete []a;
+        delete []x;
+        
+        return -2;
+    }
+
+    flag = enter_matrix(a, n, k, fin);
+    
+    if (flag < 0)
+    {
+        printf("Матрица некорректна.\n");
+        
+        if (k == 0)
+            fclose(fin);
+        
+        delete []a;
+        delete []x;
+        
+        return -2;
+    }
+    
+    printf("Изначальная матрица:\n");
+    print_matrix(a, n, n, m);
+    
+    t = clock();
+    calculate_values(a, x, &values_count, left, right, eps, n);
+    t = clock() - t;
+        
+    if (values_count != 0)
+    {
+        printf("Собственные значения:\n");
+        
+        if (values_count < m)
+            print_matrix(x, 1, n, values_count);
+        else
+            print_matrix(x, 1, n, m);
     }
     else
     {
-        cout<<"Input type isn't correct"<<endl;
-        return -2;
+        printf("На отрезке нет собственных значений.\n");
     }
     
-    matrix = new double [n*n];
-    vector = new double [n];
+    printf("\nВремя: %f с.\n", t*1.0/CLOCKS_PER_SEC);
     
-    if (!(matrix && vector))
+    if (values_count == n)
     {
-        cout<<"No memory, enter matrix with less dimensions"<<endl;
+        if (k == 0)
+            fseek(fin, 0, SEEK_SET);
         
-        if (inputType == 1)
-            fclose(fin);
+        flag = enter_matrix(a, n, k, fin);
         
-        delete []matrix;
-        delete []vector;
+        residual(a, x, &norm1, &norm2, n);
         
-        return -2;
-    }
-
-    returnFlag = enterMatrix(matrix, n, fin);
-    
-    if (returnFlag == -1)
-    {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []vector;
-        
-        return -2;
+        printf("Невязка в первом инварианте: %10.3e\n", norm1);
+        printf("Невязка во втором инварианте: %10.3e\n", norm2);
     }
     
-    cout<<"Enter size of printing vector: ";
-    
-    if (scanf("%d", &m) != 1 || m <= 0)
-    {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []vector;
-        
-        return -2;
-    }
-    
-    printf("Enter left and right borders:\n") ;
-    
-    if (scanf("%lf", &left) != 1 || scanf("%lf", &right) != 1 || right < left || fabs(right - left) < 1e-100)
-    {
-        printf("Data isn't correct\n");
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []vector;
-        
-        return -2;
-    }
-    
-    cout<<"Enter accuracy: ";
-    
-    if (scanf("%lf", &eps) != 1 || eps <= 0)
-    {
-        cout<<"Data isn't correct"<<endl;
-        
-        if (inputType == 1)
-            fclose(fin);
-        
-        delete []matrix;
-        delete []vector;
-        
-        return -2;
-    }
-    
-    t = clock();
-    calculateValues(matrix, vector, left, right, eps, n, &k);
-    t = clock() - t;
-    
-    cout<<endl<<"Values vector:"<<endl;
-    printVector(vector, n, m, k);
-    
-    if (inputType == 1)
-        fseek(fin, 1, SEEK_SET);
-    
-    returnFlag = enterMatrix(matrix, n, fin);
-    p = residualNorm(matrix, vector, n);
-    
-    cout<<endl<<"The norm of residual: in first inv: "<<p.first<<", in second inv: "<<p.second<<endl;
-    
-    cout<<"Calculating time =  "<< t << " milliseconds"<<endl;
-
-    if (inputType == 1)
+    if (k == 0)
         fclose(fin);
     
-    delete []matrix;
-    delete []vector;
+    delete []a;
+    delete []x;
     
     return 0;
 }
