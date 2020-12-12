@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-void calculate_values(double *a, double *x, int *values_count, double left, double right, double eps, int n);
-void values(double *a, double *x, int *values_count, double left, double right, int n,  double eps);
-int n_(double* a, int n, double lambda);
-void rotate(double* a, int n);
+void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, double *x_, double eps, int n);
+void reflection(double* a, double *x_, int n);
+void QR(double *a, double *cos_phi, double *sin_phi, int k, int n);
+void RQ(double *a, double *cos_phi, double *sin_phi, int k, int n);
+
 
 #endif /* values_hpp */

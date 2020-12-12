@@ -1,7 +1,6 @@
 #include "matrix.hpp"
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
 using namespace std;
 
@@ -71,6 +70,27 @@ void print_matrix(double* a, int l, int n, int m)
         }
         printf("\n");
     }
+}
+
+
+double norm(double *a, int n)
+{
+    int i, j;
+    double sum;
+    double res;
+
+    res = 0.0;
+    for (i = 0; i < n; ++i)
+    {
+        sum = 0.0;
+        for (j = 0; j < n; ++j)
+            sum += fabs(a[i*n+j]);
+
+        if (res < sum)
+            res = sum;
+    }
+
+    return res;
 }
 
 void residual(double* a, double* x, double *norm1, double *norm2, int n)

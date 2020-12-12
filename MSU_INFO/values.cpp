@@ -1,155 +1,165 @@
 #include <math.h>
 #include "values.hpp"
+#include "matrix.hpp"
 
-void calculate_values(double* a, double* x, int *values_count, double left, double right, double eps, int n)
+void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, double *x_, double eps, int n)
+{
+    int i, k;
+    reflection(a, x_, n);
+    
+    double exit_eps = eps * norm(a, n);
+    
+    for (k = n-1; k > 1; --k)
+    {
+        while (fabs(a[k*n+k-1]) > exit_eps)
+        {
+            printf("\n");
+            print_matrix(a, n, n, 5);
+            printf("\n");
+            
+            double shift = a[k*n + k];
+            
+            printf("%lf %lf %lf\n", fabs(a[k*n+k-1]), shift, exit_eps);
+
+            for (i = 0; i <= k; ++i)
+                a[i*n+i] -= shift;
+            
+            QR(a, cos_phi, sin_phi, k, n);
+            RQ(a, cos_phi, sin_phi, k, n);
+
+            for (i = 0; i <= k; ++i)
+                a[i*n+i] += shift;
+            
+            printf("\n");
+            print_matrix(a, n, n, 5);
+            printf("\n");
+        }
+    }
+    
+    if (n > 1)
+    {
+        double tr = a[0*n+0] + a[1*n+1];
+        double det = a[0*n+0] * a[1*n+1] - a[0*n+1] * a[1*n+0];
+        double d = sqrt(tr*tr - 4.0*det);
+
+        a[0*n+0] = 0.5 * (tr+d);
+        a[1*n+1] = 0.5 * (tr-d);
+    }
+    
+    for (i = 0; i < n; ++i)
+        x[i] = a[i*n+i];
+}
+
+void QR(double *a, double *cos_phi, double *sin_phi, int k, int n)
 {
     int i, j;
-    double alp;
-    double max_a, max_b;
-        
-    for (i = 0; i < n; ++i)
-        x[i] = 0; 
-    
-    rotate(a, n);
-    
-    max_a = a[0];
-    max_b = a[1];
-    
-    for (i = 1; i < n; ++i)
-    {
-        if (fabs(a[i*n+i]) > max_a)
-            max_a = fabs(a[i*n+i]);
+    double x_, y_, r;
+    double a_ij, a_i1j;
 
-        if (i<n-1)
-        {
-            if (fabs(a[i*n + i+1]) > max_b)
-                max_b = fabs(a[i*n + i+1]);
-        }
-    }
-
-    alp = 4 * fmax(max_a, max_b);
-    
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < k; ++i)
     {
-        for (j = 0; j < n; ++j)
+        x_ = a[i*n+i];
+        y_ = a[(i+1)*n+i];
+
+        r = sqrt(x_*x_+y_*y_);
+
+        if (r < 1e-16)
         {
-            a[i*n+j] /= alp;
+            if (a[i*n+i] > 0.0)
+                cos_phi[i] = 1.0;
+            else
+                cos_phi[i] = -1.0;
             
-            if (i != j && a[i*n+j] < 1e-16)
-                a[i*n+j] = 0;
+            sin_phi[i] = 0.0;
         }
-    }//97
-    
-    right += eps;
-    left -= eps;
-    
-    if (eps/alp > 1e-16)
-        eps /= alp;
-    
-    right /= alp;
-    left /= alp;
-    
-    values(a, x, values_count, left, right, n, eps);
-    
-    for (i = 0; i < n; ++i)
-        x[i] *= alp;
-}
+        else
+        {
+            cos_phi[i] = x_/r;
+            sin_phi[i] = -y_/r;
+        }
 
-void values(double *a, double *x, int *values_count, double left, double right, int n,  double eps)
-{
-    int c, j;
-    
-    c = n_(a, n, right) - n_(a, n, left);
-        
-    if (right - left > eps && c != 0)
-    {
-        values(a, x, values_count, left, (left+right)/2, n, eps);
-        values(a, x, values_count, (left+right)/2, right, n, eps);
+        for (j = i; j <= k; ++j)
+        {
+            a_ij = a[i*n+j];
+            a_i1j = a[(i+1)*n+j];
+
+            a[i*n+j] = a_ij * cos_phi[i] - a_i1j * sin_phi[i];
+            a[(i+1)*n+j] = a_ij * sin_phi[i] + a_i1j * cos_phi[i];
+        }
     }
-    else if (c != 0)
-    {
-        for (j = 0; j < c; ++j)
-            x[*values_count+j] = (left+right)/2;
-
-        *values_count += c;
-    }//95
 }
 
-int n_(double* a, int n, double lam)
+void RQ(double *a, double *cos_phi, double *sin_phi, int k, int n)
 {
     int i;
-    int res;
-    double elem;
-    
-    elem = a[0] - lam;
-    
-    if (elem < 0)
-        res = 1;
-    else
-        res = 0;
-    
-    for (i = 1; i < n; ++i)
+    int j;
+    double a_ji;
+    double a_ji1;
+
+    for (i = 0; i < k; ++i)
     {
-        if (fabs(elem) < 1e-18)
-            elem = 1e-10;
-        
-        elem = a[i*n+i] - lam - a[i*n + i-1] * a[(i-1)*n+i]/elem;
-        
-        if (elem < 0)
-            ++res;
+        for (j = 0; j < i+2; ++j)
+        {
+            a_ji = a[j*n+i];
+            a_ji1 = a[j*n+i+1];
+
+            a[j*n+i] = a_ji * cos_phi[i] - a_ji1 * sin_phi[i];
+            a[j*n+i+1] = a_ji * sin_phi[i] + a_ji1 * cos_phi[i];
+        }
     }
-    
-    return res;
 }
 
-void rotate(double* a, int n)
+void reflection(double* a, double *x_, int n)
 {
     int i, j, k;
-    double x_, y_, r, a_ik, a_jk, cos_phi, sin_phi;
-    double a_ii, a_ij, a_ji, a_jj;
-    
+
     for (i = 0; i < n-2; ++i)
     {
-       for (j = i+2; j < n; ++j)
-        {
-            x_ = a[(i+1)*n+i];
-            y_ = a[j*n+i];
-            
-            if (fabs(y_) < 1e-16)
-                continue;
-            
-            r = sqrt(x_*x_+y_*y_);
-            
-            if (r < 1e-16)
-                continue;
-            
-            cos_phi = x_/r;
-            sin_phi = -y_/r;
-            
-            for (k = i; k < n; ++k)
-            {
-                a_ik = a[(i+1)*n+k];
-                a_jk = a[j*n+k];
-                
-                a[(i+1)*n+k] = a_ik * cos_phi - a_jk * sin_phi;
-                a[j*n+k] = a_ik * sin_phi + a_jk * cos_phi;
-                
-                if (k != i+1 && k != j)
-                {
-                    a[k*n+i+1] = a[(i+1)*n+k];
-                    a[k*n+j] = a[j*n+k];
-                }
-            }//*Tij
-            
-            a_ii = a[(i+1)*n+i+1];
-            a_ji = a[j*n+i+1];
-            a_ij = a[(i+1)*n+j];
-            a_jj = a[j*n+j];
+        double s = 0.0;
+        for (j = i+2; j < n; ++j)
+            s += a[j*n+i] * a[j*n+i];//(12)
 
-            a[(i+1)*n+i+1] = a_ii * cos_phi - a_ij * sin_phi;
-            a[j*n+i+1] = a_ji * cos_phi - a_jj * sin_phi;
-            a[(i+1)*n+j] = a_ii * sin_phi + a_ij * cos_phi;
-            a[j*n+j] = a_ji * sin_phi + a_jj * cos_phi;//Tij^t
-        }//67
+        double norm_a1 = sqrt(a[(i+1)*n+i]*a[(i+1)*n+i] + s);//(13)
+        
+        if (norm_a1 < 1e-16)
+            continue;
+
+        if (s < 1e-16)
+            continue;
+        
+        x_[i+1] = a[(i+1)*n+i] - norm_a1;
+        
+        for (j = i+2; j < n; ++j)
+            x_[j] = a[j*n+i]; //(14)
+        
+        double norm_x = sqrt(x_[i+1]*x_[i+1] + s);//(15)
+        
+        if (norm_x < 1e-16)
+            continue;
+        
+        for (j = i+1; j < n; ++j)
+            x_[j] /= norm_x; //(16)
+
+        for (k = i; k < n; ++k) //лемма 10-11
+        {
+            double sum = 0.0;
+            for (j = i+1; j < n; ++j)
+                sum += x_[j] * a[j*n+k];
+
+            sum *= 2.0;
+            for (j = i+1; j < n; ++j)
+                a[j*n+k] -= sum * x_[j];
+        }
+        
+        for (k = 0; k < n; ++k) //лемма 10-11
+        {
+            double sum = 0.0;
+            for (j = i+1; j < n; ++j)
+                sum += a[k*n+j] * x_[j];
+
+            sum *= 2.0;
+            for (j = i+1; j < n; ++j)
+                a[k*n+j] -= sum * x_[j];
+        }
     }
 }
