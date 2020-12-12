@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     double *a_inv;
     double *a_inv1;
     double *a_inv2;
+    double *a1, *a2; 
     double *buf;
     double *x1, *x2;
     double *sum1, *sum2;
@@ -80,6 +81,9 @@ int main(int argc, char *argv[])
     a_inv1 = new double [n*n];
     a_inv2 = new double [n*n];
     
+    a1 = new double [n*n];
+    a2 = new double [n*n];
+    
     if (k == 0)
         flag = read_matrix(a, buf, n, filename, threads_count, thread_num);
     else
@@ -99,6 +103,8 @@ int main(int argc, char *argv[])
         delete []buf;
         delete []a_inv1;
         delete []a_inv2;
+        delete []a1;
+        delete []a2;
         
         MPI_Finalize();
         
@@ -113,7 +119,7 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     t = get_time();
     
-    flag = invert(a, a_inv, x1, x2, sum1, sum2, n, threads_count, thread_num);
+    flag = invert(a, a1, a2, a_inv, a_inv1, a_inv2, x1, x2, sum1, sum2, n, threads_count, thread_num);
     
     MPI_Barrier(MPI_COMM_WORLD);
     t = get_time() - t;
@@ -132,6 +138,8 @@ int main(int argc, char *argv[])
         delete []buf;
         delete []a_inv1;
         delete []a_inv2;
+        delete []a1;
+        delete []a2;
         
         MPI_Finalize();
         
@@ -165,6 +173,8 @@ int main(int argc, char *argv[])
     delete []buf;
     delete []a_inv1;
     delete []a_inv2;
+    delete []a1;
+    delete []a2;
     
     MPI_Finalize();
 
