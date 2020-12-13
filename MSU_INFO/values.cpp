@@ -6,8 +6,6 @@ void calculate_values(double* a, double* x, double *x1, double *x2, double *x_, 
 {
     int i, k;
     reflection(a, x_, y_, z_, n);
-    printf("\n");
-    print_matrix(a, n, n, 10);
     
     double exit_eps = eps * norm(a, n);
     
@@ -51,65 +49,50 @@ void calculate_values(double* a, double* x, double *x1, double *x2, double *x_, 
 
 void QR(double *a, double *x1, double *x2, int k, int n)
 {
-    int i;
-    int j;
-    double tmp1;
-    double tmp2;
+    int i, j;
 
-    for (i = 0; i < k - 1; ++i)
+    for (i = 0; i < k; ++i)
     {
-        tmp1 = a[(i + 1) * n + i] * a[(i + 1) * n + i];
-
-        if (tmp1 < 1e-100)
+        double s = a[(i+1)*n+i] * a[(i+1)*n+i];
+        
+        if (s < 1e-16)
         {
-            tmp2 = fabs(a[i * n + i]);
-            x1[i] = (a[i * n + i] > 0.0 ? 1.0 : -1.0);
+            x1[i] = (a[i*n+i] > 0.0 ? 1.0 : -1.0);
             x2[i] = 0.0;
         }
         else
         {
-            tmp2 = sqrt(a[i * n + i] * a[i * n + i] + tmp1);
+            double norm_a1 = sqrt(a[i*n+i] * a[i*n+i] + s);
 
-            a[i * n + i] -= tmp2;
+            double x_i = (a[i*n+i] - norm_a1);
+            double norm_x = sqrt(x_i * x_i + s);
 
-            tmp1 = sqrt(a[i * n + i] * a[i * n + i] + tmp1);
-            x1[i] = a[i * n + i] / tmp1;
-            x2[i] = a[(i + 1) * n + i] / tmp1;
+            x1[i] = x_i / norm_x;
+            x2[i] = a[(i+1)*n+i] / norm_x;
         }
 
-        for (j = i + 1; j < k; ++j)
+        for (j = i; j <= k; ++j)
         {
-            tmp1 = x1[i] * a[i * n + j];
-            tmp1 += x2[i] * a[(i + 1) * n + j];
+            double sum = 2.0 * (x1[i]*a[i*n+j] + x2[i]*a[(i+1)*n+j]);
 
-            tmp1 *= 2.0;
-
-            a[i * n + j] -= tmp1 * x1[i];
-            a[(i + 1) * n + j] -= tmp1 * x2[i];
+            a[i*n+j] -= sum * x1[i];
+            a[(i+1)*n+j] -= sum * x2[i];
         }
-
-        a[i * n + i] = tmp2;
-        a[(i + 1) * n + i] = 0.0;
     }
 }
 
 void RQ(double *a, double *x1, double *x2, int k, int n)
 {
-    int i;
-    int j;
-    double tmp;
-
-    for (i = 0; i < k - 1; ++i)
+    int i, j;
+    
+    for (i = 0; i < k; ++i)
     {
-        for (j = 0; j < i + 2; ++j)
+        for (j = 0; j < i+2; ++j)
         {
-            tmp = a[j * n + i] * x1[i];
-            tmp += a[j * n + i + 1] * x2[i];
-
-            tmp *= 2.0;
-
-            a[j * n + i] -= tmp * x1[i];
-            a[j * n + i + 1] -= tmp * x2[i];
+            double sum = 2 * (a[j*n+i] * x1[i] + a[j*n+i+1] * x2[i]);
+            
+            a[j*n+i] -= sum * x1[i];
+            a[j*n+i+1] -= sum * x2[i];
         }
     }
 }
