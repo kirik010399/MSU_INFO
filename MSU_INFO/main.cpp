@@ -18,7 +18,7 @@ int main(int argc, char **argv)
         
     if (argc < 5)
     {
-        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps left right k *filename (если k != 0)");
+        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps k *filename (если k != 0)");
         return -1;
     }
     
