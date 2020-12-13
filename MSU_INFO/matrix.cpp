@@ -120,7 +120,7 @@ void print_matrix(double *a, int n, int m, int threads_count, int thread_num, do
             if (thread_num == dst)
             {
                 for (j = 0; j < m; j++)
-                    printf("%.3lf ", a[loc_i*n+j]);
+                    printf("%10.3e ", a[loc_i*n+j]);
                 
                 printf("\n");
             }
@@ -130,7 +130,7 @@ void print_matrix(double *a, int n, int m, int threads_count, int thread_num, do
                 MPI_Recv(buf, m, MPI_DOUBLE, dst, 0, MPI_COMM_WORLD, &st);
                 
                 for (j = 0; j < m; j++)
-                    printf("%.3lf ", buf[j]);
+                    printf("%10.3e ", buf[j]);
                 printf("\n");
             }
         }
