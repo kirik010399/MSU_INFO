@@ -2,7 +2,7 @@
 #include "values.hpp"
 #include "matrix.hpp"
 
-void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, double *x_, double eps, int n)
+void calculate_values(double* a, double* x, double *x_, double eps, int n)
 {
     int i, k;
     reflection(a, x_, n);
@@ -20,8 +20,22 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
             for (i = 0; i <= k; ++i)
                 a[i*n+i] -= shift;
             
-            QR(a, cos_phi, sin_phi, k, n);
-            RQ(a, cos_phi, sin_phi, k, n);
+            int flag = LR(a, k, n);
+            
+            while (flag == -1)
+            {
+                for (i = 0; i <= k; ++i)
+                    a[i*n+i] += shift;
+                
+                shift -= 1e-5;
+                
+                for (i = 0; i <= k; ++i)
+                    a[i*n+i] -= shift;
+                
+                flag = LR(a, k, n);
+            }
+            
+            RL(a, k, n);
 
             for (i = 0; i <= k; ++i)
                 a[i*n+i] += shift;
@@ -47,62 +61,35 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
         x[i] = a[i*n+i];
 }
 
-void QR(double *a, double *cos_phi, double *sin_phi, int k, int n)
+int LR(double *a, int k, int n)
 {
     int i, j;
-    double x_, y_, r;
-    double a_ij, a_i1j;
-
-    for (i = 0; i < k; ++i)
+    
+    for (i = 1; i <= k; ++i)
     {
-        x_ = a[i*n+i];
-        y_ = a[(i+1)*n+i];
-
-        r = sqrt(x_*x_+y_*y_);
-
-        if (r < 1e-16)
-        {
-            if (a[i*n+i] > 0.0)
-                cos_phi[i] = 1.0;
-            else
-                cos_phi[i] = -1.0;
-            
-            sin_phi[i] = 0.0;
-        }
-        else
-        {
-            cos_phi[i] = x_/r;
-            sin_phi[i] = -y_/r;
-        }
+        if(fabs(a[(i-1)*n+i-1]) < 1e-16)
+            return -1;
+        
+        a[i*n+i-1] = a[i*n+i-1] / a[(i-1)*n+i-1];
 
         for (j = i; j <= k; ++j)
-        {
-            a_ij = a[i*n+j];
-            a_i1j = a[(i+1)*n+j];
-
-            a[i*n+j] = a_ij * cos_phi[i] - a_i1j * sin_phi[i];
-            a[(i+1)*n+j] = a_ij * sin_phi[i] + a_i1j * cos_phi[i];
-        }
+            a[i*n+j] -= a[i*n+i-1] * a[(i-1)*n+j];//(4)
     }
+    
+    return 0; 
 }
 
-void RQ(double *a, double *cos_phi, double *sin_phi, int k, int n)
+void RL(double *a, int k, int n)
 {
-    int i;
-    int j;
-    double a_ji;
-    double a_ji1;
+    int i, j;
 
-    for (i = 0; i < k; ++i)
+    for (i = 0; i <= k; ++i)
     {
-        for (j = 0; j < i+2; ++j)
-        {
-            a_ji = a[j*n+i];
-            a_ji1 = a[j*n+i+1];
+        if (i != 0)
+            a[i*n+i-1] *= a[i*n+i];
 
-            a[j*n+i] = a_ji * cos_phi[i] - a_ji1 * sin_phi[i];
-            a[j*n+i+1] = a_ji * sin_phi[i] + a_ji1 * cos_phi[i];
-        }
+        for (j = i; j <= k; ++j)
+            a[i*n+j] += a[i*n+j+1] * a[(j+1)*n+j];//(8)
     }
 }
 
