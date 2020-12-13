@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     int n, m, k;
     double *a;
     double *x;
-    double *x_, *cos_phi, *sin_phi;
+    double *x_, *y_, *z_, *x1, *x2;
     FILE* fin = NULL;
     clock_t t;
     int flag;
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
         
     if (argc < 5)
     {
-        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps left right k *filename (если k != 0)");
+        printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps k *filename (если k != 0)");
         return -1;
     }
     
@@ -55,9 +55,11 @@ int main(int argc, char **argv)
     
     a = new double [n*n];
     x = new double [n];
-    cos_phi = new double[n];
-    sin_phi = new double[n];
+    x1 = new double[n];
+    x2 = new double[n];
     x_ = new double[n];
+    y_ = new double[n];
+    z_ = new double[n];
     
     if (!(a && x))
     {
@@ -68,9 +70,11 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []x;
-        delete []cos_phi;
-        delete []sin_phi;
+        delete []x1;
+        delete []x2;
         delete []x_;
+        delete []y_;
+        delete []z_;
         
         return -2;
     }
@@ -86,9 +90,11 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []x;
-        delete []cos_phi;
-        delete []sin_phi;
+        delete []x1;
+        delete []x2;
         delete []x_;
+        delete []y_;
+        delete []z_;
         
         return -2;
     }
@@ -97,7 +103,7 @@ int main(int argc, char **argv)
     print_matrix(a, n, n, m);
     
     t = clock();
-    calculate_values(a, x, cos_phi, sin_phi, x_, eps, n);
+    calculate_values(a, x, x1, x2, x_, y_, z_, eps, n);
     t = clock() - t;
         
     printf("Собственные значения:\n");
@@ -120,9 +126,11 @@ int main(int argc, char **argv)
     
     delete []a;
     delete []x;
-    delete []cos_phi;
-    delete []sin_phi;
+    delete []x1;
+    delete []x2;
     delete []x_;
+    delete []y_;
+    delete []z_;
     
     return 0;
 }
