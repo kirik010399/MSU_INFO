@@ -3,56 +3,17 @@
 
 void calculate_values(double* a, double* x, int *values_count, double left, double right, double eps, int n)
 {
-    int i, j;
-    double alp;
-    double max_a, max_b;
+    int i;
         
     for (i = 0; i < n; ++i)
         x[i] = 0; 
     
     rotate(a, n);
     
-    max_a = a[0];
-    max_b = a[1];
-    
-    for (i = 1; i < n; ++i)
-    {
-        if (fabs(a[i*n+i]) > max_a)
-            max_a = fabs(a[i*n+i]);
-
-        if (i<n-1)
-        {
-            if (fabs(a[i*n + i+1]) > max_b)
-                max_b = fabs(a[i*n + i+1]);
-        }
-    }
-
-    alp = 4 * fmax(max_a, max_b);
-    
-    for (i = 0; i < n; ++i)
-    {
-        for (j = 0; j < n; ++j)
-        {
-            a[i*n+j] /= alp;
-            
-            if (i != j && a[i*n+j] < 1e-16)
-                a[i*n+j] = 0;
-        }
-    }//97
-    
     right += eps;
     left -= eps;
     
-    if (eps/alp > 1e-16)
-        eps /= alp;
-    
-    right /= alp;
-    left /= alp;
-    
     values(a, x, values_count, left, right, n, eps);
-    
-    for (i = 0; i < n; ++i)
-        x[i] *= alp;
 }
 
 void values(double *a, double *x, int *values_count, double left, double right, int n,  double eps)
@@ -78,21 +39,16 @@ void values(double *a, double *x, int *values_count, double left, double right, 
 int n_(double* a, int n, double lam)
 {
     int i;
-    int res;
+    int res = 0;
     double elem;
     
     elem = a[0] - lam;
     
     if (elem < 0)
-        res = 1;
-    else
-        res = 0;
+        ++res;
     
     for (i = 1; i < n; ++i)
     {
-        if (fabs(elem) < 1e-18)
-            elem = 1e-10;
-        
         elem = a[i*n+i] - lam - a[i*n + i-1] * a[(i-1)*n+i]/elem;
         
         if (elem < 0)
