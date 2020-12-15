@@ -9,6 +9,7 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
     int i, j, k, max_str_index, max_col_index;
     double value, max_elem;
     int begin_row, last_row;
+    double t;
     
     double eps = 1e-30;
     
@@ -72,17 +73,29 @@ void solve(double *a, double *b, double *x, int *ind, max_elem *max_, int n, int
                 if (max_str_index != i) // Swap strings (i <-> max)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[max_str_index*n+j], a[i*n+j]);
+                    {
+                        t = a[max_str_index*n+j];
+                        a[max_str_index*n+j] = a[i*n+j];
+                        a[i*n+j] = t;
+                    }
                     
-                    swap(b[max_str_index], b[i]);
+                    t = b[max_str_index];
+                    b[max_str_index] = b[i];
+                    b[i] = t;
                 }
                 
-                swap(ind[i], ind[max_col_index]);//swap variables
-                
+                t = ind[max_col_index];
+                ind[max_col_index] = ind[i];
+                ind[i] = t;
+                                
                 if (max_col_index != i) // Swap columns (i <-> max)
                 {
                     for (j = 0; j < n; ++j)
-                        swap(a[j*n+max_col_index], a[j*n+i]);
+                    {
+                        t = a[j*n+max_col_index];
+                        a[j*n+max_col_index] = a[j*n+i];
+                        a[j*n+i] = t;
+                    }
                 }
                 
                 value = 1.0/a[i*n+i];
