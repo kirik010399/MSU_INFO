@@ -8,7 +8,7 @@ void calculate_values(double* a, double* x, double *x_, double eps, int n)
     reflection(a, x_, n);
     
     double norm_ = norm(a, n);
-    double exit_eps = eps * norm_;
+    double exit_eps = eps;
     
     for (i = 0; i < n; ++i)
     {
@@ -20,10 +20,11 @@ void calculate_values(double* a, double* x, double *x_, double eps, int n)
     
     for (k = n-1; k > 1; --k)
     {
+//        printf("K: %d\n", k); 
         while (fabs(a[k*n+k-1]) > exit_eps)
         {
-            double prev_value = fabs(a[k*n+k-1]);
-            
+//            printf("%.16lf\n", a[k*n+k-1]);
+
             double shift = a[k*n + k];
             
             for (i = 0; i <= k; ++i)
@@ -48,11 +49,6 @@ void calculate_values(double* a, double* x, double *x_, double eps, int n)
 
             for (i = 0; i <= k; ++i)
                 a[i*n+i] += shift;
-            
-            double cur_value = fabs(a[k*n+k-1]);
-
-            if (fabs(cur_value - prev_value) < 1e-12)
-                break;
         }
     }
     
@@ -97,7 +93,7 @@ void RL(double *a, int k, int n)
         if (i != 0)
             a[i*n+i-1] *= a[i*n+i];
 
-        for (j = i; j <= k; ++j)
+        for (j = i; j <= k-1; ++j)
             a[i*n+j] += a[i*n+j+1] * a[(j+1)*n+j];//(8)
     }
 }

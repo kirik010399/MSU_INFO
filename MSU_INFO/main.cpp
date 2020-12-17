@@ -16,6 +16,9 @@ int main(int argc, char **argv)
     double eps;
     double norm1, norm2;
         
+//    int argc = 5;
+//    char *argv[5] = {"a.out", "100", "5", "1e-7", "4"};
+    
     if (argc < 5)
     {
         printf("Некорректный запуск программы. Правильный формат:\n./a.out n m eps left right k *filename (если k != 0)");
