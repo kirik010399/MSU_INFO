@@ -4,11 +4,20 @@
 
 void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, double *x_, double eps, int n)
 {
-    int i, k;
+    int i, j, k;
     reflection(a, x_, n);
     
-    double exit_eps = eps * norm(a, n);
+    double norm_ = norm(a, n);
+    double exit_eps = eps * norm_;
     
+    for (i = 0; i < n; ++i)
+    {
+        for (j = 0; j < n; ++j)
+        {
+            a[i*n+j] /= norm_;
+        }
+    }
+
     for (k = n-1; k > 1; --k)
     {
         while (fabs(a[k*n+k-1]) > exit_eps)
@@ -16,16 +25,39 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
             double prev_value = fabs(a[k*n+k-1]);
             
             double shift = a[k*n + k];
-            
+
             for (i = 0; i <= k; ++i)
                 a[i*n+i] -= shift;
+            
+            int null_flag = 0;
+            
+            for (i = 0; i <= k; ++i)
+                if (fabs(a[i*n+i]) < 1e-16)
+                    null_flag = 1;
+            
+            while(null_flag == 1)
+            {
+                for (i = 0; i <= k; ++i)
+                    a[i*n+i] += shift;
+                
+                shift -= 1e-5;
+                
+                for (i = 0; i <= k; ++i)
+                    a[i*n+i] -= shift;
+                
+                null_flag = 0;
+                
+                for (i = 0; i <= k; ++i)
+                    if (fabs(a[i*n+i]) < 1e-16)
+                        null_flag = 1;
+            }
             
             QR(a, cos_phi, sin_phi, k, n);
             RQ(a, cos_phi, sin_phi, k, n);
 
             for (i = 0; i <= k; ++i)
                 a[i*n+i] += shift;
-            
+
             double cur_value = fabs(a[k*n+k-1]);
 
             if (fabs(cur_value - prev_value) < 1e-10)
@@ -44,7 +76,7 @@ void calculate_values(double* a, double* x, double *cos_phi, double *sin_phi, do
     }
     
     for (i = 0; i < n; ++i)
-        x[i] = a[i*n+i];
+        x[i] = a[i*n+i] * norm_;
 }
 
 void QR(double *a, double *cos_phi, double *sin_phi, int k, int n)
