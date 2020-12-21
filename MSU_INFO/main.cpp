@@ -9,7 +9,6 @@ int main(int argc, char **argv)
     int n, m, k;
     double *a;
     double *x;
-    double *x_;
     FILE* fin = NULL;
     clock_t t;
     int flag;
@@ -58,7 +57,6 @@ int main(int argc, char **argv)
     
     a = new double [n*n];
     x = new double [n];
-    x_ = new double[n];
     
     if (!(a && x))
     {
@@ -69,7 +67,6 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []x;
-        delete []x_;
         
         return -2;
     }
@@ -85,7 +82,6 @@ int main(int argc, char **argv)
         
         delete []a;
         delete []x;
-        delete []x_;
         
         return -2;
     }
@@ -94,7 +90,7 @@ int main(int argc, char **argv)
     print_matrix(a, n, n, m);
     
     t = clock();
-    calculate_values(a, x, x_, eps, n);
+    calculate_values(a, x, eps, n);
     t = clock() - t;
         
     printf("Собственные значения:\n");
@@ -117,7 +113,6 @@ int main(int argc, char **argv)
     
     delete []a;
     delete []x;
-    delete []x_;
     
     return 0;
 }

@@ -2,10 +2,12 @@
 #include "values.hpp"
 #include "matrix.hpp"
 
-void calculate_values(double* a, double* x, double *x_, double eps, int n)
+void calculate_values(double* a, double* x, double eps, int n)
 {
     int i, j, k;
-    reflection(a, x_, n);
+    
+    rotate(a, n);
+//    print_matrix(a, n, n, 10);
     
     double norm_ = norm(a, n);
     double exit_eps = eps;
@@ -20,7 +22,7 @@ void calculate_values(double* a, double* x, double *x_, double eps, int n)
     
     for (k = n-1; k > 1; --k)
     {
-//        printf("K: %d\n", k); 
+//        printf("K: %d\n", k);
         while (fabs(a[k*n+k-1]) > exit_eps)
         {
 //            printf("%.16lf\n", a[k*n+k-1]);
@@ -98,57 +100,47 @@ void RL(double *a, int k, int n)
     }
 }
 
-void reflection(double* a, double *x_, int n)
+void rotate(double* a, int n)
 {
     int i, j, k;
-
+    double x_, y_, r, a_ik, a_jk, cos_phi, sin_phi;
+    double a_ki, a_kj;
+    
     for (i = 0; i < n-2; ++i)
     {
-        double s = 0.0;
-        for (j = i+2; j < n; ++j)
-            s += a[j*n+i] * a[j*n+i];//(12)
-
-        double norm_a1 = sqrt(a[(i+1)*n+i]*a[(i+1)*n+i] + s);//(13)
-        
-        if (norm_a1 < 1e-16)
-            continue;
-
-        if (s < 1e-16)
-            continue;
-        
-        x_[i+1] = a[(i+1)*n+i] - norm_a1;
-        
-        for (j = i+2; j < n; ++j)
-            x_[j] = a[j*n+i]; //(14)
-        
-        double norm_x = sqrt(x_[i+1]*x_[i+1] + s);//(15)
-        
-        if (norm_x < 1e-16)
-            continue;
-        
-        for (j = i+1; j < n; ++j)
-            x_[j] /= norm_x; //(16)
-
-        for (k = i; k < n; ++k) //лемма 10-11
+       for (j = i+2; j < n; ++j)
         {
-            double sum = 0.0;
-            for (j = i+1; j < n; ++j)
-                sum += x_[j] * a[j*n+k];
-
-            sum *= 2.0;
-            for (j = i+1; j < n; ++j)
-                a[j*n+k] -= sum * x_[j];
-        }
-        
-        for (k = 0; k < n; ++k) //лемма 10-11
-        {
-            double sum = 0.0;
-            for (j = i+1; j < n; ++j)
-                sum += a[k*n+j] * x_[j];
-
-            sum *= 2.0;
-            for (j = i+1; j < n; ++j)
-                a[k*n+j] -= sum * x_[j];
+            x_ = a[(i+1)*n+i];
+            y_ = a[j*n+i];
+            
+            if (fabs(y_) < 1e-16)
+                continue;
+            
+            r = sqrt(x_*x_+y_*y_);
+            
+            if (r < 1e-16)
+                continue;
+            
+            cos_phi = x_/r;
+            sin_phi = -y_/r;
+            
+            for (k = i; k < n; ++k)
+            {
+                a_ik = a[(i+1)*n+k];
+                a_jk = a[j*n+k];
+                
+                a[(i+1)*n+k] = a_ik * cos_phi - a_jk * sin_phi;
+                a[j*n+k] = a_ik * sin_phi + a_jk * cos_phi;
+            }//*Tij
+            
+            for (k = 0; k < n; ++k)
+            {
+                a_ki = a[k*n+i+1];
+                a_kj = a[k*n+j];
+                
+                a[k*n+i+1] = a_ki * cos_phi - a_kj * sin_phi;
+                a[k*n+j] = a_ki * sin_phi + a_kj * cos_phi;
+            }//*Tij^t
         }
     }
 }
