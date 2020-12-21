@@ -94,8 +94,21 @@ int main(int argc, char **argv)
     print_matrix(a, n, n, m);
     
     t = clock();
-    calculate_values(a, x, eps, n);
+    flag = calculate_values(a, x, eps, n);
     t = clock() - t;
+    
+    if (flag < 0)
+    {
+        printf("Некорректная матрица\n");
+
+        if (k == 0)
+            fclose(fin);
+        
+        delete []a;
+        delete []x;
+        
+        return -1;
+    }
         
     printf("Собственные значения:\n");
     print_matrix(x, 1, n, m);

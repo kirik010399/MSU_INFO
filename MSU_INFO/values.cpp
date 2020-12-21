@@ -2,7 +2,7 @@
 #include "values.hpp"
 #include "matrix.hpp"
 
-void calculate_values(double* a, double* x, double eps, int n)
+int calculate_values(double* a, double* x, double eps, int n)
 {
     int i, j, k;
     
@@ -11,6 +11,9 @@ void calculate_values(double* a, double* x, double eps, int n)
     
     double norm_ = norm(a, n);
     double exit_eps = eps;
+    
+    if (norm_ < 1e-16)
+        return -1;
     
     for (i = 0; i < n; ++i)
     {
@@ -66,6 +69,8 @@ void calculate_values(double* a, double* x, double eps, int n)
     
     for (i = 0; i < n; ++i)
         x[i] = a[i*n+i] * norm_;
+    
+    return 0;
 }
 
 int LR(double *a, int k, int n)
