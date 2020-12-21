@@ -4,6 +4,8 @@
 #include "matrix.hpp"
 #include "values.hpp"
 
+using namespace std;
+
 int main(int argc, char **argv)
 {
     int n, m, k;
@@ -58,19 +60,21 @@ int main(int argc, char **argv)
     a = new double [n*n];
     x = new double [n];
     
-    if (!(a && x))
+    try
+    {
+        a = new double [n*n];
+        x = new double [n];
+    }
+    catch (bad_alloc&)
     {
         printf("Недостаточно памяти.\n");
-        
+
         if (k == 0)
             fclose(fin);
         
-        delete []a;
-        delete []x;
-        
         return -2;
     }
-
+    
     flag = enter_matrix(a, n, k, fin);
     
     if (flag < 0)
