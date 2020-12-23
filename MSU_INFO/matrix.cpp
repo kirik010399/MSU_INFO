@@ -200,3 +200,31 @@ double error_norm(double* a, double* a_inv, double *a_inv1, double *a_inv2, int 
     
     return global_max; 
 }
+
+double matrix_norm(double* a, int n, int threads_count, int thread_num)
+{
+    int i, j, k;
+    double temp, sum = 0.0, max = 0.0;
+        
+    for (i = 0; i < n; ++i)
+    {
+        int owner = i % threads_count;
+        int loc_i = i / threads_count;
+                
+        if (thread_num == owner)
+        {
+            sum = 0.0;
+
+            sum += fabs(a[loc_i*n+j]);
+            
+            if (sum > max)
+                max = sum;
+        }
+    }
+    
+    double global_max;
+    
+    MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    
+    return global_max;
+}

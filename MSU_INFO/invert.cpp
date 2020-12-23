@@ -9,12 +9,18 @@ int invert(double *a, double *a1, double *a2, double *a_inv, double *a_inv1, dou
     int first;
     double tmp;
     double s1, s2;
-    double eps = 1e-20;
-
+    double eps = 1e-14;
+        
     if (thread_num + 1 > n % threads_count)
         rows = n/threads_count;
     else
         rows = n/threads_count + 1;
+    
+    double norm = matrix_norm(a, n, threads_count, thread_num);
+
+    for (i = 0; i < rows; ++i)
+        for (j = 0; j < n; ++j)
+            a[i*n+j] /= norm;
     
     for (i = 0; i < rows; i++)
         for (j = 0; j < n; j++)
@@ -47,6 +53,9 @@ int invert(double *a, double *a1, double *a2, double *a_inv, double *a_inv1, dou
         
         MPI_Bcast(&norm_a1, 1, MPI_DOUBLE, owner, MPI_COMM_WORLD);
     
+//        if (thread_num == 0)
+//            printf("norm a_1: %.16lf\n", norm_a1);
+        
         if (norm_a1 < eps)
             return -1;
         
@@ -161,6 +170,10 @@ int invert(double *a, double *a1, double *a2, double *a_inv, double *a_inv1, dou
                 a_inv[loc_i*n+j] = a_inv2[i*n+j];
         }
     }
+    
+    for (i = 0; i < rows; ++i)
+        for (j = 0; j < n; ++j)
+            a_inv[i*n+j] /= norm;
     
     return 0; 
 }
