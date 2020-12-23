@@ -9,7 +9,21 @@ double f(int k, int n, int i, int j)
     switch (k)
     {
         case 1:
-            return n-fmax(i, j)+1;
+            if(i == j)
+            {
+                if (i < n/3-1)
+                    return 1;
+                else if (i != n/3-1)
+                    return 2;
+            }
+            if (i == n/3-1 && j < n/3)
+                return j+1;
+            if (j == n/3-1 && i < n/3)
+                return i+1;
+            if (i >= n/3 && j >= n/3 && fabs(i-j) == 1)
+                return -1;
+            
+            return 0;
             
         case 2:
             if (i == j)
@@ -22,9 +36,9 @@ double f(int k, int n, int i, int j)
             if (i == j && i < n-1)
                 return 1;
             if (j == n-1)
-                return i;
+                return i+1;
             if (i == n-1)
-                return j;
+                return j+1;
             return 0;
             
         case 4:
