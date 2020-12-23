@@ -93,6 +93,17 @@ double norm(double *a, int n)
     return res;
 }
 
+double vector_norm(double* x, int n)
+{
+    int i;
+    double res = 0;
+    
+    for (i = 0; i < n; ++i)
+        res += x[i] * x[i];
+    
+    return sqrt(res);
+}
+
 void residual(double* a, double* x, double *norm1, double *norm2, int n)
 {
     int i, j;
