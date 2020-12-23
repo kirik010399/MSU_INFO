@@ -61,6 +61,10 @@ int calculate_values(double* a, double* x, double eps, int n)
     {
         double tr = a[0*n+0] + a[1*n+1];
         double det = a[0*n+0] * a[1*n+1] - a[0*n+1] * a[1*n+0];
+        
+        if (tr*tr - 4.0*det < 0)
+            return -1;
+        
         double d = sqrt(tr*tr - 4.0*det);
 
         a[0*n+0] = 0.5 * (tr+d);
@@ -81,7 +85,10 @@ int LR(double *a, int k, int n)
     {
         if(fabs(a[(i-1)*n+i-1]) < 1e-16)
             return -1;
-        
+    }
+    
+    for (i = 1; i <= k; ++i)
+    {
         a[i*n+i-1] = a[i*n+i-1] / a[(i-1)*n+i-1];
 
         for (j = i; j <= k; ++j)
