@@ -9,8 +9,16 @@ using namespace std;
 
 void print_matrix(double* matrix, int n, FILE *fout);
 void print_vector(double* result, int n, FILE *fout);
-void solve_system(double* matrix, double* vector, double* result, int n, int thread_num, int threads_count, int *return_flag);
+void solve_system(double* matrix, double* vector, double* result, int n,
+                  int thread_num, int threads_count, int *return_flag);
 void synchronize(int threads_count);
+
+long double get_time()
+{
+    struct timeval t;
+    gettimeofday(&t, 0);
+    return t.tv_sec + t.tv_usec/1000000.0;
+}
 
 double f(int k, int n, int i, int j)
 {
@@ -46,7 +54,8 @@ void *solve(void *Arg)
 {
     Args *arg = (Args*)Arg;
 
-    solve_system(arg->matrix, arg->vector, arg->result, arg->n, arg->thread_num, arg->threads_count, arg->return_flag);
+    solve_system(arg->matrix, arg->vector, arg->result, arg->n, arg->thread_num,
+                 arg->threads_count, arg->return_flag);
     
     return NULL;
 }
@@ -55,6 +64,7 @@ int main()
 {
     int n, k;
     int i, j;
+    long double t;
     double *matrix;
     double *vector;
     double *result;
@@ -108,7 +118,7 @@ int main()
         }
     }
     
-    print_matrix(matrix, n, stdout);
+    // print_matrix(matrix, n, stdout);
     
     for (i = 0; i < threads_count; ++i)
     {
@@ -120,6 +130,8 @@ int main()
         args[i].threads_count = threads_count;
         args[i].return_flag = &return_flag;
     }
+    
+    t = get_time();
     
     for (i = 0; i < threads_count; ++i)
     {
@@ -157,6 +169,8 @@ int main()
         }
     }
     
+    t = get_time() - t;
+    
     if(!return_flag)
     {
         printf("Матрица вырождена.\n");
@@ -171,6 +185,8 @@ int main()
         
         return -1;
     }
+    
+    printf("Время: %Lf с.\n", t);
     
     print_matrix(matrix, n, fout);
     fprintf(fout, "\n");
@@ -187,7 +203,8 @@ int main()
     return 0;
 }
 
-void solve_system(double* matrix, double* vector, double* result, int n, int thread_num, int threads_count, int *return_flag)
+void solve_system(double* matrix, double* vector, double* result, int n,
+                  int thread_num, int threads_count, int *return_flag)
 {
     int i, j, k, max_index;
     int begin_row, last_row;
@@ -272,9 +289,9 @@ void solve_system(double* matrix, double* vector, double* result, int n, int thr
 
 void print_matrix(double* matrix, int n, FILE *fout)
 {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-        for (int j = 0; j < 10; ++j)
+        for (int j = 0; j < 5; ++j)
         {
             fprintf(fout, "%.6lf ", matrix[i*n+j]);
         }
@@ -284,7 +301,7 @@ void print_matrix(double* matrix, int n, FILE *fout)
 
 void print_vector(double* result, int n, FILE *fout)
 {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         fprintf(fout, "%.6lf ", result[i]);
     }
