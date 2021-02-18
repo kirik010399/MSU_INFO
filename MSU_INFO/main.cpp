@@ -12,6 +12,9 @@ void print_vector(double* result, int n, FILE *fout);
 void solve_system(double* matrix, double* vector, double* result, int n,
                   int thread_num, int threads_count, int *return_flag);
 void synchronize(int threads_count);
+double norm(double* matrix, double* vector, double* result, int n);
+double error_norm(double *result, int n);
+
 
 long double get_time()
 {
@@ -191,6 +194,8 @@ int main()
     print_matrix(matrix, n, fout);
     fprintf(fout, "\n");
     print_vector(result, n, fout);
+    fprintf(fout, "\n");
+    fprintf(fout, "%lf %lf\n", norm(matrix, vector, result, n), error_norm(result, n));
     
     fclose(fin);
     fclose(fout);
@@ -307,6 +312,49 @@ void print_vector(double* result, int n, FILE *fout)
     }
     fprintf(fout, "\n");
 }
+
+double norm(double* matrix, double* vector, double* result, int n)
+{
+    int i, j;
+    double norm1 = 0.0, norm2 = 0.0;
+    double tmp;
+    
+    for (i = 0; i < n; ++i)
+    {
+        tmp = 0.0;
+        
+        for (j = 0; j < n; ++j)
+            tmp += matrix[i*n+j] * result[j];
+        
+        tmp -= vector[i];
+        
+        norm1 += tmp*tmp;
+    }
+    
+    norm2 = 0.0;
+    
+    for (i = 0; i < n; ++i)
+        norm2 += vector[i]*vector[i];
+    
+    return sqrt(norm1)/sqrt(norm2);
+}
+
+double error_norm(double *result, int n)
+{
+    double error = 0;
+    int i;
+    
+    for (i = 0; i < n; ++i)
+    {
+        if (i % 2 == 0)
+            error += (result[i]-1)*(result[i]-1);
+        else
+            error += result[i]*result[i];
+    }
+    
+    return sqrt(error);
+}
+
 
 void synchronize(int threads_count)
 {
