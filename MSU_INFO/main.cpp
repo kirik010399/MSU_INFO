@@ -8,13 +8,10 @@
 using namespace std;
 
 void print_matrix(double* matrix, int n, FILE *fout);
-void print_vector(double* result, int n, FILE *fout);
-void solve_system(double* matrix, double* vector, double* result, int n,
+void inverse(double* matrix, double* inverse_matrix, int n,
                   int thread_num, int threads_count, int *return_flag);
 void synchronize(int threads_count);
-double norm(double* matrix, double* vector, double* result, int n);
-double error_norm(double *result, int n);
-
+double norm(double* matrix, double* inverse_matrix, int n);
 
 long double get_time()
 {
@@ -45,19 +42,18 @@ double f(int k, int n, int i, int j)
 typedef struct
 {
     double *matrix;
-    double *vector;
-    double *result;
+    double *inverse_matrix;
     int n;
     int thread_num;
     int threads_count;
     int *return_flag;
 } Args;
 
-void *solve(void *Arg)
+void *Inverse(void *Arg)
 {
     Args *arg = (Args*)Arg;
 
-    solve_system(arg->matrix, arg->vector, arg->result, arg->n, arg->thread_num,
+    inverse(arg->matrix, arg->inverse_matrix, arg->n, arg->thread_num,
                  arg->threads_count, arg->return_flag);
     
     return NULL;
@@ -69,8 +65,7 @@ int main()
     int i, j;
     long double t;
     double *matrix;
-    double *vector;
-    double *result;
+    double *inverse_matrix;
     FILE *fin, *fout;
     int return_flag = 1;
     
@@ -103,21 +98,20 @@ int main()
     }
   
     matrix = new double [n*n];
-    vector = new double [n];
-    result = new double [n];
+    inverse_matrix = new double [n*n];
     args = new Args [threads_count];
     threads = new pthread_t [threads_count];
 
     for (i = 0; i < n; ++i)
     {
-        vector[i] = 0;
-        
         for (j = 0; j < n; ++j)
         {
             matrix[i*n+j] = f(k, n, i, j);
             
-            if (j % 2 == 0)
-                vector[i] += matrix[i*n+j];
+            if (i == j)
+                inverse_matrix[i*n+j] = 1;
+            else
+                inverse_matrix[i*n+j] = 0;
         }
     }
     
@@ -126,8 +120,7 @@ int main()
     for (i = 0; i < threads_count; ++i)
     {
         args[i].matrix = matrix;
-        args[i].vector = vector;
-        args[i].result = result;
+        args[i].inverse_matrix = inverse_matrix;
         args[i].n = n;
         args[i].thread_num = i;
         args[i].threads_count = threads_count;
@@ -138,15 +131,14 @@ int main()
     
     for (i = 0; i < threads_count; ++i)
     {
-        if (pthread_create(threads+i, 0, solve, args+i))
+        if (pthread_create(threads+i, 0, Inverse, args+i))
         {
             printf("Поток не создался.\n");
             
             fclose(fin);
             fclose(fout);
             delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []inverse_matrix;
             delete []args;
             delete []threads;
             
@@ -163,8 +155,7 @@ int main()
             fclose(fin);
             fclose(fout);
             delete []matrix;
-            delete []vector;
-            delete []result;
+            delete []inverse_matrix;
             delete []args;
             delete []threads;
             
@@ -181,8 +172,7 @@ int main()
         fclose(fin);
         fclose(fout);
         delete []matrix;
-        delete []vector;
-        delete []result;
+        delete []inverse_matrix;
         delete []args;
         delete []threads;
         
@@ -193,29 +183,38 @@ int main()
     
     print_matrix(matrix, n, fout);
     fprintf(fout, "\n");
-    print_vector(result, n, fout);
+    
+    print_matrix(inverse_matrix, n, fout);
     fprintf(fout, "\n");
-    fprintf(fout, "%lf %lf\n", norm(matrix, vector, result, n), error_norm(result, n));
+
+    for (i = 0; i < n; ++i)
+    {
+        for (j = 0; j < n; ++j)
+        {
+            matrix[i*n+j] = f(k, n, i, j);
+        }
+    }
+    
+    fprintf(fout, "%lf\n", norm(matrix, inverse_matrix, n));
     
     fclose(fin);
     fclose(fout);
     delete []matrix;
-    delete []vector;
-    delete []result;
+    delete []inverse_matrix;
     delete []args;
     delete []threads;
     
     return 0;
 }
 
-void solve_system(double* matrix, double* vector, double* result, int n,
+void inverse(double* matrix, double* inverse_matrix, int n,
                   int thread_num, int threads_count, int *return_flag)
 {
     int i, j, k, max_index;
     int begin_row, last_row;
-
+    int begin_col, last_col;
     double a;
-    
+
     double eps = 1e-16;
     
     for (i = 0; i < n; ++i)
@@ -224,7 +223,7 @@ void solve_system(double* matrix, double* vector, double* result, int n,
 
         if (thread_num == 0)
         {
-            a = matrix[i*n+i];
+            a = fabs(matrix[i*n+i]);
             max_index = i;
             
             for (j = i+1; j < n; ++j)
@@ -243,22 +242,27 @@ void solve_system(double* matrix, double* vector, double* result, int n,
             {
                 if (max_index != i)
                 {
-                    for (j = i; j < n; ++j)
+                    for (j = 0; j < n; ++j)
                         swap(matrix[max_index*n+j], matrix[i*n+j]);
-                    
-                    swap(vector[max_index], vector[i]);
+                        
+                    for (j = 0; j < n; ++j)
+                        swap(inverse_matrix[max_index*n+j], inverse_matrix[i*n+j]);
                 }
                 
                 a = 1.0/matrix[i*n+i];
                        
                 for (j = i; j < n; ++j)
                     matrix[i*n+j] *= a;
-               
-                vector[i] *= a;
+                    
+                for (j = 0; j < n; ++j)
+                    inverse_matrix[i*n+j] *= a;
             }
         }
         
         synchronize(threads_count);
+        
+        if (!*return_flag)
+            return;
 
         begin_row = (n - i - 1) * thread_num;
         begin_row = begin_row/threads_count + i + 1;
@@ -271,23 +275,27 @@ void solve_system(double* matrix, double* vector, double* result, int n,
          
             for (k = i; k < n; ++k)
                 matrix[j*n+k] -= matrix[i*n+k] * a;
-           
-            vector[j] -= vector[i] * a;
+                
+            for (k = 0; k < n; ++k)
+                inverse_matrix[j*n+k] -= inverse_matrix[i*n+k] * a;
         }
     }
    
     synchronize(threads_count);
+    
+    begin_col = n * thread_num / threads_count;
+    last_col = n * (thread_num + 1) / threads_count;
 
-    if (thread_num == 0)
+    for (k = begin_col; k < last_col; ++k)
     {
         for (i = n-1; i >= 0; --i)
         {
-            a = vector[i];
-           
+            a = inverse_matrix[i*n+k];
+            
             for (j = i+1; j < n; ++j)
-                a -= matrix[i*n+j] * result[j];
-           
-            result[i] = a;
+                a -= matrix[i*n+j] * inverse_matrix[j*n+k];
+            
+            inverse_matrix[i*n+k] = a;
         }
     }
 }
@@ -304,57 +312,34 @@ void print_matrix(double* matrix, int n, FILE *fout)
     }
 }
 
-void print_vector(double* result, int n, FILE *fout)
+double norm(double* matrix, double* inverse_matrix, int n)
 {
-    for (int i = 0; i < 5; ++i)
-    {
-        fprintf(fout, "%.6lf ", result[i]);
-    }
-    fprintf(fout, "\n");
-}
-
-double norm(double* matrix, double* vector, double* result, int n)
-{
-    int i, j;
-    double norm1 = 0.0, norm2 = 0.0;
-    double tmp;
-    
+    int i, j, k;
+    double a, sum = 0.0, max = 0.0;
+        
     for (i = 0; i < n; ++i)
     {
-        tmp = 0.0;
+        sum = 0.0;
         
         for (j = 0; j < n; ++j)
-            tmp += matrix[i*n+j] * result[j];
+        {
+            a = 0.0;
+            
+            for (k = 0; k < n; ++k)
+                a += matrix[i*n+k] * inverse_matrix[k*n+j];
+            
+            if (i == j)
+                a -= 1.0;
+            
+            sum += fabs(a);
+        }
         
-        tmp -= vector[i];
-        
-        norm1 += tmp*tmp;
+        if (sum > max)
+            max = sum;
     }
     
-    norm2 = 0.0;
-    
-    for (i = 0; i < n; ++i)
-        norm2 += vector[i]*vector[i];
-    
-    return sqrt(norm1)/sqrt(norm2);
+    return max;
 }
-
-double error_norm(double *result, int n)
-{
-    double error = 0;
-    int i;
-    
-    for (i = 0; i < n; ++i)
-    {
-        if (i % 2 == 0)
-            error += (result[i]-1)*(result[i]-1);
-        else
-            error += result[i]*result[i];
-    }
-    
-    return sqrt(error);
-}
-
 
 void synchronize(int threads_count)
 {
@@ -365,19 +350,26 @@ void synchronize(int threads_count)
     static int threads_out = 0;
     
     pthread_mutex_lock(&mutex);
+    //заблокировали mutex для работы с threads_in и threads_out до сигнала
+    //дальше идет только один процесс, остальные если есть ждут
     
     threads_in++;
     if (threads_in >= threads_count)
     {
+        //текущий поток пришел последним
         threads_out = 0;
         pthread_cond_broadcast(&condvar_in);
+        //подали остальным сигнал на разблокировку
     }
     else
     {
         while (threads_in < threads_count)
             pthread_cond_wait(&condvar_in, &mutex);
+            //разблокировали mutex (следующий может выполнять)
+            //и ждем сигнала разблокировки
     }
-    
+    //то же самое для подсчета количества вышедших из фукнции
+    //(так как возможно использование в цикле)
     threads_out++;
     if (threads_out >= threads_count)
     {
@@ -387,8 +379,9 @@ void synchronize(int threads_count)
     else
     {
         while (threads_out < threads_count)
-            pthread_cond_wait(&condvar_out,&mutex);
+            pthread_cond_wait(&condvar_out, &mutex);
     }
     
     pthread_mutex_unlock(&mutex);
+    //все одновременно выходят
 }
